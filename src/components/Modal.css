@@ -1,0 +1,125 @@
+
+/* Estilos generales para el modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Fondo oscuro y semitransparente */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Asegura que esté sobre otros elementos */
+  }
+  
+  .modal-content {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    animation: slideDown 0.3s ease; /* Animación de aparición */
+  }
+  
+  @keyframes slideDown {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  /* Estilos específicos para los elementos del modal */
+  .login-box label {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+  }
+  
+  .login-box input {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0 16px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .login-button {
+    background-color: #87CEEB; /* Color de fondo del botón */
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .login-button:hover {
+    background-color: #5aa5cc; /* Cambio de color al hacer hover */
+  }
+  
+  .back-button {
+    background-color: #aaa; /* Botón "Volver" en un color más tenue */
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .back-button:hover {
+    background-color: #888;
+  }
+  
+  /* Estilo para el enlace de registro */
+  .register-text {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .register-text .register-link {
+    color: #87CEEB;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  .register-link:hover {
+    text-decoration: underline;
+  }
+  
+  /* Ajustes responsivos */
+  @media (max-width: 480px) {
+    .modal-content {
+      padding: 15px;
+    }
+  
+    .login-box input {
+      font-size: 0.9rem;
+    }
+  
+    .login-button, .back-button {
+      font-size: 0.9rem;
+      padding: 8px;
+    }
+  
+    .register-text {
+      font-size: 0.8rem;
+    }
+  }
+  

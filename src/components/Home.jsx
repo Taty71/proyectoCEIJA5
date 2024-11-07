@@ -1,20 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
+//import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import LoginButton from './LoginButton';
-import '../components/EstilosC.css';
+import '../EstilosC.css';
 
 const Home = () => {
+    //const navigate = useNavigate();
+    const [showModal, setShowModal] = useState(false);
+
+    const handleLoginRedirect = () => {
+        setShowModal(true); 
+       
+    };
+    const handleCloseModal = () => {
+        setShowModal(false); // Cierra el modal
+    };
     return (
         <div className="home">
-            <Navbar />
-            <LoginButton />
+            <div className="barNav">
+                <button onClick={handleLoginRedirect} className="login-button">Iniciar Sesión</button>
+                <Navbar />
+            </div>
+            {showModal && <LoginButton onClose={handleCloseModal} />} {/* Modal se muestra solo cuando showModal es true */}
+
             <div className="school-info">
-                <img src="src\assets\f3.jpg" alt="Imagen de la escuela" className="school-image" />
+              <div className='school-image'></div>
+                
                 <div class="text-overlay">
                     <h1>C.E.I.J.A 5</h1>
-                    <p>Educando para la libertad</p>
+                    <p className='textE'>Educando para la libertad</p>
                     <p>San Martín 772 - La Calera</p>
                 </div>
+            </div>
+            <div className='logo'>
+            <img src="public\LogoCE.png" alt="Logo Proyecto" className="logo" />
             </div>
         </div>
     );

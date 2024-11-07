@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../components/EstilosC.css';
+import '../EstilosC.css';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);

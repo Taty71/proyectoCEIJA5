@@ -1,0 +1,190 @@
+/* Estilo general de la página */
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  background-color: #f5f5f5;
+  background-attachment: fixed;
+}
+
+/* Estilo para el contenedor de la barra de navegación y el botón de inicio de sesión */
+.barNav {
+  display: flex;
+  justify-content: flex-end; /* Alinea los elementos a la derecha */
+  align-items: center;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 10px;
+}
+/* Menú Hamburguesa */
+.navbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  padding-left: 20px;
+}
+
+.hamburger {
+  font-size: 30px; /* Tamaño más pequeño para un estilo más delicado */
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #87CEEB; /* Color dorado */
+  text-shadow: 1px 1px 3px #d35400; /* Sombra amarilla */
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  background-color: #4a4a4a;
+  padding: 15px; /* Menor padding para que sea más compacto */
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px #d35400; /* Sombra amarilla */
+  z-index: 10;
+  width: 180px; /* Más estrecho */
+}
+
+.menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu ul li a {
+  text-decoration: none;
+  color: #87CEEB; /* Color dorado */
+  font-weight: bold;
+  font-size: 16px; /* Tamaño más pequeño para delicadeza */
+  text-align: center;
+}
+
+.menu button {
+  background: none;
+  border: none;
+  color: #87CEEB;
+  font-size: 18px; /* Tamaño más pequeño para el botón de cierre */
+  align-self: flex-end;
+  cursor: pointer;
+}
+
+/* Botón de inicio de sesión */
+.barNav>.login-button {
+  width: 10%; /* Ancho más pequeño */
+  background-color: #4a4a4a;
+  color: #87CEEB;
+  border: none;
+  padding: 8px; /* Tamaño más pequeño */
+  border-radius: 8px;
+  font-size: 14px; /* Tamaño más pequeño para un look más delicado */
+  cursor: pointer;
+  text-shadow: 1px 1px 3px #d35400; /* Sombra amarilla */
+  margin-left: 20px; /* Espacio entre el botón y el menú */
+}
+/* Información de la escuela */
+.school-info {
+  margin-top: 3%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid #87CEEB;
+  padding: 10px;
+  border-radius: 10px;
+  width:85vw;
+  text-align: center;
+  min-height: 80vh; /* Ajusta la altura mínima para que la imagen se vea mejor */
+  
+}
+.school-image {
+  width: 100%;
+  height: 95vh; /* Añade una altura para el contenedor */
+  border-radius: 8px;
+  margin-bottom: 20px;
+  background-image: url('./assets/im1.jpg'); 
+  background-size: cover; 
+  background-position: center; /* Ajusta la posición de la imagen */ 
+  background-attachment: fixed; /* Hace que la imagen de fondo no se mueva */
+}
+
+.text-overlay {
+  position: absolute;
+  top: 40%;
+  left: 20%;
+  transform: translate(-50%, -50%);
+  text-align:left;
+  background-color: rgba(228, 232, 215, 0.03); /* Fondo semitransparente */
+  padding: 10px;
+}
+
+.text-overlay h1 {
+  color: #1d1d1c;
+  text-shadow: 1px 1px #d35400;
+  margin: 5px;
+  font-size: 2.5rem;
+}
+
+.text-overlay p {
+  color: #252423;
+  margin: 3px;
+}
+
+.text-overlay>.textE {
+  color: #075878;
+  text-shadow: 1px 1px #d35400;
+  font-style: italic;
+  font-size: 1.5em;
+  padding-top: 20px;
+  padding-bottom: 30px;
+}
+/* Estilos para el logo en el extremo inferior derecho */
+.logo {
+  position: absolute;
+  bottom: 5px;
+  right:10px;
+  max-width: 80px;max-height: 55px; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .menu {
+    width: 150px;
+    padding: 15px;
+  }
+
+  .menu ul li a {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu {
+    width: 120px;
+    padding: 10px;
+  }
+
+  .menu ul li a {
+    font-size: 14px;
+  }
+  .login-button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  .text-overlay h1 {
+    font-size: 2.5vw; /* Ajuste para pantalla más pequeña */
+  }
+  .text-overlay p {
+    font-size: 1em; /* Ajuste para pantalla más pequeña */
+  }
+}

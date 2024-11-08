@@ -1,58 +1,56 @@
 
 /* Estilos generales para el modal */
 .modal-overlay {
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.6); /* Fondo oscuro y semitransparente */
-    display: flex;
-    align-items: center;
-    justify-content: center;
     z-index: 1000; /* Asegura que esté sobre otros elementos */
   }
-  
+  /* Estilos para el contenido del modal */
   .modal-content {
     background-color: #f9f9f9;
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     max-width: 400px;
     width: 90%;
-    text-align: center;
+    display: flex; flex-direction: column; 
+    align-items: center;
     animation: slideDown 0.3s ease; /* Animación de aparición */
   }
-  
-  @keyframes slideDown {
-    from {
-      transform: translateY(-20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
+  /* Estilos para la caja de registro */
+  .login-box, .register-box { width: 100%; 
+    display:flex; 
+    flex-direction: column; } 
+
   
   /* Estilos específicos para los elementos del modal */
-  .login-box label {
+  .login-box> label, .register-box label{
     font-weight: bold;
     color: #333;
+    margin-top: 10px;
     margin-bottom: 5px;
-    display: block;
+    display: flex;
+    
   }
   
-  .login-box input {
+  .login-box input, .register-box input, .register-box select {
     width: 100%;
-    padding: 8px;
-    margin: 8px 0 16px 0;
+    padding: 10px;
+    margin: 10px -80px 16px 0;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 1rem;
+    box-sizing: border-box;
   }
   
-  .login-button {
+  .login-button, .register-button {
     background-color: #87CEEB; /* Color de fondo del botón */
     color: white;
     border: none;
@@ -63,13 +61,14 @@
     width: 100%;
     margin-top: 10px;
     transition: background-color 0.3s ease;
+    cursor: pointer;
   }
   
-  .login-button:hover {
+  .login-button:hover, .register-button:hover {
     background-color: #5aa5cc; /* Cambio de color al hacer hover */
   }
-  
-  .back-button {
+
+.back-button {
     background-color: #aaa; /* Botón "Volver" en un color más tenue */
     color: white;
     border: none;
@@ -80,46 +79,61 @@
     width: 100%;
     margin-top: 10px;
     transition: background-color 0.3s ease;
-  }
+}
   
-  .back-button:hover {
+.back-button:hover {
     background-color: #888;
-  }
-  
+}
   /* Estilo para el enlace de registro */
-  .register-text {
-    margin-top: 15px;
-    font-size: 0.9rem;
+.register-text {
+    margin: 25px 5px;
+    font-size: 1.5rem;
     color: #555;
-  }
+    font-style:oblique;
+}
   
-  .register-text .register-link {
-    color: #87CEEB;
+.register-link {
+    color: #244e5f;
     font-weight: bold;
+    text-shadow: 1px 1px #452929;
     text-decoration: none;
-  }
+    padding-left: 20px;
+    font-size: 1.8rem;
+    font-style: initial;
+}
   
-  .register-link:hover {
-    text-decoration: underline;
-  }
+.register-link:hover {
+  color: #60a8ce;
+  font-size: 2rem;
+}
   
+@keyframes slideDown {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+}
   /* Ajustes responsivos */
-  @media (max-width: 480px) {
-    .modal-content {
+@media (max-width: 480px) {
+   .modal-content {
       padding: 15px;
-    }
+  }
   
-    .login-box input {
+  .login-box input {
       font-size: 0.9rem;
-    }
+  }
   
-    .login-button, .back-button {
+  .login-button, .back-button {
       font-size: 0.9rem;
       padding: 8px;
-    }
-  
-    .register-text {
-      font-size: 0.8rem;
-    }
   }
+  
+  .register-text {
+      font-size: 0.8rem;
+  }
+}
   

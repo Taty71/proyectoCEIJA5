@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Modal.css';
-import '../EstilosC.css';
+
+
 
 const LoginButton = ({ onClose }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
+
+   // const [showRegister, setShowRegister] = useState(false);
 
     const handleLogin = async () => {
-        const response = await fetch('http://localhost/backend/login.php', {
+        console.log('hola')
+        const response = await fetch('http://localhost/proyectoCEIJA5api/loginC.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -23,13 +29,10 @@ const LoginButton = ({ onClose }) => {
     };
 
     return (
-   // <div className="login-page">
-         //   {showModal && (
-
-            <div className="modal-overlay" onClick={onClose}>
+             <div className="modal-overlay" onClick={onClose}>
                     <div className="modal-content"onClick={(e) => e.stopPropagation()}>
                         <div className="login-box">
-                            <label>Cuenta</label>
+                            <label>Email</label>
                             <input
                                 type="text"
                                 value={email}
@@ -44,12 +47,11 @@ const LoginButton = ({ onClose }) => {
                             <button onClick={handleLogin} className="login-button">Iniciar Sesión</button>
                             <button onClick={onClose} className="back-button">Volver</button>
                       
-                            <p className="register-text">No tenes cuenta? <a href="/register" className="register-link">Registrate</a></p>
+                            <p className="register-text"> ¿No tienes cuenta? <a href="#" onClick={() => navigate('/register')} className="register-link">Regístrate</a> </p>
                         </div>
                     </div>
                 </div>
-            );
-    
+           );
  };
     
 

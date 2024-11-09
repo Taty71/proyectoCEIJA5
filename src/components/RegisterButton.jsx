@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import './Modal.css';
-
 
 const RegisterButton = ({ onClose }) => {
     const [nombre, setNombre] = useState('');
@@ -9,22 +7,32 @@ const RegisterButton = ({ onClose }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rol, setRol] = useState('estudiante'); // Valor predeterminado
-    const navigate = useNavigate();
 
     const handleRegister = async () => {
-        const response = await fetch('http://localhost/proyectoCEIJA5api/register.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ nombre, apellido, email, password, rol }),
-        });
-        const result = await response.json();
-        if (result.status === 'success') {
-            alert("Registro exitoso"); // Muestra un mensaje de éxito
-            navigate('/login'); // Redirige a la página de login // Redirige a la página de login
-        } else {
-            alert(result.message); // Muestra el mensaje de error
+        if (!nombre || !apellido || !email || !password || !rol) {
+            alert("Por favor, completa todos los campos.");
+            return;
+        }
+
+        try {
+            const response = await fetch('http://127.0.0.1/proyectoCEIJA5api/register.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, apellido, email, password, rol }),
+            });
+            
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                alert("Registro exitoso");
+                // Aquí podrías hacer algo más después del registro exitoso
+            } else {
+                alert(result.message); // Mostrar mensaje de error
+            }
+        } catch (error) {
+            console.error("Error de red:", error);
+            alert("Error de red: No se pudo conectar con el servidor.");
         }
     };
 

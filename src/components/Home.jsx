@@ -3,17 +3,29 @@ import React, { useState } from 'react';
 import Navbar from './Navbar';
 import LoginButton from './LoginButton';
 import '../EstilosC.css';
+import RegisterButton from './RegisterButton'; // Verifica la ruta y el nombre
+
 
 const Home = () => {
     //const navigate = useNavigate();
-    const [showModal, setShowModal] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [showRegisterModal, setShowRegisterModal] = useState(false);
 
     const handleLoginRedirect = () => {
-        setShowModal(true); 
-       
+        setShowLoginModal(true);
     };
-    const handleCloseModal = () => {
-        setShowModal(false); // Cierra el modal
+    const handleCloseLoginModal = () => {
+        setShowLoginModal(false);
+    };
+    // Función para abrir el modal de Register
+    const handleRegisterRedirect = () => {
+        setShowLoginModal(false); // Cerrar el modal de login
+        setShowRegisterModal(true); // Mostrar el modal de registro
+    };
+
+    // Función para cerrar el modal de Register
+    const handleCloseRegisterModal = () => {
+        setShowRegisterModal(false);
     };
     return (
         <div className="home">
@@ -21,12 +33,17 @@ const Home = () => {
                 <button onClick={handleLoginRedirect} className="login-button">Iniciar Sesión</button>
                 <Navbar />
             </div>
-            {showModal && <LoginButton onClose={handleCloseModal} />} {/* Modal se muestra solo cuando showModal es true */}
+             {/* Modal de Login */}
+             {showLoginModal && (
+                <LoginButton onClose={handleCloseLoginModal} onRegisterClick={handleRegisterRedirect} />
+            )}
+             {/* Modal de Registro */}
+             {showRegisterModal && <RegisterButton onClose={handleCloseRegisterModal} />}
 
             <div className="school-info">
               <div className='school-image'></div>
                 
-                <div class="text-overlay">
+                <div className="text-overlay">
                     <h1>C.E.I.J.A 5</h1>
                     <p className='textE'>Educando para la libertad</p>
                     <p>San Martín 772 - La Calera</p>

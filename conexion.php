@@ -7,16 +7,20 @@ header('Access-Control-Allow-Headers: Content-Type');
 header("Access-Control-Allow-Credentials: true");
 
 // Configuración de conexión a la base de datos
-$servername = "localhost";
-$username = "root";
-$password = "Taty53";
-$dbname = "ceija5";
+function getDbConnection() {
+    $servername = "localhost";
+    $username = "root";
+    $password = "Taty53";
+    $dbname = "ceija5";
 
-// Crear la conexión
-$conn = new mysqli($servername, $username, $password, $dbname);
+    // Crear la conexión
+    $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Verificar la conexión
-if ($conn->connect_error) {
-    die(json_encode(["status" => "error", "message" => "Error de conexión a la base de datos"]));
+    // Verificar la conexión
+    if ($conn->connect_error) {
+        die(json_encode(["status" => "error", "message" => "Error de conexión a la base de datos: " . $conn->connect_error]));
+    }
+
+    return $conn;  // Retornar la conexión para usarla en otras partes del código
 }
 ?>

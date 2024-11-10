@@ -4,21 +4,23 @@ include_once 'conexion.php';
 // Incluir el archivo con las funciones
 include_once 'actualizarPassw.php'; 
 
+header('Content-Type: application/json');
+
 
 // Obtener los datos de la solicitud
-//$input = json_decode(file_get_contents("php://input"), true);
+$input = json_decode(file_get_contents("php://input"), true);
 
 // Obtener los datos de la solicitud POST
-$nombre = $_POST['nombre'] ?? '';
-$apellido = $_POST['apellido'] ?? '';
-$email = $_POST['email'] ?? '';
-$password = $_POST['password'] ?? '';
-$rol = $_POST['rol'] ?? '';
+$nombre = $input['nombre'] ?? '';
+$apellido = $input['apellido'] ?? '';
+$email = $input['email'] ?? '';
+$password = $input['password'] ?? '';
+$rol = $input['rol'] ?? '';
 
 // Verificar que todos los campos necesarios estén presentes
 if (empty($email) || empty($password) || empty($nombre) || empty($apellido) || empty($rol)) {
     echo json_encode(["status" => "error", "message" => "Todos los campos son obligatorios"]);
-    exit;
+    exit; // Sale del script si algún campo está vacío
 }
 
 // Conexión a la base de datos

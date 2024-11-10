@@ -4,6 +4,9 @@ include_once 'conexion.php';
 // Incluir el archivo con las funciones
 include_once 'actualizarPassw.php'; 
 
+// Configuración de conexión a la base de datos
+$conn = getDbConnection(); // Asegúrate de iniciar la conexión aquí
+
 // Obtener los datos de la solicitud
 $input = json_decode(file_get_contents("php://input"), true);
 $action = $input['action'] ?? '';

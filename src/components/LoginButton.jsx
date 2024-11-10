@@ -11,8 +11,7 @@ const LoginButton = ({ onClose,onRegisterClick }) => {
         if (!email || !password) {
             alert("Por favor, ingresa tanto el email como la contraseña.");
             return; // No continuar si los campos están vacíos
-        }
-    
+        } 
         try {
             const response = await fetch('http://localhost/proyectoCEIJA5api/api.php', {
                 method: 'POST',
@@ -43,7 +42,7 @@ const LoginButton = ({ onClose,onRegisterClick }) => {
                     <input
                         type="text"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => setEmail(e.target.value)}gi
                     />
                     <label>Contraseña</label>
                     <input
@@ -62,5 +61,4 @@ const LoginButton = ({ onClose,onRegisterClick }) => {
         </div>
     );
 };
-
 export default LoginButton;

@@ -5,7 +5,6 @@ header('Access-Control-Allow-Origin: *'); // Permite solicitudes desde cualquier
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header("Access-Control-Allow-Credentials: true");
-
 // Configuración de conexión a la base de datos
 function getDbConnection() {
     $servername = "localhost";

@@ -46,7 +46,7 @@ const Home = () => {
                 <div className="text-overlay">
                     <h1>C.E.I.J.A 5</h1>
                     <p className='textE'>Educando para la libertad</p>
-                    <p>San Martín 772 - La Calera</p>
+                    <p>San Martín 772 - La Calera - Córdoba</p>
                 </div>
             </div>
             <div className='logo'>

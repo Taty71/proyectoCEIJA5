@@ -14,7 +14,7 @@ const LoginButton = ({ onClose,onRegisterClick }) => {
         }
     
         try {
-            const response = await fetch('http://127.0.0.1/proyectoCEIJA5api/api.php', {
+            const response = await fetch('http://localhost/proyectoCEIJA5api/api.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

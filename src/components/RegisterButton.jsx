@@ -6,33 +6,54 @@ const RegisterButton = ({ onClose }) => {
     const [apellido, setApellido] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [rol, setRol] = useState('estudiante'); // Valor predeterminado
+    const [rol, setRol] = useState(''); // Valor predeterminado
 
     const handleRegister = async () => {
-        if (!nombre || !apellido || !email || !password || !rol) {
-            alert("Por favor, completa todos los campos.");
-            return;
-        }
+      
+            console.log("Nombre:", nombre);
+            console.log("Apellido:", apellido);
+            console.log("Email:", email);
+            console.log("Password:", password);
+            console.log("Rol:", rol);
+        
+            if (!nombre.trim() || !apellido.trim() || !email.trim() || !password.trim() || !rol.trim()) {
+                alert("Por favor, completa todos los campos.");
+                return;
+            }
 
+            // Validación del formato del email
+           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+           if (!emailRegex.test(email)) {
+                   alert("Por favor, ingresa un email válido.");
+               return;
+    }
         try {
-            const response = await fetch('http://127.0.0.1/proyectoCEIJA5api/register.php', {
+            const response = await fetch('http://localhost/proyectoCEIJA5api/register.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nombre, apellido, email, password, rol }),
+                body: JSON.stringify({ 
+                    nombre, 
+                    apellido, 
+                    email, 
+                    password, 
+                    rol,
+                }),
             });
-            
+         
             if (!response.ok) throw new Error('Error en la respuesta del servidor');
 
-            const result = await response.json();
-            if (result.status === 'success') {
-                alert("Registro exitoso");
+            const data = await response.json();
+            console.log("Api response:", data); // Verifica la respuesta
+            if (data.status === 'success') {
+                alert(data.message);
                 // Aquí podrías hacer algo más después del registro exitoso
+                navigate('/login');
             } else {
-                alert(result.message); // Mostrar mensaje de error
+                alert(data.message); // Mostrar mensaje de error
             }
         } catch (error) {
             console.error("Error de red:", error);
-            alert("Error de red: No se pudo conectar con el servidor.");
+            alert('Hubo un error al registrar el usuario');
         }
     };
 
@@ -66,12 +87,13 @@ const RegisterButton = ({ onClose }) => {
                     />
                     <label>Rol</label>
                     <select value={rol} onChange={(e) => setRol(e.target.value)}>
-                        <option value="administrador">Administrador</option>
-                        <option value="profesor">Profesor</option>
-                        <option value="estudiante">Estudiante</option>
-                        <option value="secretario">Secretario</option>
-                        <option value="coordinador">Coordinador</option>
-                    </select>
+                    <option value="">Seleccione un rol</option> {/* Opción para forzar la selección */}
+                    <option value="administrador">Administrador</option>
+                    <option value="profesor">Profesor</option>
+                    <option value="estudiante">Estudiante</option>
+                    <option value="secretario">Secretario</option>
+                    <option value="coordinador">Coordinador</option>
+                </select>
                     <button onClick={handleRegister} className="register-button">Registrarse</button>
                     <button onClick={onClose} className="back-button">Cerrar</button>
                 </div>

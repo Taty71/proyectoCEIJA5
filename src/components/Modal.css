@@ -92,12 +92,12 @@
 .register-text {
     margin: 25px 5px;
     font-size: 1rem;
-    color: #555;
+    color: #ccc2c2;
     font-style:oblique;
 }
   
 .register-link {
-    color: #244e5f;
+    color: #7db6cc;
     font-weight: bold;
     text-shadow: 1px 1px #452929;
     text-decoration: none;
@@ -107,8 +107,9 @@
 }
   
 .register-link:hover {
-  color: #60a8ce;
+  color: #2c66ef;
   font-size: 1.8rem;
+  text-shadow: 1px 1px 10px #ae6969;
 }
   
 @keyframes slideDown {

@@ -112,27 +112,79 @@
   background-size: cover;;
   
 }
-.school-image {
+/*.school-image {
   width: 75%;
   height: 70vh; /* Añade una altura para el contenedor */
-  border-radius: 8px;
+  /*border-radius: 8px;
   margin-bottom: 20px;
   background-image: url('./assets/im1.jpg'); 
   background-size: cover; 
   background-position: center; /* Ajusta la posición de la imagen */ 
-  background-attachment: fixed; /* Hace que la imagen de fondo no se mueva */
+  /*background-attachment: fixed; /* Hace que la imagen de fondo no se mueva */
+*/
+/* Estilo para el contenedor del carrusel */
+.school-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  max-width: 50%;
+  height: 35vh;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  position: relative;
 }
 
-.text-overlay {
-  position: absolute;
-  top: 40%;
-  left: 20%;
-  transform: translate(-50%, -50%);
-  text-align:left;
-  background-color: rgba(228, 232, 215, 0.03); /* Fondo semitransparente */
-  padding: 10px;
+/* Contenedor general del carrusel */
+.carousel-container {
+  max-width: 800px; /* Ajusta el ancho máximo según prefieras */
+  margin: 20px auto;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Imágenes del carrusel */
+.carousel-image {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* Personalizar flechas de navegación */
+.carousel .control-arrow {
+  background: none;
+  color: #87CEEB;
+  font-size: 30px;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.carousel .control-arrow:hover {
+  opacity: 1;
+  color: #d35400;
+}
+
+/* Ocultar los indicadores en la parte inferior */
+.carousel .carousel-status,
+.carousel .thumbs-wrapper,
+.carousel .thumbs {
+  display: none;
+}
+
+/* Indicadores personalizados */
+.carousel .control-dots .dot {
+  background-color: #87CEEB;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.carousel .control-dots .dot.selected {
+  background-color: #d35400;
+}
 .text-overlay h1 {
   color: #1d1d1c;
   text-shadow: 1px 1px #d35400;

@@ -4,6 +4,8 @@ import Navbar from './Navbar';
 import LoginButton from './LoginButton';
 import '../EstilosC.css';
 import RegisterButton from './RegisterButton'; // Verifica la ruta y el nombre
+import SlideImg from './SlideImg';
+
 
 
 const Home = () => {
@@ -41,7 +43,9 @@ const Home = () => {
              {showRegisterModal && <RegisterButton onClose={handleCloseRegisterModal} />}
 
             <div className="school-info">
-              <div className='school-image'></div>
+              <div className='school-image'>
+                <SlideImg />
+              </div>
                 
                 <div className="text-overlay">
                     <h1>C.E.I.J.A 5</h1>

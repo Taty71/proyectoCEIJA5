@@ -1,101 +1,64 @@
 import React, { useState } from 'react';
 import './Modal.css';
-
+import {useForm} from "react-hook-form";
+import Input from './Input';
+import CloseButton from './CloseButton';
+import service from '../services/service';
+import { useNavigate } from 'react-router-dom';
+import { yupResolver } from '@hookform/resolvers/yup'; 
+import { userValidationSchema } from './ValidacionSchemaYup';
 const RegisterButton = ({ onClose }) => {
-    const [nombre, setNombre] = useState('');
-    const [apellido, setApellido] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [rol, setRol] = useState(''); // Valor predeterminado
-
-    const handleRegister = async () => {
-      
-            console.log("Nombre:", nombre);
-            console.log("Apellido:", apellido);
-            console.log("Email:", email);
-            console.log("Password:", password);
-            console.log("Rol:", rol);
-        
-            if (!nombre.trim() || !apellido.trim() || !email.trim() || !password.trim() || !rol.trim()) {
-                alert("Por favor, completa todos los campos.");
-                return;
-            }
-
-            // Validación del formato del email
-           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-           if (!emailRegex.test(email)) {
-                   alert("Por favor, ingresa un email válido.");
-               return;
-    }
+    const { register, handleSubmit, formState: { errors } } = useForm({ resolver: yupResolver(userValidationSchema) });
+    const navigate = useNavigate(); // Para redirigir
+    const onSubmit = async (data) => {
+        console.log("Datos enviados:", data);
         try {
-            const response = await fetch('http://localhost/proyectoCEIJA5api/register.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    nombre, 
-                    apellido, 
-                    email, 
-                    password, 
-                    rol,
-                }),
-            });
-         
-            if (!response.ok) throw new Error('Error en la respuesta del servidor');
-
-            const data = await response.json();
-            console.log("Api response:", data); // Verifica la respuesta
-            if (data.status === 'success') {
-                alert(data.message);
-                // Aquí podrías hacer algo más después del registro exitoso
-                navigate('/login');
+            const response = await service.createU(data); // Llamada al servicio
+            console.log("Respuesta completa del servidor:", response);
+            if (response && response.status === 'success') {
+                alert(response.message);
+                navigate('/'); // Redirige al home
             } else {
-                alert(data.message); // Mostrar mensaje de error
+                alert("Error en la respuesta: " + JSON.stringify(response));
             }
         } catch (error) {
-            console.error("Error de red:", error);
+            console.error('Error al registrar el usuario:', error);
             alert('Hubo un error al registrar el usuario');
         }
     };
-
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay">
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="register-box">
-                    <label>Nombre</label>
-                    <input
-                        type="text"
-                        value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
-                    />
-                    <label>Apellido</label>
-                    <input
-                        type="text"
-                        value={apellido}
-                        onChange={(e) => setApellido(e.target.value)}
-                    />
-                    <label>Email</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <label>Contraseña</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <label>Rol</label>
-                    <select value={rol} onChange={(e) => setRol(e.target.value)}>
-                    <option value="">Seleccione un rol</option> {/* Opción para forzar la selección */}
-                    <option value="administrador">Administrador</option>
-                    <option value="profesor">Profesor</option>
-                    <option value="estudiante">Estudiante</option>
-                    <option value="secretario">Secretario</option>
-                    <option value="coordinador">Coordinador</option>
-                </select>
-                    <button onClick={handleRegister} className="register-button">Registrarse</button>
-                    <button onClick={onClose} className="back-button">Cerrar</button>
+                
+                <form onSubmit={handleSubmit(onSubmit)}>
+            
+                     <Input label="Nombre" placeholder="Nombre" registro={{...register("nombre")}} error={errors.nombre?.message}/>
+                   
+                     <Input label="Apellido" placeholder="Apellido" registro={{...register("apellido")}} error={errors.apellido?.message}/>
+                     
+                     <Input label="Email" placeholder="Email" registro={{...register("email")}} error={errors.email?.message}/>
+                    
+                     <Input label="Contraseña" type="password" registro={{...register("password" )}} error={errors.password?.message}/>
+                     
+                     <Input
+                            label="Rol"
+                            type="select"
+                            registro={{ ...register("rol" ) }}
+                            options={[
+                                { value: 'administrador', label: 'Administrador' },
+                                { value: 'profesor', label: 'Profesor' },
+                                { value: 'estudiante', label: 'Estudiante' },
+                                { value: 'secretario', label: 'Secretario' },
+                                { value: 'coordinador', label: 'Coordinador' },
+                            ]}
+                            error={errors.rol?.message}
+                        />
+                       
+                     <button type="submit" className="register-button">Registrarse</button>
+                     <button onClick={onClose} className="back-button">Volver</button>
+                    
+                </form>
                 </div>
             </div>
         </div>

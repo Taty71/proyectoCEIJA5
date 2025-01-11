@@ -1,13 +1,30 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import '../EstilosC.css';
+// src/components/Modalidad.jsx
+import React, { useState } from 'react';
+import ModalidadModal from './modalidadModal';
+import './Modal.css';
 
-const Modalidad = () => {
+const Modalidad = ({ onClose }) => {
+    const [showModal, setShowModal] = useState(false);
+    const [modalidad, setModalidad] = useState('');
+
+    const handleModalOpen = (modalidadSeleccionada) => {
+        setModalidad(modalidadSeleccionada);
+        setShowModal(true);
+    };
+
+    const handleModalClose = () => {
+        setShowModal(false);
+    };
+
     return (
-        <div>
-            <h2>Elija una Modalidad</h2>
-                <Link to="/preinscripcion?modalidad=presencial">Presencial</Link>
-                <Link to="/preinscripcion?modalidad=semipresencial">Semipresencial</Link>
+        <div className="modal-overlay">
+            <div className="modal-container">
+                <button className="modal-close" onClick={onClose}>✖</button>
+                <h2>Elija una Modalidad</h2>
+                <button onClick={() => handleModalOpen('Presencial')} className="modalidad-button">Presencial</button> 
+                <button onClick={() => handleModalOpen('Semipresencial')} className="modalidad-button">Semipresencial</button> 
+                {showModal && <ModalidadModal modalidad={modalidad} onClose={handleModalClose} />}
+            </div>
         </div>
     );
 };

@@ -2,7 +2,8 @@
 include_once 'conexion.php'; 
 
 // Incluir el archivo con las funciones
-include_once 'actualizarPassw.php'; 
+include_once 'actualizarPassw.php'; //no estoy usuando la funcion aun para actualizar la contraseña
+
 
 <<<<<<< HEAD
 
@@ -21,6 +22,11 @@ header('Content-Type: application/json');
 
 // Obtener los datos de la solicitud
 $input = json_decode(file_get_contents("php://input"), true);
+
+// Verificar que $input no esté vacío y sea un array 
+if (empty($input) || !is_array($input)) 
+    { echo json_encode(["status" => "error", "message" => "Datos de entrada no válidos"]);
+     exit;}
 
 // Obtener los datos de la solicitud POST
 $nombre = $input['nombre'] ?? '';

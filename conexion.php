@@ -5,11 +5,12 @@ header('Access-Control-Allow-Origin: *'); // Permite solicitudes desde cualquier
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header("Access-Control-Allow-Credentials: true");
+header('Access-Control-Allow-Headers: Content-Type, Authorization'); // Encabezados permitidos
 // Configuración de conexión a la base de datos
 function getDbConnection() {
     $servername = "localhost";
     $username = "root";
-    $password = "Taty53";
+    $password = "";
     $dbname = "ceija5";
 
     // Crear la conexión

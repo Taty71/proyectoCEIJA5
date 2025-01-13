@@ -1,0 +1,24 @@
+/* filepath: /D:/PROYECTOS REACT/PROYECTO CEIJA5_2025/proyectoCEIJA5/src/components/Input.css */
+.input-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.input-container label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.input-container input,
+.input-container select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}

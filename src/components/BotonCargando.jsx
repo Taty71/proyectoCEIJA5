@@ -1,17 +1,19 @@
 import React from 'react';
-import { ClipLoader } from 'react-spinners'; // Importa el spinner que prefieras
-
+import { ClimbingBoxLoader } from 'react-spinners'; // Importa el spinner que prefieras
+import './modal.css';
 
 
 const BotonCargando = ({ loading, children }) => {
     return (
+        <>
         <button
             type="submit"
             className="login-button"
             disabled={loading} // Desactiva el botón mientras está cargando
         >
-            {loading ? <ClipLoader color="#fff" size={20} /> : children}
+            {loading ? <ClimbingBoxLoader color="#fff" size={20} /> : children}
         </button>
+        </>
     );
 };
 

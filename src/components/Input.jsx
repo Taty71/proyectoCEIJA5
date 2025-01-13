@@ -1,8 +1,9 @@
-import './Modal.css';
+import './input.css';
+
 function Input(props){
     const {label, type, name, placeholder,options= [] , registro, error}=props
     return( 
-        <>
+        <div className="input-container">
         
                 <label>{label}</label>
                 {options.length > 0 ? (
@@ -26,7 +27,7 @@ function Input(props){
                 )} 
                  {/* Muestra el error de forma genérica */}
                  {error && <span className="error-message">{error}</span>}  
-        </> 
+        </div> 
         
     )
 }

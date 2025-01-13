@@ -1,7 +1,7 @@
 // src/components/ModalidadModal.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Modal.css';
+import './modalM.css';
 import Preinscripcion from '../pages/Preinscripcion';
 
 const ModalidadModal = ({ modalidad, onClose }) => {

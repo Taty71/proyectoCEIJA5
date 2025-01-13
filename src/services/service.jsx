@@ -1,21 +1,8 @@
 import axios from '../config/axios';
 import mensajeError from '../utils/MensajeError';
 // Base URL preconfigurada desde axios
-const baseURL = 'inscripcionRegistroB.php'; // Asegúrate de que tu backend maneje este endpoint
-const baseURLusur = '/register.php';
+//const baseURL = 'inscripcionRegistroB.php'; // Asegúrate de que tu backend maneje este endpoint
 
-// Registrar nueva inscripción//
-const create = async (formData) => { 
-    try { 
-        const response = await axios.post('inscripcionRegistroB.php', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }, 
-        }); 
-            return response.data; 
-    } catch (error) { 
-        console.error('Error al enviar inscripción:', error); 
-        throw error; 
-    } 
-};
 //Registrar usuario
 const createU = async (data) => { 
     try { 
@@ -30,18 +17,34 @@ const createU = async (data) => {
     } 
 };
 // logueo
-const getUser = async (data) => {  // Asegúrate de que se pase 'data' como argumento
+const getUser = async (data) => { 
     try {
-        const response = await axios.post('api.php', data, {  // Aquí pasas 'data' directamente
+        const response = await axios.post('api.php', {
+            action: 'login',
+            ...data
+        }, { 
             headers: {'Content-Type': 'application/json'},
         });
         console.log('Respuesta del servidor:', response.data); // Para depuración
         return response.data;
     } catch (error) {
         console.error('Error obteniendo los datos del usuario:', error);
-        throw error;
+        return Error(error); // Manejo uniforme de errores
     }
 };
+// Registrar nueva inscripción//
+const create = async (formData) => { 
+    try { 
+        const response = await axios.post('inscripcionRegistroB.php', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }, 
+        }); 
+            return response.data; 
+    } catch (error) { 
+        console.error('Error al enviar inscripción:', error); 
+        throw error; 
+    } 
+};
+
 // Obtener todas las inscripciones
 const getAll = async () => {
     try {
@@ -53,8 +56,8 @@ const getAll = async () => {
         throw error;
     }
 };
-
-// Consultar inscripciones por documento
+{
+/*Consultar inscripciones por documento
 const getByDocumento = async (dni) => {
     try {
         const response = await axios.get(`editarRegistro.php?/${dni}`);
@@ -64,7 +67,7 @@ const getByDocumento = async (dni) => {
         console.error('Error consultando inscripción por documento:', error);
         throw error;
     }
-};
+};}
 
 // Modificar una inscripción existente
 const update = async (id, updatedData) => {
@@ -104,17 +107,17 @@ const uploadFile = async (idInscripcion, fileData) => {
         console.error('Error subiendo archivo:', error);
         throw error;
     }
-};
+};*/}
 
 // Exportar todas las funciones
 export default {
     getAll,
-    getByDocumento,
+    //getByDocumento,
     create,
     createU,
     getUser,
-    update,
-    remove,
-    uploadFile,
+    //update,
+    //remove,
+   // uploadFile,
     //buscarDni
 };

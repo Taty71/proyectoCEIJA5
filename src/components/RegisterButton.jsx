@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Modal.css';
+import './modal.css';
 import {useForm} from "react-hook-form";
 import Input from './Input';
 import CloseButton from './CloseButton';

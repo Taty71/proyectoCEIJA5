@@ -2,35 +2,53 @@ import React, { useState } from 'react';
 import './modal.css';
 import {useForm} from "react-hook-form";
 import Input from './Input';
-import CloseButton from './CloseButton';
+import BotonCargando from './BotonCargando';
 import service from '../services/service';
 import { useNavigate } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup'; 
 import { userValidationSchema } from './ValidacionSchemaYup';
+import AlertaMens from './AlertaMens';
 const RegisterButton = ({ onClose }) => {
     const { register, handleSubmit, formState: { errors } } = useForm({ resolver: yupResolver(userValidationSchema) });
+    const [alerta, setAlerta] = useState({text:"", variant:""})
+    const [loading,setLoading] = useState(false)
     const navigate = useNavigate(); // Para redirigir
+
+    const mostrarAlerta = (text, variant) => {
+        console.log(`Alerta: ${text}, Variant: ${variant}`); // Verifica los valores
+        setAlerta({ text, variant });
+        setTimeout(() => {
+            console.log('Ocultando alerta'); // Debug log
+            setAlerta({ text: '', variant: '' });
+        }, 10000); // Oculta la alerta después de 5s
+    }
     const onSubmit = async (data) => {
         console.log("Datos enviados:", data);
+        setLoading(true);
         try {
             const response = await service.createU(data); // Llamada al servicio
             console.log("Respuesta completa del servidor:", response);
-            if (response && response.status === 'success') {
-                alert(response.message);
-                navigate('/'); // Redirige al home
-            } else {
-                alert("Error en la respuesta: " + JSON.stringify(response));
-            }
+            setTimeout(() => {
+                setLoading(false);
+                if (response && response.status === 'success') {
+                    mostrarAlerta(response.message, 'success');
+                    navigate('/'); // Redirige al home
+                } else {
+                    mostrarAlerta("Error en la respuesta: " + JSON.stringify(response), 'error');
+                }
+            }, 5000); // Mantiene el spinner durante 5 segundos
         } catch (error) {
             console.error('Error al registrar el usuario:', error);
-            alert('Hubo un error al registrar el usuario');
+            mostrarAlerta('Hubo un error al registrar el usuario', 'error');
+            setLoading(false);
         }
     };
     return (
         <div className="modal-overlay">
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="register-box">
-                
+                  {/* Mostrar la alerta si hay un mensaje */}
+                  {alerta.text && <AlertaMens text={alerta.text} variant={alerta.variant} />}
                 <form onSubmit={handleSubmit(onSubmit)}>
             
                      <Input label="Nombre" placeholder="Nombre" registro={{...register("nombre")}} error={errors.nombre?.message}/>
@@ -54,9 +72,11 @@ const RegisterButton = ({ onClose }) => {
                             ]}
                             error={errors.rol?.message}
                         />
-                       
-                     <button type="submit" className="register-button">Registrarse</button>
-                     <button onClick={onClose} className="back-button">Volver</button>
+                        <BotonCargando loading={loading}>
+                          Registrarse
+                        </BotonCargando> 
+                   
+                     <button onClick={(e) => { e.preventDefault(); onClose(); }} className="button back-button">Volver</button>
                     
                 </form>
                 </div>

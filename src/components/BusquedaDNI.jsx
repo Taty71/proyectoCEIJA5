@@ -43,7 +43,7 @@ const BusquedaDNI = () => {
                     onChange={handleChange}
                     placeholder="Ingresa el DNI"
                 />
-                <button type="submit">Consultar</button>
+                <button type="submit" className='buttonF'>Consultar</button>
             </form>
             {error && <p style={{ color: 'red' }}>{error}</p>}  {/* Mostrar mensaje de error */}
             {estudiante && (

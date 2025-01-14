@@ -18,7 +18,13 @@
 }
 
 .error-message {
-    color: red;
-    font-size: 0.875rem;
+    color: rgb(237, 231, 231);
+    font-style: italic;
+    font-size: 0.98rem;
     margin-top: 0.5rem;
+    text-shadow: 
+    -1px -1px 0 #700a0a,  
+     1px -1px 0 #700a0a,
+    -1px  1px 0 #700a0a,
+     1px  1px 0 #700a0a;
 }

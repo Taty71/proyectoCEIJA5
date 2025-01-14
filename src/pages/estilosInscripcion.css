@@ -120,7 +120,7 @@
 font-style:oblique }
 
 /* Estilos para centrar el botón */
-button[type="submit"] {
+.buttonF {
   background-color: #2d4177; /* Azul vibrante del SVG */
   width: 60%;
   color: #ffffff; /* Blanco */
@@ -135,7 +135,7 @@ button[type="submit"] {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
 }
 
-button[type="submit"]:hover {
+.buttonF:hover {
   background-color: #143bba; /* Azul más oscuro al pasar el mouse */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Sombra más intensa */
 }

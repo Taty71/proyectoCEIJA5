@@ -1,5 +1,5 @@
 import axios from '../config/axios';
-import mensajeError from '../utils/MensajeError';
+import Error from '../utils/MensajeError';
 // Base URL preconfigurada desde axios
 //const baseURL = 'inscripcionRegistroB.php'; // Asegúrate de que tu backend maneje este endpoint
 
@@ -12,8 +12,9 @@ const createU = async (data) => {
         console.log('Respuesta completa del servidor:', response); // Para depuración
             return response.data; 
     } catch (error) { 
+        const errorInfo = Error(error);
         console.error('Error al enviar registro usuario:', error); 
-        throw error; 
+        return errorInfo; 
     } 
 };
 // logueo
@@ -28,8 +29,9 @@ const getUser = async (data) => {
         console.log('Respuesta del servidor:', response.data); // Para depuración
         return response.data;
     } catch (error) {
+        const errorInfo = Error(error);
         console.error('Error obteniendo los datos del usuario:', error);
-        return Error(error); // Manejo uniforme de errores
+        return errorInfo; // Manejo uniforme de errores
     }
 };
 // Registrar nueva inscripción//
@@ -40,8 +42,9 @@ const create = async (formData) => {
         }); 
             return response.data; 
     } catch (error) { 
+        const errorInfo = Error(error);
         console.error('Error al enviar inscripción:', error); 
-        throw error; 
+        return errorInfo;
     } 
 };
 

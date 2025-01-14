@@ -10,7 +10,7 @@
     left: 0;
     width: 100vw; /* Ocupa todo el ancho de la pantalla */
     height: 100vh; /* Ocupa toda la altura de la pantalla */
-    background-color: rgba(52, 41, 41, 0.01);
+    background-color: #34292903;
     background-color: transparent; /* Fondo oscuro y semitransparente */
     z-index: 1000; /* Asegura que esté sobre otros elementos */
   }
@@ -44,27 +44,18 @@
     font-size: 1.1rem;
     
   }
-  /*sacar
-   .register-box input, .register-box select {
-    width: 100%;
-    padding: 10px;
-    margin: 10px -80px 16px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-    box-sizing: border-box;
-  }*/
+ /*
   .login-button {
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center;}
     /* Otros estilos */
-}
-.login-button .clip-loader {
+
+.button .clip-loader {
   position: absolute;
 }
-  .register-button, .back-button {
+.button {
     color: white;
     border: none;
     border-radius: 5px;
@@ -72,31 +63,27 @@
     cursor: pointer;
     width: 100%;
     margin-top: 10px;
-    transition: background-color 0.3s ease;
-  }
-  .login-button, .register-button {
-    background-color: #87CEEB; /* Color de fondo del botón */
     padding: 10px;
+    transition: background-color 0.3s ease;
+    background-color: #87CEEB;
   }
   
-  .login-button:hover, .register-button:hover {
-    background-color: #5aa5cc; /* Cambio de color al hacer hover */
+  .button:hover {
+    background-color: #2c66ef; /* Cambio de color al hacer hover */
   }
   .login-box input> span{ 
     position:'relative';
     top:'10px'; 
     left:'350px';
   }
-.back-button {
-    background-color: #aaa; /* Botón "Volver" en un color más tenue */
-    color: white;
-    border: none;
-    padding: 8px;
-}
-  
-.back-button:hover {
-    background-color: #888;
-}
+
+  .back-button {
+    background-color: #424141;
+  } 
+  .back-button:hover {
+  background-color: #2c66ef;
+  } 
+
   /* Estilo para el enlace de registro */
 .register-text {
     margin: 25px 5px;
@@ -140,12 +127,10 @@
   .login-box input {
       font-size: 0.9rem;
   }
-  
-  .login-button, .back-button {
-      font-size: 0.9rem;
-      padding: 8px;
-  }
-  
+  .login-button, .register-button, .back-button {
+    font-size: 0.9rem;
+    padding: 8px;
+}
   .register-text {
       font-size: 0.8rem;
   }

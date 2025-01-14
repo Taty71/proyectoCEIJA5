@@ -30,18 +30,20 @@ const LoginButton = ({ onClose, onRegisterClick }) => {
         try {
             const response = await service.getUser(data);  // Pasa 'data' directamente
             console.log("Respuesta completa del servidor:", response);
-            if (response?.status=== 'success') {
-                console.log(`Nombre del usuario: ${response.user.nombre}`); // Debug log
-                console.log(`Rol del usuario: ${response.user.rol}`); // Debug log
-                mostrarAlerta(`Bienvenido, ${response.user.nombre}. Rol: ${response.user.rol}`, 'success');
-                setTimeout(() => {
-                    navigate('/');
-                    setLoading(false);
-                }, 3000); // Delay of 3 seconds before navigating
-            } else {
-                mostrarAlerta(response?.message || 'Error en las credenciales', 'error');
+            setTimeout(() => {
                 setLoading(false);
-            }
+                if (response?.status=== 'success') {
+                    console.log(`Nombre del usuario: ${response.user.nombre}`); // Debug log
+                    console.log(`Rol del usuario: ${response.user.rol}`); // Debug log
+                    mostrarAlerta(`Bienvenido, ${response.user.nombre}. Rol: ${response.user.rol}`, 'success');
+                    setTimeout(() => {
+                        navigate('/');
+                        
+                    }, 3000); // Delay of 3 seconds before navigating
+                } else {
+                    mostrarAlerta(response?.message || 'Error en las credenciales', 'error');
+                }
+            }, 5000); // Mantiene el spinner durante 10 segundos
         } catch (error) {
             mostrarAlerta('Error del servidor. Intenta nuevamente.', 'error');
             console.error('Error en login:', error);
@@ -64,7 +66,7 @@ const LoginButton = ({ onClose, onRegisterClick }) => {
                         Iniciar Sesión
                     </BotonCargando>
                 
-                    <button onClick={(e) => { e.preventDefault(); onClose(); }} className="back-button">Volver</button>
+                    <button onClick={(e) => { e.preventDefault(); onClose(); }} className="button back-button">Volver</button>
                     <p className="register-text">¿No tienes cuenta? 
                         {/* Enlace para mostrar el modal de registro */}
                         <a href="#" onClick={(e) => { e.preventDefault(); onRegisterClick(); }} className="register-link">Regístrate</a>

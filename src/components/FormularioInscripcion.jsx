@@ -200,7 +200,7 @@ const FormularioInscripcion = ({ modalidad, estudianteEncontrado }) => {
 
            
           {/* Botón enviar */}
-            <button type="submit">Enviar</button>
+            <button type="submit" className="buttonF">Enviar</button>
         </form>
         
     );

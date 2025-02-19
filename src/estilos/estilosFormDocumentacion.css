@@ -1,0 +1,45 @@
+.form-documentacion {
+    width: 100%;
+    margin-top: 10px;
+    margin: 0 2% 2% 2%;
+    display: flex;
+    flex-direction:column;
+    align-items: center; /* Centra el contenedor en la página */
+    justify-content: center;
+    background-color: #939396;
+    border-radius: 10px;
+    padding: 2%;
+    box-shadow: 1px 3px #2f2f31;
+  }
+  
+.form-h3 span {
+    display: block; /* Asegura que el span ocupe una nueva línea */
+    font-size: 0.85em;
+    font-style: italic;
+    color: #555;
+    margin-top: 5px;
+  }
+.form-doc{
+    width: 95%;
+    margin-top: 5%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 50px;
+    align-items: center; /* Centra el contenedor en la página */
+  }
+.titulo{
+    display: flex; 
+    width: 100%; /* Asegura que ocupe el ancho completo */
+    flex-direction: column; /* Coloca los elementos en columna */
+  }
+.titulo  .radioOptions{
+    width: 26px;
+    color:#222222;
+  }
+  /* Estilos para los grupos de formulario */ 
+.form-group { 
+    display: flex; flex-direction: column;
+    margin-bottom: 15px;
+    
+  }

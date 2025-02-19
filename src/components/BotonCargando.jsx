@@ -1,10 +1,11 @@
-import React from 'react';
+// Importamos los módulos necesarios
 import { ClimbingBoxLoader } from 'react-spinners'; // Importa el spinner que prefieras
-import './modal.css';
-import './botonCargando.css';
+import '../estilos/modal.css';
+import '../estilos/botonCargando.css';
+import PropTypes from 'prop-types';
 
 
-const BotonCargando = ({ loading, children }) => {
+const BotonCargando = ({ loading, children= "Cargando..."}) => {
     return (
         <div className="boton-cargando-container">
             <button
@@ -22,6 +23,10 @@ const BotonCargando = ({ loading, children }) => {
             </button>
         </div>
     );
+};
+BotonCargando.propTypes = {
+    loading: PropTypes.bool.isRequired,
+    children: PropTypes.node.isRequired,
 };
 
 export default BotonCargando;

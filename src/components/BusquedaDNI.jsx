@@ -1,6 +1,9 @@
 // src/components/BusquedaDni.jsx
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import service from '../services/service';
+import Input from './Input';
+import AlertaMens from './AlertaMens';
+import '../estilos/estilosDocumentacion.css';  
 
 //Busqueda DNI
 const BusquedaDNI = () => {
@@ -36,12 +39,13 @@ const BusquedaDNI = () => {
         <div>
             <h2>Consulta de Estudiante por DNI</h2>
             <form onSubmit={handleSubmit}>
-                <input
+            <Input
+                    label="DNI"
                     type="number"
                     name="dni"
-                    value={dni}
-                    onChange={handleChange}
                     placeholder="Ingresa el DNI"
+                    registro={{ value: dni, onChange: handleChange }}
+                    error={error && <AlertaMens text={error} variant="error" />}
                 />
                 <button type="submit" className='buttonF'>Consultar</button>
             </form>

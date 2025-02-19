@@ -1,6 +1,7 @@
 // src/components/Navbar.jsx
-import React, { useState } from 'react';
-import '../App.css';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
+import '../estilos/estilosHome.css';
 
 const Navbar = ({ onModalopen }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -19,13 +20,16 @@ const Navbar = ({ onModalopen }) => {
                     <button onClick={toggleMenu}>✖</button>
                     <ul>
                         <li className="opcMenu"><a href="#nuestra-escuela">Nuestra Escuela</a></li>
-                        <li className="opcMenu"><button onClick={() => { onModalopen(); toggleMenu(); }}>Modalidad</button></li>
+                        <li className="opcMenu"><button  onClick={() => { onModalopen(); toggleMenu(); }}>Modalidad</button></li>
                         <li className="opcMenu"><a href="#contacto">Contáctanos</a></li>
                     </ul>
                 </div>
             )}
         </div>
     );
+};
+Navbar.propTypes = {
+    onModalopen: PropTypes.func.isRequired,
 };
 
 export default Navbar;

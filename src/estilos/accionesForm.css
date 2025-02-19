@@ -1,0 +1,45 @@
+.accionesContainer {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 90%;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 1px 1px 5px 1px  #313030;
+}
+
+.buttonAcciones {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 5px;
+    padding: 10px;
+    background-color: #ccc2c2; /* Vibrant blue of the SVG */
+    width: 150px;
+    color: #000; 
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+   
+}
+.buttonAcciones:hover, .selectedButton {
+    background-color: #87CEEB;  
+}
+.img {
+    width: 30px;
+    height: 30px;
+    margin-bottom: 5px;
+}
+
+/* Estilos para que los botones se ubiquen debajo del formulario */
+@media (max-width: 768px) {
+    .accionesContainer {
+        flex-direction: column;
+    }
+    .buttonAcciones {
+        width: 75%;
+        margin: 10px 0;
+    }
+}

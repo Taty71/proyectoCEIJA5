@@ -1,5 +1,5 @@
-import React from 'react';
-import './alerta.css';
+import PropTypes from 'prop-types';
+import '../estilos/alerta.css';
 
 const AlertaMens = ({ text, variant }) => {
     console.log(` ${text}, ${variant}`); // Debug log
@@ -9,8 +9,8 @@ const AlertaMens = ({ text, variant }) => {
         </div>
     );
 };
-/*AlertaMens.propTypes = {
+AlertaMens.propTypes = {
     text: PropTypes.string.isRequired,
     variant: PropTypes.string.isRequired,
-};*/
+};
 export default AlertaMens;

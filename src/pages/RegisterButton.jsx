@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
-import './modal.css';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
+import '../estilos/Modal.css';
 import {useForm} from "react-hook-form";
-import Input from './Input';
-import BotonCargando from './BotonCargando';
+import Input from '../components/Input';
+import BotonCargando from '../components/BotonCargando';
 import service from '../services/service';
 import { useNavigate } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup'; 
-import { userValidationSchema } from './ValidacionSchemaYup';
-import AlertaMens from './AlertaMens';
+import { userValidationSchema } from '../validaciones/ValidacionSchemaYup';
+import AlertaMens from '../components/AlertaMens';
+
 const RegisterButton = ({ onClose }) => {
     const { register, handleSubmit, formState: { errors } } = useForm({ resolver: yupResolver(userValidationSchema) });
     const [alerta, setAlerta] = useState({text:"", variant:""})
@@ -49,8 +51,8 @@ const RegisterButton = ({ onClose }) => {
                 <div className="register-box">
                   {/* Mostrar la alerta si hay un mensaje */}
                   {alerta.text && <AlertaMens text={alerta.text} variant={alerta.variant} />}
+                  <button onClick={(e) => { e.preventDefault(); onClose(); }} className="back-button">✖</button>
                 <form onSubmit={handleSubmit(onSubmit)}>
-            
                      <Input label="Nombre" placeholder="Nombre" registro={{...register("nombre")}} error={errors.nombre?.message}/>
                    
                      <Input label="Apellido" placeholder="Apellido" registro={{...register("apellido")}} error={errors.apellido?.message}/>
@@ -76,13 +78,13 @@ const RegisterButton = ({ onClose }) => {
                           Registrarse
                         </BotonCargando> 
                    
-                     <button onClick={(e) => { e.preventDefault(); onClose(); }} className="button back-button">Volver</button>
-                    
                 </form>
                 </div>
             </div>
         </div>
     );
 };
-
+RegisterButton.propTypes = {
+    onClose: PropTypes.func.isRequired,
+};
 export default RegisterButton;

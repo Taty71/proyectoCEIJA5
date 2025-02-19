@@ -1,7 +1,8 @@
-import React from 'react';
+// Objetivo: Componente para mostrar un carrusel de imágenes
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // Importar los estilos del carrusel
 import { Carousel } from 'react-responsive-carousel';
-import './slideImg.css'
+import '../estilos/slideImg.css';
+import slideimge from '../assets/images/ce5n.png';
 
 const SlideImg = () => {
     return (
@@ -17,13 +18,13 @@ const SlideImg = () => {
             className="carousel-container" // Clase CSS para el contenedor del carrusel
         >
             <div> 
-                <img src="src\assets\ce5n.png" alt="Imagen 1" className="carousel-image" /> 
+                <img src={slideimge}  alt="Imagen 1" className="carousel-image" /> 
             </div> 
             <div> 
-                <img src="src\assets\ce5n.png" alt="Imagen 2" className="carousel-image" /> 
+                <img src={slideimge} alt="Imagen 2" className="carousel-image" /> 
             </div> 
             <div> 
-                <img src="src\assets\ce5n.png" alt="Imagen 1" className="carousel-image" /> 
+                <img src={slideimge} alt="Imagen 1" className="carousel-image" /> 
             </div> 
         </Carousel>
     </div>

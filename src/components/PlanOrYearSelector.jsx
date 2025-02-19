@@ -1,30 +1,63 @@
-// src/components/PlanOrYearSelector.jsx 
-import React from 'react'; 
-import './estilosDocumentacion.css';
-const PlanOrYearSelector = ({ modalidad, handleChange }) => { 
+import { useState } from 'react';
+import PropTypes from 'prop-types';
+import '../estilos/estilosDocumentacion.css';
+import AlertaMens from './AlertaMens';
+import Input from './Input';
+
+const PlanOrYearSelector = ({ modalidad, handleChange, value}) => { 
+    const [alerta, setAlerta] = useState(false);
+
+    const handleSelection = (event) => {
+        handleChange(event); // Actualiza el valor en Formik
+        setAlerta(event.target.value === ""); // Muestra la alerta si no selecciona nada
+    };
+
     if (modalidad === 'Presencial') { 
         return ( 
-            <div className="form-groupA"> 
-                <label>Año:</label> 
-                <select name="planAnio" onChange={handleChange} required  
-                    className="small-select"> 
-                <option value="">Seleccionar Año</option> 
-                <option value="1er Año">1er Año</option> 
-                <option value="2do Año">2do Año</option> 
-                <option value="3er Año">3er Año</option> </select> 
-            </div> );
-        } else if (modalidad === 'Semipresencial') { 
-            return ( 
-            <div className="form-groupA"> 
-                <label>Plan:</label> 
-                <select name="planAnio" onChange={handleChange} required  
-                    className="small-select"> 
-                    <option value="">Seleccionar Plan</option> 
-                    <option value="Plan A">Plan A</option> 
-                    <option value="Plan B">Plan B</option> 
-                    <option value="Plan C">Plan C</option> 
-                    </select>
-            </div> ); } 
-        return null; }; 
-            
+            <div className="form-group"> 
+                <Input 
+                    className="selectPlanAnio"
+                    label="Año"
+                    name="planAnio"
+                    type="select"
+                    options={[
+                        { value: '', label: 'Seleccionar Año' },
+                        { value: '1er Año', label: '1er Año' },
+                        { value: '2do Año', label: '2do Año' },
+                        { value: '3er Año', label: '3er Año' },
+                    ]}
+                    registro={{ value, onChange: handleSelection }}
+                    error={alerta && <AlertaMens text="Por favor, selecciona un año." variant="error" />}
+                />
+            </div>
+        );
+    } else if (modalidad === 'Semipresencial') { 
+        return ( 
+            <div className="form-group"> 
+                <Input
+                    className="selectPlanAnio"
+                    label="Plan"
+                    name="planAnio"
+                    type="select"
+                    options={[
+                        { value: '', label: 'Seleccionar Plan' },
+                        { value: 'Plan A', label: 'Plan A' },
+                        { value: 'Plan B', label: 'Plan B' },
+                        { value: 'Plan C', label: 'Plan C' },
+                    ]}
+                    registro={{ value, onChange: handleSelection }}
+                    error={alerta && <AlertaMens text="Por favor, selecciona un plan." variant="error" />}
+                />
+            </div>
+        ); 
+    } 
+    return null; 
+}; 
+PlanOrYearSelector.propTypes = {
+    modalidad: PropTypes.string.isRequired,
+    handleChange: PropTypes.func.isRequired,
+    value: PropTypes.string.isRequired,
+};
+
 export default PlanOrYearSelector;
+

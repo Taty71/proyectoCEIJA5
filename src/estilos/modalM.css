@@ -1,0 +1,134 @@
+/* Contenedor principal del modal Modalidad */ 
+.modal-container { 
+    background: #313030; /* Fondo gris oscuro */ 
+    padding: 20px; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 16px #ccc2c2; ; /* Sombra */ 
+    width: 80%;
+    font-size: 0.9rem;
+    max-width: 600px; 
+    max-height: min-content;
+    text-align: center; 
+    position: relative;
+     animation: fadeIn 0.3s ease; /* Efecto de aparición */ 
+    } 
+  
+     /* Botón cerrar */ 
+  .modal-close {
+    position: relative; top: 10px; right: -280px; 
+    background: none; 
+    border: none;
+    font-size: 24px; /* Tamaño pequeño */ 
+    font-weight: bold;
+    color: #ccc2c2; 
+    cursor: pointer; 
+    transition: color 0.3s ease; 
+  } 
+  .modal-close:hover { 
+    color: #87CEEB; }
+
+  .modal-container h2 { 
+    color: #ffffff; 
+    text-shadow: 1px 1px #87CEEB;
+   }
+  .modal-container .subH2 { 
+    color: #ffffff; 
+   
+   }
+   .modal-container{
+    margin: 0 auto;
+    color: #ffffff; 
+    font-size: 0.9rem;
+   }
+  .modal-doc {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px #ccc2c2; 
+    max-width: 600px;
+    margin: 0 auto;
+    color: #ffffff; 
+    font-size: 0.9rem;
+  }
+  
+  .modal-doc fieldset {
+    border: none; 
+    padding: 10px;
+    margin: 0;
+    width: 85%;
+    color: #000000;
+    font-style: oblique;
+    font-weight: bold;
+  }
+  
+  .modal-doc legend {
+      font-size: 1.2rem;
+      padding: 0 10px;
+      border-radius: 5px;
+      color: #ffffff; 
+  }
+  
+  .modal-doc ul {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      gap: 10px;
+  }
+  
+  .modal-doc li {
+      background-color: #ffffff;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px #ccc2c2;
+      font-size: 1rem;
+  }
+  
+  .modal-doc li:hover {
+      background-color: #ccc2c2; 
+      transform: scale(1.02);
+      transition: all 0.3s ease-in-out;
+  }
+  .modalidad-button { 
+    background-color: #DDDDDD; /* Color azul claro */ 
+    text-shadow: 1px 1px #ccc2c2;
+    font-style: oblique;
+    border: none; 
+    padding: 10px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 18px; 
+    margin: 10px; /* Margen entre botones */ 
+    transition: background-color 0.3s ease, transform 0.3s ease; 
+  } 
+  .modal-button {
+    font-weight: bold;  
+    background-color: #DDDDDD; /* Color azul claro */ 
+    text-shadow: 1px 1px #ccc2c2;
+    border: none; 
+    padding: 8px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 14px; 
+    margin-top: 15px; /* Margen entre botones */ 
+    transition: background-color 0.3s ease, transform 0.3s ease; 
+  }
+  .modalidad-button:hover, 
+  .modal-button:hover { 
+    background-color: #87CEEB; ; /* Cambio de color al hacer hover */ 
+    box-shadow: 1px 1px #ffffff;
+    transform: scale(1.05); /* Efecto de escala al hacer hover */ 
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } } 
+  /* Ajustes responsivos */ 
+  @media (max-width: 480px) { 
+  .modal-container { padding: 15px 20px; }
+  .modal-container h2 { font-size: 1.3rem; } 
+  .modal-container p { font-size: 0.9rem; } 
+  .modalidad-button, 
+  .modal-button { font-size: 14px; padding: 8px;} }

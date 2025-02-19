@@ -1,4 +1,5 @@
-import './input.css';
+import '../estilos/input.css';
+import PropTypes from 'prop-types';
 
 function Input(props){
     const {label, type, name, placeholder,options= [] , registro, error}=props
@@ -7,9 +8,8 @@ function Input(props){
         
                 <label>{label}</label>
                 {options.length > 0 ? (
-                    // Renderiza un <select> si hay opciones
+                    // Renderiza un <select> si hay opciones {//<option value="">Seleccione una opción</option>}
                     <select name={name} {...registro}>
-                        <option value="">Seleccione una opción</option>
                         {options.map((option, index) => (
                             <option key={index} value={option.value}>
                                 {option.label}
@@ -26,10 +26,21 @@ function Input(props){
                     />
                 )} 
                  {/* Muestra el error de forma genérica */}
-                 {error && <span className="error-message">{error}</span>}  
+                 {error && <span className="error-message">{error}</span>} 
         </div> 
         
     )
 }
-export default Input
-//... express
+Input.propTypes = {
+    label: PropTypes.string.isRequired,
+    type: PropTypes.string,
+    name: PropTypes.string,
+    placeholder: PropTypes.string,
+    options: PropTypes.array,
+    registro: PropTypes.object,
+    error: PropTypes.any,
+};
+
+
+
+export default Input;

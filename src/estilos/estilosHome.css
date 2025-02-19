@@ -1,8 +1,9 @@
 /* Estilo general de la página */
 
 body {
-  font-family: "Lora", serif;
+  font-family: "Roboto Slab", serif;
   font-optical-sizing: auto;
+  font-weight: 400;
   font-style: normal;
 }
 .home {
@@ -10,7 +11,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    min-height: 90vh;
     padding: 20px;
     background-color: #f5f5f5;
     background-attachment: fixed;
@@ -42,10 +43,9 @@ body {
     background: none;
     border: none;
     cursor: pointer;
-    color: #87CEEB; /* Color dorado */
-    text-shadow: 1px 1px 3px #d35400; /* Sombra amarilla */
+    color: #87CEEB;
+    text-shadow: 1px 1px 3px #ccc2c2; 
   }
-  
   .menu {
     display: flex;
     flex-direction: column;
@@ -53,10 +53,10 @@ body {
     position: absolute;
     top: 50px;
     right: 10px;
-    background-color: #4a4a4a;
+    background-color: #313030;
     padding: 15px; /* Menor padding para que sea más compacto */
     border-radius: 8px;
-    box-shadow: 0px 4px 10px #d35400; /* Sombra amarilla */
+    box-shadow: 0px 4px 10px #ccc2c2; 
     z-index: 10;
     width: 180px; /* Más estrecho */
   }
@@ -70,31 +70,43 @@ body {
     gap: 8px;
   }
   .menu .opcMenu{
-    font-family: 'Roboto', sans-serif; 
-    font-size: 16px; /* Tamaño más pequeño para delicadeza */
+    font-family: inherit; /* Hereda la fuente del elemento padre */
+    font-size: inherit; /* Hereda el tamaño de fuente del elemento padre */
+    background: none; /* Elimina el fondo predeterminado del botón */
+    border: none; /* Elimina el borde predeterminado del botón */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+    text-decoration: none; /* Elimina la subrayado del texto */
+    padding: 0; /* Elim /* Tamaño más pequeño para delicadeza */
+   
+    font-weight: bold;
+    text-align: left
   }
   .menu ul li a {
     text-decoration: none;
-    color: #87CEEB; /* Color dorado */
-    font-weight: bold;
-   
-    text-align: center;
-    
+    color: #87CEEB; 
   }
   
   .menu button {
     background: none;
     border: none;
     color: #87CEEB;
-    font-size: 18px; /* Tamaño más pequeño para el botón de cierre */
+    font-size: 18px;
     align-self: flex-end;
     cursor: pointer;
+  }
+  li> button{
+  font-family: inherit;
+  font-style: inherit;
+  font-weight: inherit;
+  color: #87CEEB;
+  font-size: inherit; /* Hereda el tamaño de fuente del elemento padre */
+   
   }
   
   /* Botón de inicio de sesión */
   .barNav>.login-button {
     width: 10%; /* Ancho más pequeño */
-    background-color: #4a4a4a;
+    background-color: #313030;
     color: #87CEEB;
     border: none;
     padding: 8px; /* Tamaño más pequeño */
@@ -184,7 +196,7 @@ body {
   }
   
   .carousel .control-dots .dot.selected {
-    background-color: #1d0ef1;
+    background-color: #0d2363;
     width: 16px; 
     height: 16px;
   }
@@ -200,15 +212,15 @@ body {
 
 .text-overlay > .textE {
     color: #075878;
-    text-shadow: 1px 1px #d35400;
+    text-shadow: 1px 1px #313030;
     font-style: italic;
     font-size: 1.5em;
     margin-top: 10px; /* Ajusta la separación entre este texto y el carrusel */
-    margin-bottom: 10px; /* Reduce el espacio inferior */
+    margin-bottom: 10px; 
 }
   /* Estilos para el logo en el extremo inferior derecho */
   .logo {
-    position: absolute;
+    position: fixed;
     bottom: 5px;
     right:10px;
     max-width: 80px;max-height: 55px; }

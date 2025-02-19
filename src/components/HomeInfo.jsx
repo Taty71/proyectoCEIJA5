@@ -1,5 +1,5 @@
 import SlideImg from '../components/SlideImg';
-import LogoCE from '../assets/LogoCE.png';
+import LogoCE from '../assets/images/LogoCE.png';
 
 const HomeInfo = () => {
     return (

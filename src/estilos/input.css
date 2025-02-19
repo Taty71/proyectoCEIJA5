@@ -15,6 +15,7 @@
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 4px;
+    width: 90%;    
 }
 
 .error-message {
@@ -22,9 +23,4 @@
     font-style: italic;
     font-size: 0.98rem;
     margin-top: 0.5rem;
-    text-shadow: 
-    -1px -1px 0 #700a0a,  
-     1px -1px 0 #700a0a,
-    -1px  1px 0 #700a0a,
-     1px  1px 0 #700a0a;
 }

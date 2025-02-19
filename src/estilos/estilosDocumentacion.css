@@ -8,7 +8,7 @@
     font-size: 1rem;
     appearance: none;
     background-color: #fff;
-    color: #333;
+    color: #313030;
   }
 .upload-preview-container { 
     display: flex; align-items: center; gap: 10px; 
@@ -41,7 +41,7 @@
     }
     
 .small-button { 
-    background-color: #007bff; 
+    background-color: #313030;
     color: white; border: none; 
       padding: 8px 12px; 
       border-radius: 4px; 
@@ -50,9 +50,10 @@
       transition: background-color 0.3s ease; 
       width: 100px; /* Ancho fijo para todos los botones */
       text-align: center; 
-      border: 1px solid #4e53e6;
-      box-shadow: 1px 1px #0342ed; } 
-.small-button:hover { background-color: #b30051; }
+      border: 1px solid #ffffff;
+      box-shadow: 1px 1px #87CEEB;
+} 
+.small-button:hover { background-color: #87CEEB; color:#000}
 
   
 

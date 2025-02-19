@@ -1,17 +1,17 @@
 // src/components/ModalidadModal.jsx
-import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import './modalM.css';
-import Preinscripcion from '../pages/Preinscripcion';
+import '../estilos/modalM.css';
+
 
 const ModalidadModal = ({ modalidad, onClose }) => {
     const renderContent = () => {
         if (modalidad === 'Presencial') {
             return (
                 <>
-                    <h2>Modalidad Presencial</h2>
-                    <p>Inscripciones desde el 20 de febrero del ciclo lectivo.</p>
-                    <p>Horario para inscripciones: 19 a 22 hs.</p>
+                    <h2 className="subH2"> Modalidad Presencial</h2>
+                    <p>&quot;Inscripciones desde el 20 de febrero del ciclo lectivo.</p>
+                    <p> Horario para inscripciones: 19 a 22 hs.</p>
                    
                     <div className="modal-doc">
                         <fieldset>
@@ -19,7 +19,7 @@ const ModalidadModal = ({ modalidad, onClose }) => {
                              <ul>
                             <li>Fotocopia DNI</li>
                             <li>Fotocopia Partida Nacimiento</li>
-                            <li>Foto 4x4 (dos)</li>
+                            <li>Foto 4x4 (dos) / Ficha Médica CUS</li>
                             <li>1er Año: Título nivel primario / Pase escuela Secundaria hasta 3er año incompleto.</li>
                             <li>2do Año: Pase escuela Secundaria CBU completo / 4to año incompleto.</li>
                             <li>3er Año: Pase escuela Secundaria 4to año completo.</li>
@@ -43,7 +43,7 @@ const ModalidadModal = ({ modalidad, onClose }) => {
                     <ul>
                         <li>Fotocopia DNI</li>
                         <li>Fotocopia Partida Nacimiento</li>
-                        <li>Foto 4x4 (dos)</li>
+                        <li>Foto 4x4 (dos) / Ficha Médica CUS</li>
                         <li>Plan A: Título nivel primario / Pase escuela Secundaria hasta 3er año incompleto.</li>
                         <li>Plan B: Pase escuela Secundaria CBU completo / 4to año incompleto.</li>
                         <li>Plan C: Pase escuela Secundaria 4to año completo.</li>
@@ -70,6 +70,10 @@ const ModalidadModal = ({ modalidad, onClose }) => {
             </div>
         </div>
     );
+};
+ModalidadModal.propTypes = {
+    modalidad: PropTypes.string.isRequired,
+    onClose: PropTypes.func.isRequired,
 };
 
 export default ModalidadModal;

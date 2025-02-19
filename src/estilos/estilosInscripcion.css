@@ -1,0 +1,195 @@
+/* Estilo del contenedor del formulario */
+.inscripcion-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 110vh; /* Ocupa toda la altura de la pantalla */
+  margin: 3px 10px;
+  padding: 10px;
+  background-color: #ccc2c2;  /* Fondo claro */
+  box-shadow: 0 4px 8px #313030; 
+}
+
+.formulario-inscripcion-adm {
+  display: flex;
+  flex-direction: column;
+  min-height: 110vh;
+  color: #000; 
+}
+
+.acciones-formulario-container {
+  margin-top: auto;
+  padding: 1rem;
+  background-color: #313030;
+  border-top: 1px solid #9eafbf;
+}
+
+/* Estilos para el formulario */
+
+.formd {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.form-datos,
+.form-domicilio,
+.form-eleccion {
+  flex: 1; /* Ajusta el ancho para que todas las columnas sean iguales */
+  margin: 10px; /* Opcional: margen entre columnas */
+  min-width: 300px; /* Mínimo ancho para buena responsividad */
+  max-width: calc(33.333% - 20px); /* Asegura que haya espacio entre columnas */
+}
+
+/* Estilos para el título */
+.inscripcion-container h2 {
+  color: #000; 
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  text-align: center;
+}
+
+
+/* Asegurar que ambos botones tengan el mismo ancho */
+.form-eleccion input .selectModalidad,
+.form-eleccion select .selectPlanAnio{
+  width:100%; 
+}
+.form-eleccion .buttonD {
+  width: 50%;
+  margin: 25% 25% 0 25%; /* Centra el botón horizontalmente */
+}
+/* Asegurar que ambos placeholders tengan el mismo tamaño de letra */
+.form-eleccion input::placeholder,
+.form-eleccion select::placeholder {
+  font-size: 1rem; 
+  color: #313030; 
+  font-style: oblique; 
+}
+
+/* Estilo adicional para asegurar que los botones sean consistentes */
+.buttonD,
+.buttonF {
+  padding: 10px; 
+  font-size: 1rem; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease;
+  background-color: #313030; 
+  color: #ffffff;
+  width: 100%;
+}
+
+.buttonD:hover,
+.buttonF:hover {
+  background-color: #87CEEB; 
+  color: #000; /* Cambia el color de texto al pasar el mouse */
+}
+/*.buttonD {
+  margin-top: 20px;
+  margin-left: 20px;
+  border: none; 
+  padding: 8px 12px; 
+  border-radius: 4px; 
+  min-width: 300px;
+  background-color: #313030; 
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.buttonD:hover {
+  background-color: #87CEEB; color:#000;
+}*/
+/* Estilos para las etiquetas y entradas */
+.form-group label {
+  font-weight: bold;
+  color: #000; 
+  margin-bottom: 5px;
+}
+
+.form-group input.buscar {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc2c2;
+    border-radius: 4px;
+    width: 10%;
+  }
+.form-group input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc2c2;
+    border-radius: 4px;
+  }
+.form-group input::placeholder {
+    color: #222222;
+    font-style: oblique;
+  }
+.form-group select {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc2c2;
+  border-radius: 4px;
+  width: 87%;
+}
+  select::placeholder {
+    color: #313030; 
+    font-style: oblique;
+  }
+
+/* Estilos para centrar el botón */
+.buttonF {
+  background-color: #ccc2c2;/* Azul vibrante del SVG */
+  width: 60%;
+  color:#000;
+  font-style: italic;
+  font-weight: bold;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: block; /* Para que el botón ocupe toda la línea */
+  margin: 20px auto 0; /* Centrado horizontal y separación del contenido */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+}
+
+.buttonF:hover {
+  background-color: #87CEEB; 
+  color:#000;
+  font-weight: bold;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Sombra más intensa */
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+  .inscripcion-container form {
+    padding: 10px;
+  }
+  .form-columns {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .inscripcion-container form {
+    padding: 15px;
+  }
+
+  .form-columns {
+    flex-direction: column;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group button {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  button[type="submit"] {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+}

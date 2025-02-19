@@ -1,10 +1,10 @@
 // src/components/Home.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Navbar from '../components/Navbar';
-import LoginButton from '../components/LoginButton';
-import RegisterButton from '../components/RegisterButton';
+import LoginButton from './LoginButton';
+import RegisterButton from './RegisterButton';
 import Modalidad from '../components/Modalidad';
-import '../App.css';
+import '../estilos/estilosHome.css';
 import HomeInfo from '../components/HomeInfo';
 
 

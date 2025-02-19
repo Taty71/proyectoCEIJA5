@@ -1,9 +1,9 @@
 .title {
     position: absolute;
-    top: 2%; /* Ajusta la distancia desde la parte superior */
+    top: 8%; /* Ajusta la distancia desde la parte superior */
     left: 10%; /* Centrado horizontal */
     transform: translate(-50%, -10%); /* Asegura el centrado completo */
-    z-index: 10; /* Aparece sobre el carrusel */
+    z-index: 10; 
     color: #0d2363;
     font-size: 1.5rem;
     font-weight: bold;
@@ -12,7 +12,8 @@
 }
 .logoProyecto{
         position: fixed;
-        bottom: 5px;
-        right:10px;
-        max-width: 80px;max-height: 55px; 
+        top:20px;
+        right:15px;
+        max-width: 80px;
+        max-height: 55px; 
 }

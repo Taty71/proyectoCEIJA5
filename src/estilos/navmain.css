@@ -1,0 +1,40 @@
+/* Estilos generales para el contenedor del nav */
+nav {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;
+    background-color: #2d4177; /* Azul vibrante */
+    padding: 10px 20px;
+    border-radius: 3px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+    margin: 0.2% 0;
+}
+
+/* Estilos para los enlaces de navegación */
+nav a {
+    color: #ffffff; /* Blanco */
+    text-decoration: none;
+    margin: 0 10px;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+nav a:hover {
+    color: #87CEEB; /* Azul claro al pasar el mouse */
+}
+
+/* Estilos para el botón de logout */
+nav button {
+    background-color: #313030; /* Azul más oscuro */
+    color: #ffffff; /* Blanco */
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+nav button:hover {
+    background-color: #ccc2c2; /* Azul más oscuro al pasar el mouse */
+}

@@ -22,11 +22,11 @@ const AccionesFormulario = ({ setAccion }) => {
               {acciones.map(({ nombre, icono }) => (
                 <button
                     key={nombre}
-                    className={`buttonAcciones ${selectedButton === nombre ? "selectedButton" : ""}`}
+                    className={`buttonAcciones ${selectedButton === nombre && "selectedButton"}`}
                     onClick={() => handleButtonClick(nombre)}
                     aria-label={nombre}
                 >
-                    <img src={`../assets/logos/${icono}`} className="img" alt={nombre} />
+                    <img src={`/src/assets/logos/${icono}`} className="img" alt={nombre} />
                     {nombre}
                 </button>
             ))}

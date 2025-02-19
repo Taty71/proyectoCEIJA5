@@ -3,7 +3,7 @@ import { useUserContext } from '../context/UserContextFile'; // Make sure the pa
 import { NavLink } from 'react-router-dom';
 import Modalidad from '../components/ModalidadAdm';
 import BotonCargando from '../components/BotonCargando';
-
+import '../estilos/dashboard.css';
 const Dashboard = () => {
   const { user } = useUserContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,14 +23,14 @@ const Dashboard = () => {
     setIsModalOpen(false);
   };
   return (
-    <div>
-      <div>
+    <div className="dashboard-container">
+      <div className="dashboard-header">
       <h1>Bienvenido, {user.nombre}</h1>
       <p>Rol: {user.rol}</p>
       {/* Aquí puedes agregar más contenido del dashboard */}
 
       </div>
-       <div>
+      <div className="dashboard-content">
        <ul>
           <li>
           <button onClick={handleOpenModal}>Gestión Estudiante</button>

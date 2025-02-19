@@ -1,0 +1,88 @@
+/* Estilos generales para el contenedor del dashboard */
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #ccc2c2; /* Fondo claro */
+    min-height: 60vh; /* Ocupa toda la altura de la pantalla */
+    max-width: 75vw;
+    border-radius: 8px;
+    box-shadow: 1px 1px 5px 1px #313030;
+    margin: 5% auto; /* Centra el contenedor horizontalmente */
+}
+
+/* Estilos para el encabezado del dashboard */
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.dashboard-header h1 {
+    color: #313030; /* Azul vibrante */
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.dashboard-header p {
+    color: #333;
+    font-size: 1.2rem;
+}
+
+/* Estilos para el contenido del dashboard */
+.dashboard-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.dashboard-content ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dashboard-content li {
+    margin: 10px 0;
+    max-width: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Centra el contenido horizontalmente */
+}
+
+.dashboard-content button,
+.dashboard-content a {
+    background-color: #313030; /* Azul vibrante */
+    color: #ffffff; /* Blanco */
+    border: none;
+    padding: 20px 30px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+    display: block;
+    align-items: center;
+    justify-content: center; /* Centra el contenido horizontalmente */
+}
+
+.dashboard-content button:hover,
+.dashboard-content a:hover {
+    background-color: #ccc2c2 /* Azul más oscuro al pasar el mouse */
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .dashboard-content {
+        flex-direction: column;
+    }
+
+    .dashboard-content button,
+    .dashboard-content a {
+        width: 100%; /* Ancho completo en pantallas pequeñas */
+    }
+}

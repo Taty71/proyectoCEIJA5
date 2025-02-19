@@ -1,5 +1,6 @@
 import { NavLink, Navigate } from "react-router-dom";
 import { useUserContext } from "../context/UserContextFile";
+import '../estilos/navMain.css';
 
 const NavMain = () => {
     const context = useUserContext();  

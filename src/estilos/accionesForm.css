@@ -14,7 +14,7 @@
     align-items: center;
     margin: 5px;
     padding: 10px;
-    background-color: #ccc2c2; /* Vibrant blue of the SVG */
+    background-color: #ccc2c2; /* Light gray color */
     width: 150px;
     color: #000; 
     border: none;
@@ -24,7 +24,11 @@
     transition: background-color 0.3s ease;
    
 }
-.buttonAcciones:hover, .selectedButton {
+.buttonAcciones:hover {
+    background-color: #87CEEB;  
+}
+
+.selectedButton {
     background-color: #87CEEB;  
 }
 .img {
@@ -33,7 +37,7 @@
     margin-bottom: 5px;
 }
 
-/* Estilos para que los botones se ubiquen debajo del formulario */
+/* Styles to position the buttons below the form */
 @media (max-width: 768px) {
     .accionesContainer {
         flex-direction: column;

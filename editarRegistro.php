@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Depuración: mostrar el DNI recibido
         error_log("DNI recibido: " . $dni);
 
-        $stmt = $conn->prepare("SELECT dni, nombre, apellido, cuil, fechaNacimiento, FROM estudiantes WHERE dni = ?");
+        $stmt = $conn->prepare("SELECT dni, nombre, apellido, cuil, fechaNacimiento FROM estudiantes WHERE dni = ?");
 
         if (!$stmt) {
             echo json_encode(["status" => "error", "message" => "Error al preparar la consulta: " . $conn->error]);

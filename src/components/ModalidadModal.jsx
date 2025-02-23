@@ -62,7 +62,7 @@ const ModalidadModal = ({ modalidad, onClose }) => {
             <div className="modal-container">
                 <button className="modal-close" onClick={onClose}>✖</button>
                 {renderContent()}
-                <Link to={`/preinscripcion?modalidad=${modalidad}`}>
+                <Link to={`/preinscripcion-estd?modalidad=${modalidad}`}>
                     <button type="button" className="modal-button">
                         Ir al Formulario de Preinscripción
                     </button>

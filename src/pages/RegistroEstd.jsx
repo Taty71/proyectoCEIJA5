@@ -59,6 +59,7 @@ const RegistroEstd = ({ modalidad, previews, handleFileChange,  alert, accion, h
                         )}
                     </div>
                     {alert.text && <AlertaMens text={alert.text} variant={alert.variant} />}
+                    
                     <button type="submit" className="buttonF">{accion}</button>
                     <button type="button" className="buttonF" onClick={()=>{handleReset; resetForm();}}>Reset</button>
                 </Form>
@@ -66,16 +67,18 @@ const RegistroEstd = ({ modalidad, previews, handleFileChange,  alert, accion, h
         </Formik>
     );
 };
-
+RegistroEstd.defaultProps = {
+    accion: "Enviar", // Puedes poner el texto que prefieras o dejarlo vacío
+};
 RegistroEstd.propTypes = {
     modalidad: PropTypes.string.isRequired,
     previews: PropTypes.object.isRequired,
     handleFileChange: PropTypes.func.isRequired,
-   
     alert: PropTypes.object.isRequired,
-    accion: PropTypes.string.isRequired,
     handleSubmit: PropTypes.func.isRequired,
     handleReset: PropTypes.func.isRequired,
+    accion: PropTypes.string,
 };
+// Valor por defecto para `accion`
 
 export default RegistroEstd;

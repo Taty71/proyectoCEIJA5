@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 import service from '../services/service';
 import RegistroEstd from './RegistroEstd';
 import PropTypes from 'prop-types';
@@ -10,7 +9,7 @@ import { Logo } from '../components/Logo';
 
 const max_file_size = 600 * 1024; // 600 KB
 
-const FormularioInscripcionAdm = ({ modalidad, maxFileSize = max_file_size, accion }) => {
+const FormularioInscripcionEst = ({ modalidad, maxFileSize = max_file_size}) => {
     const [files, setFiles] = useState({});
     const [previews, setPreviews] = useState({
            dni: null,
@@ -44,32 +43,32 @@ const FormularioInscripcionAdm = ({ modalidad, maxFileSize = max_file_size, acci
         console.log("Valores del formulario:", values);
         console.log("Archivos adjuntos:", files);
 
-        if (accion === "Eliminar") {
-            setAlert({ text: "Función de eliminación en desarrollo", variant: "warning" });
-            return;
-        }
-
         if (!values.nombre || !values.apellido || !values.dni || !values.cuil || !values.fechaNacimiento || !values.calle || !values.nro || !values.barrio || !values.localidad || !values.pcia) {
             setAlert({ text: 'Por favor complete todos los campos requeridos.', variant: 'error' });
             setTimeout(() => setAlert({ text: '', variant: '' }), 5000); // Desaparece después de 5 segundos
             return;
         }
-        if (Object.keys(files).length === 0) {
+        console.log("Archivos antes de enviar:", files);
+        /*if (Object.keys(files).length === 0) {
             setAlert({ text: 'Por favor adjunte los archivos requeridos.', variant: 'error' });
             setTimeout(() => setAlert({ text: '', variant: '' }), 5000); // Desaparece después de 5 segundos
             return;
-        }
+        }*/
 
         const formDataToSend = new FormData();
         Object.entries(values).forEach(([key, value]) => formDataToSend.append(key, value));
-        Object.entries(files).forEach(([key, file]) => formDataToSend.append(key, file));
-    
-
+        Object.entries(files).forEach(([key, file]) =>{ if (file) {  // Verificamos que file no sea undefined o null
+            formDataToSend.append(key, file);
+            console.log(`Archivo añadido a FormData: ${key} - ${file.name}`);
+        } else {
+            console.log(`Archivo no válido para el campo: ${key}`);
+        }});
+        console.log("Datos a enviar:", formDataToSend);
         try {
-            const response = await service.create(formDataToSend);
+            const response = await service.createWebInscription(formDataToSend);
             console.log("Respuesta del servidor:", response);
             if (response) {
-                console.log(response.body)
+               
                 setAlert({ text: 'Formulario enviado con éxito.', variant: 'success' });
                 setTimeout(() => setAlert({ text: '', variant: '' }), 5000); // Desaparece después de 5 segundos
             } else {
@@ -102,7 +101,7 @@ const FormularioInscripcionAdm = ({ modalidad, maxFileSize = max_file_size, acci
         <Logo />
        { /*  Muestra el título dinámicamente */}
             {/*<h1>{`Modalidad  ${modalidad}`}</h1>*/}
-            <h2>{`${accion} Inscripción Estudiante`}</h2>
+            <h2>{`Inscripción Estudiante`}</h2>
             {alert.text && <AlertaMens text={alert.text} variant={alert.variant} />}
 
             <RegistroEstd
@@ -110,7 +109,6 @@ const FormularioInscripcionAdm = ({ modalidad, maxFileSize = max_file_size, acci
                 previews={previews}
                 handleFileChange={handleFileChange}
                 alert={alert}
-                accion={accion}
                 handleSubmit={handleSubmit} 
                 handleReset={handleReset}
             />
@@ -118,11 +116,11 @@ const FormularioInscripcionAdm = ({ modalidad, maxFileSize = max_file_size, acci
         </div>
     );
 };
-FormularioInscripcionAdm.propTypes = {
+FormularioInscripcionEst.propTypes = {
     modalidad: PropTypes.string.isRequired,
     maxFileSize: PropTypes.number,
     accion: PropTypes.string.isRequired,
 };
 
-export default FormularioInscripcionAdm;
+export default FormularioInscripcionEst;
 

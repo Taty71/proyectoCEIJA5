@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import service from '../services/service';
-
+import '../estilos/listaEstudiantes.css';
 
 const ListaEstudiantes = () => {
     const [estudiantes, setEstudiantes] = useState([]);
@@ -40,6 +40,8 @@ const ListaEstudiantes = () => {
                         <th>Barrio</th>
                         <th>Localidad</th>
                         <th>Provincia</th>
+                        <th>Modalidad</th>
+                        <th>Plan/Año</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,6 +58,8 @@ const ListaEstudiantes = () => {
                             <td>{estudiante.barrio}</td>
                             <td>{estudiante.localidad}</td>
                             <td>{estudiante.pcia}</td>
+                            <td>{estudiante.modalidad}</td>
+                            <td>{estudiante.planAnio}</td>
                         </tr>
                     ))}
                 </tbody>

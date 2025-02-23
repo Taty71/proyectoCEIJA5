@@ -1,21 +1,24 @@
 import axiosInstance from '../config/axios';
 import Error from '../utils/MensajeError';
-// Base URL preconfigurada desde axios
-//const baseURL = 'inscripcionRegistroB.php'; // Asegúrate de que tu backend maneje este endpoint
+
 
 //Registrar usuario
 const createU = async (data) => { 
     try { 
         const response = await axiosInstance.post('register.php', data, {
-            headers: { 'Content-Type': 'application/json' }
+            //headers: { 'Content-Type': 'application/json' }
         }); 
         console.log('Respuesta completa del servidor:', response); // Para depuración
             return response.data; 
-    } catch (error) { 
-        const errorInfo = Error(error);
-        console.error('Error al enviar registro usuario:', error); 
-        return errorInfo; 
-    } 
+    }  catch (error) { 
+        const errorMessage = error.response 
+            ? error.response.data 
+            : "Error de conexión con el servidor.";
+        
+        console.error('Error al enviar:', errorMessage);
+        
+        return { error: true, message: errorMessage };
+    }
 };
 // logueo
 const getUser = async (data) => { 
@@ -45,26 +48,39 @@ const getUser = async (data) => {
         return errorInfo; // Manejo uniforme de errores
     }
 };
-// Registrar nueva inscripción//
+// Registrar nueva inscripción Web//
+/*const service = {
+    createWebInscription: (formData) => {
+        return axiosInstance.post('/inscripcionWebEstd', formData);
+    },
+}*/
+const createWebInscription = async (formDataToSend) => { 
+    try { 
+        const response = await axiosInstance.post('inscripcionWebEstd.php', formDataToSend); 
+            return response.data; 
+    }  catch (error) {
+        console.error('Error al realizar inscripciones:', error);
+        return { error: true, message: error.message };
+    };
+}
+// Registrar nueva inscripción Adm//
 const create = async (formData) => { 
     try { 
         const response = await axiosInstance.post('inscripcionRegistroB.php', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }, 
+         
         }); 
             return response.data; 
-    } catch (error) { 
-        const errorInfo = Error(error);
-        console.error('Error al enviar inscripción:', error); 
-        console.error('Error al enviar inscripción:', error.response?.data || error.message);
-        //throw error; 
-        return errorInfo;
-    } 
+    }  catch (error) {
+        console.error('Error al inscribir:', error);
+        throw error;
+    }
 };
 
 // Obtener todas las inscripciones
-const getAll = async (formData) => {
+/*const getAll = async (formData) => {
     try {
-        const response = await axiosInstance.get('listarEstudiantes.php', formData)
+        const response = await axiosInstance.get('consultarInscripciones.php', formData)
           console.log('Respuesta del servidor:', response.data);
         return response.data;
     } catch (error) {
@@ -72,20 +88,40 @@ const getAll = async (formData) => {
         throw error;
 
     }
+};*/
+const getAll = async () => {
+    try {
+        const response = await axiosInstance.get('consultarInscripciones.php');
+        console.log('Respuesta del servidor:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error obteniendo todas las inscripciones:', error);
+        return { error: true, message: error.message };
+    }
 };
+
 
 /*Consultar inscripciones por documento*/
 const getByDocumento = async (dni) => {
     try {
-        const response = await axiosInstance.get(`editarRegistro.php?/${dni}`);
+        const response = await axiosInstance.get(`consultaDNI.php?dni=${dni}`);
         console.log('Respuesta del servidor:', response.data);
         return response.data;
     } catch (error) {
-        console.error('Error consultando inscripción por documento:', error);
+        console.error('Error consultando inscripción por DNI:', error);
         throw error;
     }
 };
-
+// Obtener materias por año o plan
+const getMaterias = async (idAnioPlan) => {
+    try {
+        const response = await axiosInstance.get(`materias.php?idAnioPlan=${idAnioPlan}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error al obtener las materias:', error);
+        return { error: true, message: error.message };
+    }
+};
 // Modificar una inscripción existente
 /*const update = async (id, updatedData) => {
     try {
@@ -132,7 +168,9 @@ export default {
     getByDocumento,
     create,
     createU,
+    createWebInscription,
     getUser,
+    getMaterias
     //update,
     //remove,
    // uploadFile,

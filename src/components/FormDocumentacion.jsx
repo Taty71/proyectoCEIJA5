@@ -98,7 +98,7 @@ FormDocumentacion.propTypes = {
             url: PropTypes.string,
             type: PropTypes.string,
         }),
-    }).isRequired,
+    }),
     
     handleFileChange: PropTypes.func.isRequired,
     setFieldValue: PropTypes.func.isRequired,

@@ -1,0 +1,54 @@
+/* Estilos generales para el contenedor de la lista de estudiantes */
+.lista-estudiantes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #ffffff; /* Fondo blanco */
+    min-height: 100vh; /* Ocupa toda la altura de la pantalla */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+}
+
+/* Estilos para el título */
+.lista-estudiantes h2 {
+    color: #313030; /* Texto gris oscuro */
+    margin-bottom: 20px;
+}
+
+/* Estilos para la tabla */
+.lista-estudiantes table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.lista-estudiantes th,
+.lista-estudiantes td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ccc2c2; 
+
+.lista-estudiantes th {
+    background-color: #87CEEB; /* Azul claro */
+    color: #313030; /* Texto gris oscuro */
+}
+
+.lista-estudiantes tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.lista-estudiantes tr:hover {
+    background-color: #ccc2c2; 
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .lista-estudiantes table {
+        width: 100%;
+    }
+
+    .lista-estudiantes th,
+    .lista-estudiantes td {
+        padding: 8px;
+        font-size: 0.9rem;
+    }
+}

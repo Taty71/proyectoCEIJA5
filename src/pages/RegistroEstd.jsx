@@ -9,18 +9,19 @@ import AlertaMens from '../components/AlertaMens';
 import PropTypes from 'prop-types';
 import '../estilos/estilosInscripcion.css'; // Importa el archivo CSS
 
-
-const RegistroEstd = ({ modalidad, previews, handleFileChange,  alert, accion, handleSubmit, handleReset }) => {
+const RegistroEstd = ({ modalidad, previews, handleFileChange, alert, accion, handleSubmit, handleReset }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const formikRef = useRef(null);
-   // Función para cerrar el modal
+   
+    // Función para cerrar el modal
     const closeModal = () => {
-    setIsModalOpen(false);
-};
+        setIsModalOpen(false);
+    };
+ 
+
     return (
         <Formik
-            initialValues={{
-                nombre: '',
+            initialValues={{  nombre: '',
                 apellido: '',
                 dni: '',
                 cuil: '',
@@ -32,22 +33,24 @@ const RegistroEstd = ({ modalidad, previews, handleFileChange,  alert, accion, h
                 pcia: '',
                 modalidad,
                 planAnio: '',
-                titulo: '',
-            }}
+                titulo: '', }}
             validationSchema={formularioInscripcionSchema}
             onSubmit={handleSubmit}
-            innerRef={formikRef} // Añadir la referencia aquí
+            innerRef={formikRef}
+            
         >
-            {({ values, handleChange, setFieldValue, resetForm }) => (
-                <Form method="POST" encType="multipart/form-data">
+            {({ values, handleChange, setFieldValue, resetForm }) => {
+                 const showMateriasList = values.planAnio !== '' && values.modalidad !== ''
+               return(
+               <Form method="POST" encType="multipart/form-data">
                     <div className="formd">
                         <DatosPersonales />
                         <Domicilio />
                         <div className="form-eleccion">
-                        <ModalidadSelection modalidad={modalidad} handleChange={handleChange} setFieldValue={setFieldValue} values={values} />
-                        <button type="button" className="buttonD" onClick={() => setIsModalOpen(true)}>
-                            Adjuntar Documentación
-                        </button>
+                            <ModalidadSelection modalidad={modalidad} handleChange={handleChange} setFieldValue={setFieldValue} values={values} showMateriasList={showMateriasList} />
+                            <button type="button" className="buttonD" onClick={() => setIsModalOpen(true)}>
+                                Adjuntar Documentación
+                            </button>
                         </div>
                         {isModalOpen && (
                             <FormDocumentacion
@@ -59,17 +62,15 @@ const RegistroEstd = ({ modalidad, previews, handleFileChange,  alert, accion, h
                         )}
                     </div>
                     {alert.text && <AlertaMens text={alert.text} variant={alert.variant} />}
-                    
                     <button type="submit" className="buttonF">{accion}</button>
-                    <button type="button" className="buttonF" onClick={()=>{handleReset; resetForm();}}>Reset</button>
+                    <button type="button" className="buttonF" onClick={() => { handleReset(); resetForm(); }}>Reset</button>
                 </Form>
-            )}
+            )}}
         </Formik>
     );
-};
-RegistroEstd.defaultProps = {
-    accion: "Enviar", // Puedes poner el texto que prefieras o dejarlo vacío
-};
+}    
+
+
 RegistroEstd.propTypes = {
     modalidad: PropTypes.string.isRequired,
     previews: PropTypes.object.isRequired,
@@ -79,6 +80,5 @@ RegistroEstd.propTypes = {
     handleReset: PropTypes.func.isRequired,
     accion: PropTypes.string,
 };
-// Valor por defecto para `accion`
 
 export default RegistroEstd;

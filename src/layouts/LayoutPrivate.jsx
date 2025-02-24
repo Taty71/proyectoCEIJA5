@@ -1,5 +1,6 @@
 import { Outlet, Navigate } from "react-router-dom";
 import { useUserContext } from "../context/UserContextFile";
+import NavMain from '../components/NavMain';
 
 const LayoutPrivate = () => {
     const { user } = useUserContext();
@@ -8,7 +9,10 @@ const LayoutPrivate = () => {
         return <Navigate to="/" replace />; // 🔥 Si no hay usuario, redirigir al inicio
     }
 
-    return <Outlet />;  // ✅ Si hay usuario, carga el contenido del dashboard
+    return (<div>
+            <NavMain />
+             <Outlet />
+            </div> )// ✅ Si hay usuario, carga el contenido del dashboard
 };
 
 export default LayoutPrivate;

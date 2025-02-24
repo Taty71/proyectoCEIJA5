@@ -1,14 +1,15 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useSearchParams } from 'react-router-dom';
-import FormularioInscripcionAdm from './FormularioInscripcionAdm';
+import FormularioInscripcion from './FormularioInscripcion';
 import '../estilos/estilosInscripcion.css';
 import BusquedaDNI from '../components/BusquedaDNI';
 import AccionesFormulario from '../components/AccionesFormulario';
 import ListaEstudiantes from './ListaEstudiantes';
 
-const Preinscripcion = () => {
+const Preinscripcion = ({ isAdmin }) => {
     const [searchParams] = useSearchParams();
-    const modalidad = searchParams.get('modalidad');
+    const modalidad = searchParams.get('modalidad') || 'DefaultModalidad';
     const [estudianteEncontrado, setEstudianteEncontrado] = useState('');
     const [accion, setAccion] = useState('Registrar');
 
@@ -17,35 +18,42 @@ const Preinscripcion = () => {
     };
 
     const renderContent = () => {
-        console.log("Acción:", accion);
-        switch (accion) {
-            case 'Registrar':
-                return <FormularioInscripcionAdm modalidad={modalidad} estudianteEncontrado={estudianteEncontrado} accion={accion} />;
-            case 'Consultar':
-                return (
-                    <>
-                        <BusquedaDNI onEstudianteEncontrado={handleEstudianteEncontrado} />
-                        <ListaEstudiantes estudianteEncontrado={estudianteEncontrado} />
-                    </>
-                );
-            case 'Modificar':
-                return <FormularioInscripcionAdm modalidad={modalidad} estudianteEncontrado={estudianteEncontrado} accion={accion} />;
-            case 'Eliminar':
-                return <ListaEstudiantes estudianteEncontrado={estudianteEncontrado} />;
-            case 'Listar':
-                return <ListaEstudiantes />;
-            default:
-                return null;
+        if (isAdmin) {
+            switch (accion) {
+                case 'Registrar':
+                    return <FormularioInscripcion modalidad={modalidad}  accion={accion} isAdmin={true} />;
+                case 'Modificar':
+                    return <FormularioInscripcion modalidad={modalidad} estudianteEncontrado={estudianteEncontrado} accion={accion} isAdmin={true} />;
+                case 'Consultar':
+                    return (
+                        <>
+                            <BusquedaDNI onEstudianteEncontrado={handleEstudianteEncontrado} accion={accion} isAdmin={true}/>
+                            <ListaEstudiantes estudianteEncontrado={estudianteEncontrado} accion={accion} isAdmin={true}/>
+                        </> )
+                case 'Eliminar':
+                    return <ListaEstudiantes estudianteEncontrado={estudianteEncontrado} accion={accion} isAdmin={true}/>;
+                case 'Listar':
+                    return <ListaEstudiantes accion={accion} isAdmin={true}/>;
+                default:
+                    return null;
+            }
+        } else {
+            return <FormularioInscripcion modalidad={modalidad} accion="Registrar" isAdmin={false} />;
         }
     };
+    
 
     return (
         <div className="inscripcion-container">
             <h2>{`${accion} Inscripción Estudiante ${modalidad}`}</h2>
-            <AccionesFormulario setAccion={setAccion} />
+            {isAdmin && <AccionesFormulario setAccion={setAccion} />}
             {renderContent()}
         </div>
     );
+};
+
+Preinscripcion.propTypes = {
+    isAdmin: PropTypes.bool.isRequired,
 };
 
 export default Preinscripcion;

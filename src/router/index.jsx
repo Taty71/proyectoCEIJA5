@@ -4,7 +4,6 @@ import LayoutPrivate from "../layouts/LayoutPrivate";
 import Home from "../pages/Home";
 import Dashboard from "../pages/Dashboard";
 import Preinscripcion from "../pages/Preinscripcion";
-import PreinscripcionEst from "../pages/PreinscripcionEstd";
 
 export const router = createBrowserRouter([
     {
@@ -26,15 +25,15 @@ export const router = createBrowserRouter([
                         element: <Dashboard />
                     },
                     {
-                        path: 'formulario-inscripcion-adm',  // Cambié la ruta aquí
-                        element: <Preinscripcion />
+                        path: 'formulario-inscripcion-adm',
+                        element: <Preinscripcion isAdmin={true} />
                     },
                 ]
             },
             {
                 path: 'preinscripcion-estd',
-                element: <PreinscripcionEst />
+                element: <Preinscripcion isAdmin={false} />
             }
         ]
     }   
-])
+]);

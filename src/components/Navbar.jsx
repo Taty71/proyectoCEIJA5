@@ -20,7 +20,9 @@ const Navbar = ({ onModalopen }) => {
                     <button onClick={toggleMenu}>✖</button>
                     <ul>
                         <li className="opcMenu"><a href="#nuestra-escuela">Nuestra Escuela</a></li>
-                        <li className="opcMenu"><button  onClick={() => { onModalopen(); toggleMenu(); }}>Modalidad</button></li>
+                        <li className="opcMenu">
+                            <button onClick={() => { onModalopen('modalidad'); toggleMenu(); }}>Modalidad</button>
+                        </li>
                         <li className="opcMenu"><a href="#contacto">Contáctanos</a></li>
                     </ul>
                 </div>

@@ -8,9 +8,9 @@ const NavMain = () => {
 
     if (!context || !context.user) {
         console.error("UserContext is not available");
-        return   <Navigate to="/" replace />
-                
+        return <Navigate to="/" replace />;
     }
+
     const { user, setUser } = context;
     console.log(user, "en NavMain");
 
@@ -21,9 +21,9 @@ const NavMain = () => {
                 <>
                     <NavLink to="/dashboard">Panel-Administracion CEIJA5</NavLink>
                     <button onClick={() => {
-                                setUser(null);
-                                localStorage.removeItem("user"); // Limpia el usuario en localStorage
-                            }}>Logout</button>
+                        setUser(null);
+                        localStorage.removeItem("user"); // Limpia el usuario en localStorage
+                    }}>Logout</button>
                 </>
             )}
         </nav>

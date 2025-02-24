@@ -9,29 +9,33 @@ import HomeInfo from '../components/HomeInfo';
 
 
 const Home = () => {
-    const [activeModal, setActiveModal] = useState(null); // Manejo qué modal está activo
+    const [activeModal, setActiveModal] = useState(null);
 
-    const openModal = (modalName) => {
-        setActiveModal(modalName); // Establezco el modal activo
+    const openModal = (modal) => {
+        console.log("Abriendo modal:", modal); // 🔍 Debug
+        setActiveModal(modal);
     };
+    
 
     const closeModal = () => {
-        setActiveModal(null); // Cierro el modal activo
+        setActiveModal(null);
     };
-
+    
 
     return (
         <div className="home">
             <div className="barNav">
                 <button onClick={() => openModal('login')} className="login-button">Iniciar Sesión</button>
                 <Navbar onModalopen={() => openModal('modalidad')} />
+               
             </div>
             {/* Renderiza los modales según el modal activo */}
             {activeModal === 'login' && (
                 <LoginButton onClose={closeModal} onRegisterClick={() => openModal('register')} />
             )}
             {activeModal === 'register' && <RegisterButton onClose={closeModal} />}
-            {activeModal === 'modalidad' && <Modalidad onClose={closeModal} />}
+            {activeModal === 'modalidad' && <Modalidad isOpen={true} onClose={closeModal} />}
+
             <HomeInfo />
         </div>
     );

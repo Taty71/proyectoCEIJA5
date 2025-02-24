@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import NavMain from '../components/NavMain';
+
 import { useUserContext } from "../context/UserContextFile";
 
 const LayoutRoot = () => {
@@ -12,7 +12,7 @@ const LayoutRoot = () => {
     // Si ya hay un usuario definido, renderizamos la vista normal
     return (
         <div>
-            <NavMain />
+           { /*<NavMain />*/}
             <Outlet />
         </div>
     );

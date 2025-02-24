@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useUserContext } from '../context/UserContextFile'; // Make sure the path is correct
 import { NavLink } from 'react-router-dom';
-import Modalidad from '../components/ModalidadAdm';
+import Modalidad from '../components/Modalidad';
 import BotonCargando from '../components/BotonCargando';
 import '../estilos/dashboard.css';
 const Dashboard = () => {

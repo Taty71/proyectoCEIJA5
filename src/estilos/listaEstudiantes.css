@@ -3,6 +3,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 5%;
     padding: 20px;
     background-color: #ffffff; /* Fondo blanco */
     min-height: 100vh; /* Ocupa toda la altura de la pantalla */
@@ -27,6 +28,7 @@
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #ccc2c2; 
+}
 
 .lista-estudiantes th {
     background-color: #87CEEB; /* Azul claro */
@@ -39,7 +41,7 @@
 
 .lista-estudiantes tr:hover {
     background-color: #ccc2c2; 
-
+}
 /* Ajustes responsivos */
 @media (max-width: 768px) {
     .lista-estudiantes table {

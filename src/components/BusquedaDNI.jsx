@@ -1,16 +1,14 @@
-// src/components/BusquedaDni.jsx
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import service from '../services/service';
 import Input from './Input';
 import AlertaMens from './AlertaMens';
 import '../estilos/estilosDocumentacion.css';  
 
-// Busqueda DNI
-const BusquedaDNI = () => {
+const BusquedaDNI = ({ onEstudianteEncontrado }) => {
     const [dni, setDni] = useState('');
-    const [estudiante, setEstudiante] = useState(null);
     const [error, setError] = useState(null);  // Para manejar errores
-
+   
     const handleChange = (e) => {
         setDni(e.target.value);
     };
@@ -20,15 +18,15 @@ const BusquedaDNI = () => {
         try {
             const response = await service.getByDocumento(dni);
             if (response.status === 'success') {
-                setEstudiante(response.data.data);
                 setError(null);  // Limpiar el error si se encuentra el estudiante
+                onEstudianteEncontrado(response.data.data);  // Pasar los datos del estudiante encontrado
             } else {
-                setEstudiante(null);
+                onEstudianteEncontrado(null);
                 setError('No se encontró un estudiante con ese DNI.');
             }
         } catch (error) {
             console.error('Error al consultar el DNI:', error);
-            setEstudiante(null);
+            onEstudianteEncontrado(null);
             setError('Hubo un error al buscar el estudiante.');
         }
     };
@@ -47,30 +45,14 @@ const BusquedaDNI = () => {
                 />
                 <button type="submit" className='buttonF'>Consultar</button>
             </form>
-            {error && <p style={{ color: 'red' }}>{error}</p>}  {/* Mostrar mensaje de error */}
-            {estudiante && (
-                <div>
-                    <h3>Información del Estudiante</h3>
-                    <p>Nombre: {estudiante.nombreEstd}</p>
-                    <p>Apellido: {estudiante.apellidoEstd}</p>
-                    <p>DNI: {estudiante.dni}</p>
-                    <p>CUIL: {estudiante.cuil}</p>
-                    <p>Fecha de Nacimiento: {estudiante.fechaNacimiento}</p>
-                    <p>Domicilio Calle: {estudiante.calle}</p>
-                    <p>Nro: {estudiante.nro}</p>
-                    <p>Barrio: {estudiante.barrioEstd}</p>
-                    <p>Localidad: {estudiante.localidadEstd}</p>
-                    <p>Provincia: {estudiante.provinciaEstd}</p>
-                    <p>Modalidad: {estudiante.modalidadEstd}</p>
-                    {estudiante.modalidadEstd === 'Plan' ? (
-                        <p>Plan Año: {estudiante.planAnio}</p>
-                    ) : (
-                        <p>Año Inscripto: {estudiante.anioInscripto}</p>
-                    )}
-                </div>
-            )}
+            {error && <p style={{ color: 'red' }}>{error}</p>} 
+            {/* Mostrar mensaje de error */}
         </div>
     );
+};
+
+BusquedaDNI.propTypes = {
+    onEstudianteEncontrado: PropTypes.func.isRequired,
 };
 
 export default BusquedaDNI;

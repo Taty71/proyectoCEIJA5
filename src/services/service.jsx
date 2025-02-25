@@ -55,13 +55,12 @@ const getUser = async (data) => {
     },
 }*/
 // Asegúrate de que este archivo tenga la exportación correcta
-export const createWebInscription = async (formData) => {
+const createWebInscription = async (formData) => {
     // Implementación de la función para la inscripción web
     try {
-        const response = await  axiosInstance.post('inscripcionWebEstd.php', {
-            method: 'POST',
-            body: formData,
-        });
+        const response = await  axiosInstance.post('inscripcionWebEstd.php',formData);
+        // {            method: 'POST',            body: formData,});
+            
         return await response.json();
     } catch (error) {
         console.error('Error en createWebInscription:', error);
@@ -69,7 +68,7 @@ export const createWebInscription = async (formData) => {
     }
 };
 
-// Otras exportaciones del archivo service.jsx
+// Inscripcion Estudiante Adm
 const createEstd = async (data) => {
     try {
         const response = await axiosInstance.post('/inscripcionRegistroB.php', data);
@@ -93,6 +92,27 @@ const createEstd = async (data) => {
         }
 
         throw new Error("Error al procesar la solicitud");
+    }
+};
+
+// Modificar inscripción Adm
+const updateEstd = async (data) => {
+    try {
+        const response = await axiosInstance.put('inscripcionRegistroB.php', data);
+        return response.data;
+    } catch (error) {
+        console.error('Error en updateEstd:', error);
+        throw error;
+    }
+};
+// Eliminar inscripción Adm
+const deleteEstd = async (dni) => {
+    try {
+        const response = await axiosInstance.delete(`inscripcionRegistroB.php?dni=${dni}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error en deleteEstd:', error);
+        throw error;
     }
 };
 
@@ -148,7 +168,7 @@ const getByDocumento = async (dni) => {
 // Obtener materias por año o plan y módulo
 const getMaterias = async (idAnioPlan, idModulo) => {
     try {
-        let url = 'solicitarMaterias.php';
+        let url = '/getMaterias.php';
         if (idAnioPlan) {
             url += `?idAnioPlan=${idAnioPlan}`;
         } else if (idModulo) {
@@ -161,7 +181,7 @@ const getMaterias = async (idAnioPlan, idModulo) => {
         return { error: true, message: error.message };
     }
 };
-// Modificar una inscripción existente
+//Modificar una inscripción existente
 /*const update = async (id, updatedData) => {
     try {
         const response = await axiosInstance.put(`${baseURL}/${id}`, updatedData);
@@ -173,7 +193,7 @@ const getMaterias = async (idAnioPlan, idModulo) => {
 };*/
 
 // Eliminar una inscripción
-/*const remove = async (id) => {
+/*const delete = async (id) => {
     try {
         const response = await axiosInstance.delete(`${baseURL}/${id}`);
         return response.data;
@@ -206,12 +226,10 @@ export default {
     getAll,
     getByDocumento,
     createU,
-    createEstd,
     createWebInscription,
+    createEstd,
+    updateEstd,
+    deleteEstd,
     getUser,
     getMaterias
-    //update,
-    //remove,
-   // uploadFile,
-    //buscarDni
 };

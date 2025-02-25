@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Formik } from 'formik';
-import {  createEstd, createWebInscription } from '../services/service'; // Importa correctamente la función para la inscripción web
+import service from '../services/service';
+//import {createEstd, createWebInscription } from '../services/service'; // Importa correctamente la función para la inscripción web
 import RegistroEstd from './RegistroEstd';
 import PropTypes from 'prop-types';
 import AlertaMens from '../components/AlertaMens';
@@ -64,9 +65,44 @@ const FormularioInscripcion = ({ modalidad, maxFileSize = max_file_size, accion,
         });
 
         try {
-            const response = isAdmin 
-                ? await createEstd(formDataToSend)  // Llama al servicio del administrador
-                : await createWebInscription(formDataToSend);  // Llama a la función para inscripción web
+            let response;
+            switch (accion) {
+                case "Registrar":
+                    response = isAdmin 
+                        ? await service.createEstd(formDataToSend)  
+                        : await service.createWebInscription(formDataToSend);
+                    break;
+            
+                case "Modificar":
+                    if (isAdmin) {
+                        response = await service.updateEstd(formDataToSend);
+                    }
+                    break;
+            
+                case "Eliminar":
+                    if (isAdmin) {
+                        response = await service.deleteEstd(values.dni);
+                    }
+                    break;
+            
+                case "Consultar":
+                    if (values.dni) {
+                        response = await service.getByDocumento(values.dni); // Consulta por DNI
+                    } else {
+                        response = await service.getAll(); // Consulta de todos los inscriptos
+                    }
+                    break;
+            
+                case "Listar":
+                    if (isAdmin) {
+                        response = await service.getAll();
+                    }
+                    break;
+            
+                default:
+                    response = await service.getAll();
+            }
+            
 
             console.log("Respuesta del servidor:", response);
 

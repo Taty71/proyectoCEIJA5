@@ -42,7 +42,7 @@ const RegistroEstd = ({ modalidad, previews, handleFileChange, alert, accion, ha
             {({ values, handleChange, setFieldValue, resetForm }) => {
                  const showMateriasList = values.planAnio !== '' && values.modalidad !== ''
                return(
-               <Form method="POST" encType="multipart/form-data">
+               <Form  encType="multipart/form-data">
                     <div className="formd">
                         <DatosPersonales />
                         <Domicilio />

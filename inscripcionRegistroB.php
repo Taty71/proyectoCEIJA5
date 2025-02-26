@@ -153,21 +153,21 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
         $stmt->close();
 
         // Insertar en estudiantes
-        $idLogin = null; // Cambiar según corresponda
+        $idUsuarios = null; // Cambiar según corresponda
         $fotoRuta = $rutas['foto']; // Esto debe contener la ruta de la foto
 
-        $stmt = $conn->prepare("INSERT INTO estudiantes (nombre, apellido, dni, cuil, fechaNacimiento, foto, idDomicilio, idLogin) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO estudiantes (nombre, apellido, dni, cuil, fechaNacimiento, foto, idDomicilio, idUsuarios) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         if (!$stmt) {
             throw new Exception("Error al preparar la consulta para estudiantes: " . $conn->error);
         }
-        $stmt->bind_param('sssisssi', $nombreEstd, $apellidoEstd, $dni, $cuil, $fechaNacimiento, $fotoRuta, $idDomicilio, $idLogin);
+        $stmt->bind_param('sssisssi', $nombreEstd, $apellidoEstd, $dni, $cuil, $fechaNacimiento, $fotoRuta, $idDomicilio, $idUsuarios);
         $stmt->execute();
         $idEstudiante = $conn->insert_id;
         $stmt->close();
 
         // Insertar en inscripciones
         $fechaInscripcion = date('Y-m-d');
-        $stmt = $conn->prepare("INSERT INTO inscripciones (idEstudiante, fechaInscripcion, idModalidad, idAnioPlan, idEstadoInscripcion) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO inscripciones (fechaInscripcion, idEstudiante, idModalidad, idAnioPlan, idEstadoInscripcion) VALUES (?, ?, ?, ?, ?)");
         if (!$stmt) {
             throw new Exception("Error al preparar la consulta para inscripciones: " . $conn->error);
         }

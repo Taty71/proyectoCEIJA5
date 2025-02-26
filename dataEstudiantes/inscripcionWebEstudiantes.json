@@ -1,0 +1,27 @@
+{
+    "nombre": "Test",
+    "apellido": "Test",
+    "dni": "123456789",
+    "cuil": "221234567892",
+    "fechaNacimiento": "2000-01-01",
+    "calle": "Test",
+    "numero": "123",
+    "barrio": "Test",
+    "localidad": "Test",
+    "provincia": "Test",
+    "modalidad": "Presencial",
+    "planAnio": "3er A\u00f1o"
+}{
+    "nombre": "Prueba",
+    "apellido": "Prueba",
+    "dni": "987654321",
+    "cuil": "229876543212",
+    "fechaNacimiento": "1996-05-07",
+    "calle": "Prueba",
+    "numero": "321",
+    "barrio": "Prueba",
+    "localidad": "Prueba",
+    "provincia": "Prueba",
+    "modalidad": "Presencial",
+    "planAnio": "1er A\u00f1o"
+}

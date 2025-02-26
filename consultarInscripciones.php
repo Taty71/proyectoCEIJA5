@@ -15,19 +15,8 @@ if ($conn->connect_error) {
     echo json_encode(["status" => "error", "message" => "Error al conectar a la base de datos: " . $conn->connect_error]);
     exit;
 }
-/*
-$sql = "SELECT 	e.id,
-                e.nombre,
-                e.apellido,
-                e.dni,
-                e.cuil,
-                e.fechaNacimiento,
-                d.calle,
-                d.numero
-        FROM estudiantes e
-        LEFT JOIN domicilios d ON e.idDomicilio = d.id";*/
 
-$sql = "SELECT 	e.id,
+$SQL_Select = "SELECT 	e.id,
                 e.nombre,
                 e.apellido,
                 e.dni,
@@ -49,17 +38,18 @@ $sql = "SELECT 	e.id,
         LEFT JOIN anio_plan ap ON i.idAnioPlan = ap.id
         LEFT JOIN modalidades m ON i.idModalidad = m.id;";
 
-$result = $conn->query($sql);
+$result = $conn->query($SQL_Select);
 
 if ($result->num_rows > 0) {
     $estudiantes = [];
     while ($row = $result->fetch_assoc()) {
-        $estudiantes[] = $row;
+        $estudiante = $row;
     }
-    echo json_encode(["status" => "success", "data" => $estudiantes]);
+    echo json_encode(["status" => "success", "data" => $estudiante]);
 } else {
     echo json_encode(["status" => "error", "message" => "No se encontraron estudiantes."]);
 }
 
 $conn->close();
+
 ?>

@@ -12,14 +12,16 @@ require_once 'conexion.php';
 $conn = getDbConnection();
 
 if ($conn->connect_error) {
+
     echo json_encode(["status" => "error", "message" => "Error al conectar a la base de datos: " . $conn->connect_error]);
+
     exit;
+
 }
+ 
+$dni = $_POST['dni'];
 
-$obj = json_decode(file_get_contents('php://input'));   
-$dni = $obj->dni;
-
-$SQL_Select = "SELECT 	e.id,
+$SQL_SELECT = "SELECT 	e.id,
                             e.nombre,
                             e.apellido,
                             e.dni,
@@ -42,16 +44,24 @@ $SQL_Select = "SELECT 	e.id,
                 LEFT JOIN modalidades m ON i.idModalidad = m.id
                 WHERE dni = $dni";
 
-$result = $conn->query($SQL_Select);
+$result = $conn->query($SQL_SELECT);
 
 if ($result->num_rows > 0) {
+
     $estudiantes = [];
+
     while ($row = $result->fetch_assoc()) {
+
         $estudiantes[] = $row;
+
     }
+
     echo json_encode(["status" => "success", "data" => $estudiantes]);
+
 } else {
+
     echo json_encode(["status" => "error", "message" => "No se encontraron estudiantes."]);
+
 }
 
 $conn->close();

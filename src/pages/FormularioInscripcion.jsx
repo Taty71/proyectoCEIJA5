@@ -102,8 +102,6 @@ const FormularioInscripcion = ({ modalidad, maxFileSize = max_file_size, accion,
                 default:
                     response = await service.getAll();
             }
-            
-
             console.log("Respuesta del servidor:", response);
 
             if (response && response.data) {
@@ -120,7 +118,7 @@ const FormularioInscripcion = ({ modalidad, maxFileSize = max_file_size, accion,
             }
             setAlert({ text: mensajeError, variant: 'error' });
         } finally {
-            setTimeout(() => setAlert({ text: '', variant: '' }), 5000);
+            setTimeout(() => setAlert({ text: '', variant: '' }), 10000);
         }
     };
     const handleReset = () => {

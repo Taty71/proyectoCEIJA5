@@ -175,40 +175,6 @@ const getAreasEstudio = async (idModulo) => {
     }
 };
 // Obtener materias por año o plan y módulo
-const getMaterias = async ({ idAnioPlan, selectedModulo, modalidadId, areaEstudio }) => {
-    try {
-        let url = 'funciones/obtenerMaterias.php';
-        
-        // Concatenar parámetros de manera adecuada
-        const params = new URLSearchParams();
-        if (idAnioPlan) {
-            params.append('idAnioPlan', idAnioPlan);
-        }
-        if (selectedModulo) {
-            params.append('modulo', selectedModulo);
-        }
-        if (modalidadId) {
-            params.append('modalidad', modalidadId);
-        }
-        if (areaEstudio) {
-            params.append('areaEstudio', areaEstudio);
-        }
-
-        // Agregar los parámetros a la URL si hay alguno
-        if (params.toString()) {
-            url += `?${params.toString()}`;
-        }
-
-        // Realizar la petición con axios
-        const response = await axiosInstance.get(url);
-        return response.data;
-
-    } catch (error) {
-        console.error('Error al obtener las materias:', error);
-        return { error: true, message: error.message };
-    }
-};
-
 
 // Exportar todas las funciones
 export default {
@@ -220,7 +186,6 @@ export default {
     updateEstd,
     deleteEstd,
     getUser,
-    getMaterias,
     getModulos,
     getAreasEstudio
 };

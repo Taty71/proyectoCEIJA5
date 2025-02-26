@@ -19,7 +19,14 @@ if ($conn->connect_error) {
 
 }
 
-$dni = $_POST['dni'];
+$input = json_decode(file_get_contents("php://input"), true);
+
+if (empty($input)) {
+    echo json_encode(["status" => "error", "message" => "Valor vacio."]);
+    exit;
+}
+
+$dni = $input['dni'];
 
 $SQL_UPDATE = "UPDATE estudiantes e
                SET e.activo = 0 

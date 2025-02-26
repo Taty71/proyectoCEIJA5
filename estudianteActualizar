@@ -19,14 +19,21 @@ if ($conn->connect_error) {
     
 }
 
-$nombre = $_POST['nombre'];
-$apellido = $_POST['apellido'];
-$dni = $_POST['dni'];
-$cuil = $_POST['cuil'];
-$fechaNacimiento = $_POST['fechaNacimiento'];
-$numero = $_POST['nro'];
-$calle = $_POST['calle'];
-$barrio = $_POST['barrio'];
+$input = json_decode(file_get_contents("php://input"), true);
+
+if (empty($input) || !is_array($input)) {
+    echo json_encode(["status" => "error", "message" => "Datos del estudiante no validos."]);
+    exit;
+}
+
+$nombre = $input['nombre'];
+$apellido = $input['apellido'];
+$dni = $input['dni'];
+$cuil = $input['cuil'];
+$fechaNacimiento = $input['fechaNacimiento'];
+$numero = $input['nro'];
+$calle = $input['calle'];
+$barrio = $input['barrio'];
 
 
 $SQL_UPDATE =  "UPDATE estudiantes e, domicilios d

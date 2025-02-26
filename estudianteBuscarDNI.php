@@ -18,8 +18,10 @@ if ($conn->connect_error) {
     exit;
 
 }
- 
-$dni = $_POST['dni'];
+
+$input = json_decode(file_get_contents("php://input"), true);
+
+$dni = $input['dni'];
 
 $SQL_SELECT = "SELECT 	e.id,
                             e.nombre,

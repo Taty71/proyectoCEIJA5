@@ -89,7 +89,7 @@ const createEstd = async (formData) => {
 // Modificar inscripción Adm
 const updateEstd = async (data) => {
     try {
-        const response = await axiosInstance.put('ejemplo.php', data);
+        const response = await axiosInstance.put('estudianteActualizar.php', data);
         return response.data;
     } catch (error) {
         console.error('Error en updateEstd:', error);
@@ -100,7 +100,7 @@ const updateEstd = async (data) => {
 // Eliminar inscripción Adm
 const deleteEstd = async (dni) => {
     try {
-        const response = await axiosInstance.delete(`ejemplo.php?dni=${dni}`);
+        const response = await axiosInstance.delete(`estudianteEliminar.php?dni=${dni}`);
         return response.data;
     } catch (error) {
         console.error('Error en deleteEstd:', error);
@@ -111,7 +111,7 @@ const deleteEstd = async (dni) => {
 // Obtener todas las inscripciones
 const getAll = async () => {
     try {
-        const response = await axiosInstance.get('consultarInscripciones.php');
+        const response = await axiosInstance.get('estudiantesListar.php');
         console.log('Respuesta del servidor:', response.data);
         return response.data;
     } catch (error) {
@@ -123,7 +123,7 @@ const getAll = async () => {
 // Consultar inscripciones por documento
 const getByDocumento = async (dni) => {
     try {
-        const response = await axiosInstance.get(`consultaDNI.php?dni=${dni}`);
+        const response = await axiosInstance.get(`estudianteBuscarDNI.php?dni=${dni}`);
         console.log('Respuesta del servidor:', response.data);
         return response.data;
     } catch (error) {

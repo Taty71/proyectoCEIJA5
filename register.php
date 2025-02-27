@@ -1,9 +1,13 @@
 <?php
-include_once 'conexion.php'; 
+include_once 'conexion.php';
 
 // Incluir el archivo con las funciones
 include_once 'actualizarPassw.php'; //no estoy usuando la funcion aun para actualizar la contraseña
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 63e30ca543a15f254dea03e7f64a243be5233a6e
 header('Content-Type: application/json');
 
 
@@ -11,9 +15,10 @@ header('Content-Type: application/json');
 $input = json_decode(file_get_contents("php://input"), true);
 
 // Verificar que $input no esté vacío y sea un array 
-if (empty($input) || !is_array($input)) 
-    { echo json_encode(["status" => "error", "message" => "Datos de entrada no válidos"]);
-     exit;}
+if (empty($input) || !is_array($input)) {
+    echo json_encode(["status" => "error", "message" => "Datos de entrada no válidos"]);
+    exit;
+}
 
 // Obtener los datos de la solicitud POST
 $nombre = $input['nombre'] ?? '';
@@ -21,14 +26,21 @@ $apellido = $input['apellido'] ?? '';
 $email = $input['email'] ?? '';
 $password = $input['password'] ?? '';
 $rol = $input['rol'] ?? '';
+<<<<<<< HEAD
 
+=======
+>>>>>>> 63e30ca543a15f254dea03e7f64a243be5233a6e
 
 // Verificar que todos los campos necesarios estén presentes
 if (empty($email) || empty($password) || empty($nombre) || empty($apellido) || empty($rol)) {
     echo json_encode(["status" => "error", "message" => "Todos los campos son obligatorios"]);
+<<<<<<< HEAD
 
     exit; // Sale del script si algún campo está vacío
 
+=======
+    exit; // Sale del script si algún campo está vacío
+>>>>>>> 63e30ca543a15f254dea03e7f64a243be5233a6e
 }
 
 // Conexión a la base de datos

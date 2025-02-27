@@ -46,18 +46,18 @@ const ListaEstudiantes = () => {
                 </thead>
                 <tbody>
                     {estudiantes.map(estudiante => (
-                        <tr key={estudiante.idEstudiante}>
-                            <td>{estudiante.idEstudiante}</td>
-                            <td>{estudiante.nombreEstd}</td>
-                            <td>{estudiante.apellidoEstd}</td>
+                        <tr key={estudiante.id}>
+                            <td>{estudiante.id}</td>
+                            <td>{estudiante.nombre}</td>
+                            <td>{estudiante.apellido}</td>
                             <td>{estudiante.dni}</td>
                             <td>{estudiante.cuil}</td>
                             <td>{estudiante.fechaNacimiento}</td>
                             <td>{estudiante.calle}</td>
-                            <td>{estudiante.nro}</td>
+                            <td>{estudiante.numero}</td>
                             <td>{estudiante.barrio}</td>
                             <td>{estudiante.localidad}</td>
-                            <td>{estudiante.pcia}</td>
+                            <td>{estudiante.provincia}</td>
                             <td>{estudiante.modalidad}</td>
                             <td>{estudiante.planAnio}</td>
                         </tr>

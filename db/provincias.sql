@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 30-11-2024 a las 05:51:45
+-- Tiempo de generación: 25-02-2025 a las 20:27:37
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -28,9 +28,17 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `provincias` (
-  `idPcias` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `provincia` varchar(60) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `provincias`
+--
+
+INSERT INTO `provincias` (`id`, `provincia`) VALUES
+(2, 'Cordoba'),
+(3, 'Corrientes');
 
 --
 -- Índices para tablas volcadas
@@ -40,7 +48,7 @@ CREATE TABLE `provincias` (
 -- Indices de la tabla `provincias`
 --
 ALTER TABLE `provincias`
-  ADD PRIMARY KEY (`idPcias`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -50,7 +58,7 @@ ALTER TABLE `provincias`
 -- AUTO_INCREMENT de la tabla `provincias`
 --
 ALTER TABLE `provincias`
-  MODIFY `idPcias` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

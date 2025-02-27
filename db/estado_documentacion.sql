@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 10-12-2024 a las 03:19:25
+-- Tiempo de generación: 25-02-2025 a las 20:23:53
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `estado_documentacion` (
-  `idEstadoDocumentacion` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `idEstudiante` int(11) NOT NULL,
   `idDocumentaciones` int(11) NOT NULL,
   `estado` varchar(50) NOT NULL
@@ -38,7 +38,7 @@ CREATE TABLE `estado_documentacion` (
 -- Volcado de datos para la tabla `estado_documentacion`
 --
 
-INSERT INTO `estado_documentacion` (`idEstadoDocumentacion`, `idEstudiante`, `idDocumentaciones`, `estado`) VALUES
+INSERT INTO `estado_documentacion` (`id`, `idEstudiante`, `idDocumentaciones`, `estado`) VALUES
 (15, 1, 1, 'Completado'),
 (16, 1, 2, 'Completado'),
 (17, 1, 3, 'Pendiente'),
@@ -55,7 +55,7 @@ INSERT INTO `estado_documentacion` (`idEstadoDocumentacion`, `idEstudiante`, `id
 -- Indices de la tabla `estado_documentacion`
 --
 ALTER TABLE `estado_documentacion`
-  ADD PRIMARY KEY (`idEstadoDocumentacion`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `idEstudiante` (`idEstudiante`),
   ADD KEY `idDocumentaciones` (`idDocumentaciones`);
 
@@ -67,7 +67,7 @@ ALTER TABLE `estado_documentacion`
 -- AUTO_INCREMENT de la tabla `estado_documentacion`
 --
 ALTER TABLE `estado_documentacion`
-  MODIFY `idEstadoDocumentacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- Restricciones para tablas volcadas
@@ -77,8 +77,8 @@ ALTER TABLE `estado_documentacion`
 -- Filtros para la tabla `estado_documentacion`
 --
 ALTER TABLE `estado_documentacion`
-  ADD CONSTRAINT `estado_documentacion_ibfk_1` FOREIGN KEY (`idEstudiante`) REFERENCES `estudiantes` (`idEstudiante`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `estado_documentacion_ibfk_2` FOREIGN KEY (`idDocumentaciones`) REFERENCES `documentaciones` (`idDocumentacion`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `estado_documentacion_ibfk_1` FOREIGN KEY (`idEstudiante`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `estado_documentacion_ibfk_2` FOREIGN KEY (`idDocumentaciones`) REFERENCES `documentaciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

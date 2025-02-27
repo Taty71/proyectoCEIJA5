@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 30-11-2024 a las 05:52:01
+-- Tiempo de generación: 25-02-2025 a las 20:26:01
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -28,10 +28,19 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `localidades` (
-  `idLocalidades` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `localidad` varchar(60) NOT NULL,
   `idPcia` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `localidades`
+--
+
+INSERT INTO `localidades` (`id`, `localidad`, `idPcia`) VALUES
+(1, 'La Calera', 2),
+(4, 'La Calera,', 2),
+(17, 'Cordoba', 2);
 
 --
 -- Índices para tablas volcadas
@@ -41,7 +50,8 @@ CREATE TABLE `localidades` (
 -- Indices de la tabla `localidades`
 --
 ALTER TABLE `localidades`
-  ADD PRIMARY KEY (`idLocalidades`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_localidades_provincias` (`idPcia`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -51,7 +61,17 @@ ALTER TABLE `localidades`
 -- AUTO_INCREMENT de la tabla `localidades`
 --
 ALTER TABLE `localidades`
-  MODIFY `idLocalidades` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `localidades`
+--
+ALTER TABLE `localidades`
+  ADD CONSTRAINT `fk_localidades_provincias` FOREIGN KEY (`idPcia`) REFERENCES `provincias` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

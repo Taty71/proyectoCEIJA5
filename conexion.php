@@ -7,11 +7,12 @@ header('Access-Control-Allow-Headers: Content-Type');
 header("Access-Control-Allow-Credentials: true");
 header('Access-Control-Allow-Headers: Content-Type, Authorization'); // Encabezados permitidos
 // Configuración de conexión a la base de datos
-function getDbConnection() {
+function getDbConnection()
+{
     $servername = "localhost";
     $username = "root";
     $password = "";
-    $dbname = "ceija5";
+    $dbname = "ceija5_redone";
 
     // Crear la conexión
     $conn = new mysqli($servername, $username, $password, $dbname);

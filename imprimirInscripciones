@@ -1,0 +1,104 @@
+<?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+header('Access-Control-Allow-Origin: *');
+header("Content-Type: application/json");
+
+require_once 'conexion.php';
+require_once __DIR__ . '/fpdf/fpdf.php'; // Asegúrate de que la ruta sea correcta
+
+$conn = getDbConnection();
+if ($conn->connect_error) {
+    echo json_encode(["status" => "error", "message" => "Error al conectar a la base de datos: " . $conn->connect_error]);
+    exit;
+}
+
+$sql = "SELECT 
+    e.id, 
+    e.nombre AS nombreEstd, 
+    e.apellido AS apellidoEstd, 
+    e.dni, 
+    e.cuil, 
+    e.fechaNacimiento, 
+    d.calle, 
+    d.numero AS nro, 
+    b.nombreBarrio AS barrioEstd, 
+    l.localidad AS localidadEstd, 
+    p.provincia AS provinciaEstd,
+    m.modalidad AS modalidadEstd,
+    ap.descripcionAnioPlan AS anioPlanEstd,
+    i.fechaInscripcion,
+    i.idEstadoInscripcion
+FROM inscripciones i
+LEFT JOIN estudiantes e ON i.idEstudiante = e.id
+LEFT JOIN domicilios d ON e.idDomicilio = d.id
+LEFT JOIN barrios b ON d.idBarrio = b.id
+LEFT JOIN localidades l ON b.idLocalidad = l.id
+LEFT JOIN provincias p ON l.idPcia = p.id
+LEFT JOIN modalidades m ON i.idModalidad = m.id
+LEFT JOIN anio_plan ap ON i.idAnioPlan = ap.id";
+
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    $estudiantes = [];
+    while ($row = $result->fetch_assoc()) {
+        $estudiantes[] = $row;
+    }
+
+    // Crear el PDF
+    $pdf = new FPDF();
+    $pdf->AddPage();
+    $pdf->SetFont('Arial', 'B', 12);
+    $pdf->Cell(0, 10, 'Listado de Estudiantes', 0, 1, 'C');
+    $pdf->Ln(10);
+
+    // Encabezados de la tabla
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(20, 10, 'ID', 1);
+    $pdf->Cell(30, 10, 'Nombre', 1);
+    $pdf->Cell(30, 10, 'Apellido', 1);
+    $pdf->Cell(20, 10, 'DNI', 1);
+    $pdf->Cell(30, 10, 'Cuil', 1);
+    $pdf->Cell(30, 10, 'Fecha Nac.', 1);
+    $pdf->Cell(30, 10, 'Calle', 1);
+    $pdf->Cell(20, 10, 'Nro', 1);
+    $pdf->Cell(30, 10, 'Barrio', 1);
+    $pdf->Cell(30, 10, 'Localidad', 1);
+    $pdf->Cell(30, 10, 'Provincia', 1);
+    $pdf->Cell(30, 10, 'Modalidad', 1);
+    $pdf->Cell(30, 10, 'Anio Plan', 1);
+    $pdf->Cell(30, 10, 'Fecha Inscrip.', 1);
+    $pdf->Ln();
+
+    // Datos de la tabla
+    $pdf->SetFont('Arial', '', 10);
+    foreach ($estudiantes as $estudiante) {
+        $pdf->Cell(20, 10, $estudiante['id'], 1);
+        $pdf->Cell(30, 10, $estudiante['nombreEstd'], 1);
+        $pdf->Cell(30, 10, $estudiante['apellidoEstd'], 1);
+        $pdf->Cell(20, 10, $estudiante['dni'], 1);
+        $pdf->Cell(30, 10, $estudiante['cuil'], 1);
+        $pdf->Cell(30, 10, $estudiante['fechaNacimiento'], 1);
+        $pdf->Cell(30, 10, $estudiante['calle'], 1);
+        $pdf->Cell(20, 10, $estudiante['nro'], 1);
+        $pdf->Cell(30, 10, $estudiante['barrioEstd'], 1);
+        $pdf->Cell(30, 10, $estudiante['localidadEstd'], 1);
+        $pdf->Cell(30, 10, $estudiante['provinciaEstd'], 1);
+        $pdf->Cell(30, 10, $estudiante['modalidadEstd'], 1);
+        $pdf->Cell(30, 10, $estudiante['anioPlanEstd'], 1);
+        $pdf->Cell(30, 10, $estudiante['fechaInscripcion'], 1);
+        $pdf->Ln();
+    }
+
+    $pdf->Output('D', 'Listado_Estudiantes.pdf');
+} else {
+    echo json_encode(["status" => "error", "message" => "No se encontraron estudiantes."]);
+}
+
+$conn->close();
+
+?>

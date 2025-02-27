@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 12-12-2024 a las 23:44:11
+-- Tiempo de generación: 25-02-2025 a las 20:07:25
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `anio_plan` (
-  `idAnioPlan` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `descripcionAnioPlan` varchar(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -39,7 +39,7 @@ CREATE TABLE `anio_plan` (
 --
 
 CREATE TABLE `area_estudio` (
-  `idAreaEstudio` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `areaEstudio` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -50,7 +50,7 @@ CREATE TABLE `area_estudio` (
 --
 
 CREATE TABLE `barrios` (
-  `idBarrios` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `nombreBarrio` varchar(60) NOT NULL,
   `idLocalidad` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -59,11 +59,15 @@ CREATE TABLE `barrios` (
 -- Volcado de datos para la tabla `barrios`
 --
 
-INSERT INTO `barrios` (`idBarrios`, `nombreBarrio`, `idLocalidad`) VALUES
+INSERT INTO `barrios` (`id`, `nombreBarrio`, `idLocalidad`) VALUES
 (1, 'Industrial', 1),
 (24, 'Centro', 4),
 (42, 'Alberdi', 1),
-(43, 'San Martin', 17);
+(43, 'San Martin', 17),
+(44, 'Stoecking', 1),
+(45, 'Centro', 1),
+(46, 'San Martin', 1),
+(47, 'COFICCO', 1);
 
 -- --------------------------------------------------------
 
@@ -72,7 +76,7 @@ INSERT INTO `barrios` (`idBarrios`, `nombreBarrio`, `idLocalidad`) VALUES
 --
 
 CREATE TABLE `cargos` (
-  `idCargos` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `cargo` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -83,7 +87,7 @@ CREATE TABLE `cargos` (
 --
 
 CREATE TABLE `detalle_incorporacion` (
-  `idDetalleInc` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `fechaEntrega` int(11) NOT NULL,
   `idIncorporacion` int(11) NOT NULL,
   `idDocumentacion` int(11) NOT NULL
@@ -117,7 +121,22 @@ INSERT INTO `detalle_inscripciones` (`idDetalleInscp`, `idTDocumentacion`, `esta
 (22, 2, 'Entregado', '2024-12-12', 15),
 (23, 4, 'Entregado', '2024-12-12', 15),
 (24, 3, 'Entregado', '2024-12-12', 15),
-(25, 7, 'Entregado', '2024-12-12', 15);
+(25, 7, 'Entregado', '2024-12-12', 15),
+(26, 1, 'Entregado', '2025-02-12', 17),
+(27, 2, 'Entregado', '2025-02-12', 17),
+(28, 4, 'Entregado', '2025-02-12', 17),
+(29, 3, 'Entregado', '2025-02-12', 17),
+(30, 7, 'Entregado', '2025-02-12', 17),
+(31, 7, 'Entregado', '2025-02-12', 18),
+(32, 8, 'Entregado', '2025-02-12', 19),
+(33, 1, 'Entregado', '2025-02-12', 20),
+(34, 7, 'Entregado', '2025-02-12', 20),
+(35, 7, 'Entregado', '2025-02-13', 21),
+(36, 4, 'Entregado', '2025-02-14', 22),
+(37, 3, 'Entregado', '2025-02-14', 22),
+(38, 7, 'Entregado', '2025-02-14', 22),
+(39, 3, 'Entregado', '2025-02-14', 23),
+(40, 7, 'Entregado', '2025-02-14', 23);
 
 -- --------------------------------------------------------
 
@@ -126,7 +145,7 @@ INSERT INTO `detalle_inscripciones` (`idDetalleInscp`, `idTDocumentacion`, `esta
 --
 
 CREATE TABLE `documentaciones` (
-  `idDocumentacion` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `descripDocumentacion` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -134,7 +153,7 @@ CREATE TABLE `documentaciones` (
 -- Volcado de datos para la tabla `documentaciones`
 --
 
-INSERT INTO `documentaciones` (`idDocumentacion`, `descripDocumentacion`) VALUES
+INSERT INTO `documentaciones` (`id`, `descripDocumentacion`) VALUES
 (1, 'DNI '),
 (2, 'CUIL'),
 (3, 'FICHA MEDICA '),
@@ -166,7 +185,14 @@ INSERT INTO `domicilios` (`idDomicilio`, `calle`, `nro`, `idBarrio`) VALUES
 (1, 'José Hernández', 318, 1),
 (25, 'José Hernández', 318, 24),
 (45, 'Jose Hernandez', 236, 42),
-(46, 'Francisco Miranda', 895, 43);
+(46, 'Francisco Miranda', 895, 43),
+(49, 'José Hernández', 563, 44),
+(50, 'Estanislao del Campo', 159, 45),
+(51, 'Sucre', 858, 1),
+(52, 'José Hernández', 2003, 46),
+(53, 'José Mujica', 563, 45),
+(55, 'Estanislao del Campo', 1024, 47),
+(56, 'San Martin', 785, 45);
 
 -- --------------------------------------------------------
 
@@ -201,7 +227,7 @@ INSERT INTO `estado_documentacion` (`idEstadoDocumentacion`, `idEstudiante`, `id
 --
 
 CREATE TABLE `estado_incorporaciones` (
-  `idEstadoIncorporar` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `estadoIncorporar` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -212,7 +238,7 @@ CREATE TABLE `estado_incorporaciones` (
 --
 
 CREATE TABLE `estado_inscripciones` (
-  `idEstadoInscripciones` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `descripcionEstado` varchar(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -223,7 +249,7 @@ CREATE TABLE `estado_inscripciones` (
 --
 
 CREATE TABLE `estudiantes` (
-  `idEstudiante` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `nombreEstd` varchar(50) NOT NULL,
   `apellidoEstd` varchar(50) NOT NULL,
   `dni` int(8) NOT NULL,
@@ -238,11 +264,18 @@ CREATE TABLE `estudiantes` (
 -- Volcado de datos para la tabla `estudiantes`
 --
 
-INSERT INTO `estudiantes` (`idEstudiante`, `nombreEstd`, `apellidoEstd`, `dni`, `cuil`, `fechaNacimiento`, `foto`, `idDomicilio`, `idLogin`) VALUES
+INSERT INTO `estudiantes` (`id`, `nombreEstd`, `apellidoEstd`, `dni`, `cuil`, `fechaNacimiento`, `foto`, `idDomicilio`, `idLogin`) VALUES
 (1, 'Cristina Beatriz', 'MAIA', 21518473, '27-21518473-6', '0012-03-02', NULL, 1, 1),
 (2, 'Danila Z', 'Congregado Maia', 43032642, '26-20123569-6', '1985-02-12', 'uploads/foto_6754cc047c627.jpg', 25, NULL),
 (18, '0', 'Maia', 23698523, '23', '1973-02-12', NULL, 45, NULL),
-(19, '0', 'Soria', 39023693, '21', '1996-12-23', NULL, 46, NULL);
+(19, '0', 'Soria', 39023693, '21', '1996-12-23', NULL, 46, NULL),
+(22, 'Martin', 'Espino', 43032641, '24', '0000-00-00', 'uploads/foto_67abe4fa3ae01.jpg', 49, NULL),
+(23, 'Daniela', 'Albornoz', 30256124, '24', '1985-04-25', 'uploads/foto_67abf4a95e569.jpg', 50, NULL),
+(24, 'Isaias', 'Longino', 38902369, '20', '2002-02-25', 'uploads/foto_67acbe8680b5a.jpg', 51, NULL),
+(25, 'Martin', 'Gomez', 33562321, '27', '1986-03-02', 'uploads/foto_67acc48735939.jpg', 52, NULL),
+(26, 'Cristina Beatriz', 'MAIA', 12562321, '27215184736', '1960-01-12', 'uploads/foto_67ad458b8f61e.jpg', 53, NULL),
+(28, 'Mario', 'Bross', 30256367, '20302563675', '1983-12-02', 'uploads/foto_67ae92e01253c.jpg', 55, NULL),
+(29, 'Sofia', 'Carras', 41203203, '24412032032', '1999-03-04', 'uploads/foto_67aea2efb9f0e.jpg', 56, NULL);
 
 -- --------------------------------------------------------
 
@@ -251,7 +284,7 @@ INSERT INTO `estudiantes` (`idEstudiante`, `nombreEstd`, `apellidoEstd`, `dni`, 
 --
 
 CREATE TABLE `incorporaciones` (
-  `idIncorporaciones` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `fechaIncorporacion` date NOT NULL,
   `situaciónRevista` varchar(50) NOT NULL,
   `idPersonalI` int(11) NOT NULL,
@@ -265,7 +298,7 @@ CREATE TABLE `incorporaciones` (
 --
 
 CREATE TABLE `inscripciones` (
-  `idInscripcion` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `idEstudiante` int(11) NOT NULL,
   `fechaInscripcion` date NOT NULL,
   `idModalidad` int(11) NOT NULL,
@@ -277,9 +310,16 @@ CREATE TABLE `inscripciones` (
 -- Volcado de datos para la tabla `inscripciones`
 --
 
-INSERT INTO `inscripciones` (`idInscripcion`, `idEstudiante`, `fechaInscripcion`, `idModalidad`, `idAnioPlan`, `idEstadoInscripcion`) VALUES
+INSERT INTO `inscripciones` (`id`, `idEstudiante`, `fechaInscripcion`, `idModalidad`, `idAnioPlan`, `idEstadoInscripcion`) VALUES
 (14, 18, '2024-12-11', 0, 0, 1),
-(15, 19, '2024-12-12', 0, 0, 1);
+(15, 19, '2024-12-12', 0, 0, 1),
+(17, 22, '2025-02-12', 0, 0, 1),
+(18, 23, '2025-02-12', 0, 0, 1),
+(19, 24, '2025-02-12', 0, 0, 1),
+(20, 25, '2025-02-12', 0, 0, 1),
+(21, 26, '2025-02-13', 0, 0, 1),
+(22, 28, '2025-02-14', 0, 0, 1),
+(23, 29, '2025-02-14', 0, 0, 1);
 
 -- --------------------------------------------------------
 
@@ -288,7 +328,7 @@ INSERT INTO `inscripciones` (`idInscripcion`, `idEstudiante`, `fechaInscripcion`
 --
 
 CREATE TABLE `localidades` (
-  `idLocalidades` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `localidad` varchar(60) NOT NULL,
   `idPcia` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -297,7 +337,7 @@ CREATE TABLE `localidades` (
 -- Volcado de datos para la tabla `localidades`
 --
 
-INSERT INTO `localidades` (`idLocalidades`, `localidad`, `idPcia`) VALUES
+INSERT INTO `localidades` (`id`, `localidad`, `idPcia`) VALUES
 (1, 'La Calera', 2),
 (4, 'La Calera,', 2),
 (17, 'Cordoba', 2);
@@ -309,7 +349,7 @@ INSERT INTO `localidades` (`idLocalidades`, `localidad`, `idPcia`) VALUES
 --
 
 CREATE TABLE `materias` (
-  `idMaterias` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `materia` varchar(50) NOT NULL,
   `idAreaEstudio` int(11) NOT NULL,
   `idModulo` int(11) NOT NULL,
@@ -323,7 +363,7 @@ CREATE TABLE `materias` (
 --
 
 CREATE TABLE `modalidades` (
-  `idModalidades` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `modalidad` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -331,7 +371,7 @@ CREATE TABLE `modalidades` (
 -- Volcado de datos para la tabla `modalidades`
 --
 
-INSERT INTO `modalidades` (`idModalidades`, `modalidad`) VALUES
+INSERT INTO `modalidades` (`id`, `modalidad`) VALUES
 (1, 'PRESENCIAL'),
 (2, 'SEMIPRESENCIAL');
 
@@ -342,7 +382,7 @@ INSERT INTO `modalidades` (`idModalidades`, `modalidad`) VALUES
 --
 
 CREATE TABLE `modulos` (
-  `idModulos` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `modulo` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -350,7 +390,7 @@ CREATE TABLE `modulos` (
 -- Volcado de datos para la tabla `modulos`
 --
 
-INSERT INTO `modulos` (`idModulos`, `modulo`) VALUES
+INSERT INTO `modulos` (`id`, `modulo`) VALUES
 (1, 'Modulo 1'),
 (2, 'Modulo 2'),
 (3, 'Modulo 3'),
@@ -368,7 +408,7 @@ INSERT INTO `modulos` (`idModulos`, `modulo`) VALUES
 --
 
 CREATE TABLE `personal_institucion` (
-  `idPersonalInst` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `nombre` varchar(50) NOT NULL,
   `apellido` varchar(50) NOT NULL,
   `dni` int(8) NOT NULL,
@@ -385,7 +425,7 @@ CREATE TABLE `personal_institucion` (
 --
 
 CREATE TABLE `provincias` (
-  `idPcias` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `provincia` varchar(60) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -393,7 +433,7 @@ CREATE TABLE `provincias` (
 -- Volcado de datos para la tabla `provincias`
 --
 
-INSERT INTO `provincias` (`idPcias`, `provincia`) VALUES
+INSERT INTO `provincias` (`id`, `provincia`) VALUES
 (2, 'Cordoba'),
 (3, 'Corrientes');
 
@@ -425,7 +465,8 @@ INSERT INTO `usuarios` (`id`, `nombre`, `apellido`, `email`, `password`, `rol`) 
 (2563, 'Franco', 'Martinez', 'fm@gmail.com', '$2y$10$8b1cnuHxRmNcztCRNsbuMuTdhFcddKQ9VVew3ztyQwGH87npdryQO', 'estudiante'),
 (2564, 'Luis', 'Montenegro', 'lm@gmail.com', '$2y$10$741Ghsf26k/kSlq6FoN3PeX0/n0ixtzNq3smdLN6TQbVJAcp02bT2', 'secretario'),
 (2565, 'Manuel ', 'Lopez', 'ml@gmail.com', '$2y$10$rlHEAPiHUYOELh0baeTAku7NlBpdHFc0lL1LBrz4in/u56RO1dMmO', 'coordinador'),
-(2570, 'dd', 'lopez', 'dd@gmail.com', '$2y$10$KSHR3Bxxrh7iUnj9twBdMODx1JaESGV2JSilYfap6yQsJ3LcoZody', 'estudiante');
+(2570, 'dd', 'lopez', 'dd@gmail.com', '$2y$10$KSHR3Bxxrh7iUnj9twBdMODx1JaESGV2JSilYfap6yQsJ3LcoZody', 'estudiante'),
+(2571, 'Cristina', 'Maia', 'crisbmaia@gmail.com', '$2y$10$iHCPIBH39wGDA029DS2XP.1uFPRn6LKR8orEfB2Nic.7e2Y0PCOly', 'administrador');
 
 --
 -- Índices para tablas volcadas
@@ -435,32 +476,32 @@ INSERT INTO `usuarios` (`id`, `nombre`, `apellido`, `email`, `password`, `rol`) 
 -- Indices de la tabla `anio_plan`
 --
 ALTER TABLE `anio_plan`
-  ADD PRIMARY KEY (`idAnioPlan`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `area_estudio`
 --
 ALTER TABLE `area_estudio`
-  ADD PRIMARY KEY (`idAreaEstudio`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `barrios`
 --
 ALTER TABLE `barrios`
-  ADD PRIMARY KEY (`idBarrios`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `fk_barrios_localidades` (`idLocalidad`);
 
 --
 -- Indices de la tabla `cargos`
 --
 ALTER TABLE `cargos`
-  ADD PRIMARY KEY (`idCargos`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `detalle_incorporacion`
 --
 ALTER TABLE `detalle_incorporacion`
-  ADD PRIMARY KEY (`idDetalleInc`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `detalle_inscripciones`
@@ -474,7 +515,7 @@ ALTER TABLE `detalle_inscripciones`
 -- Indices de la tabla `documentaciones`
 --
 ALTER TABLE `documentaciones`
-  ADD PRIMARY KEY (`idDocumentacion`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `domicilios`
@@ -495,19 +536,19 @@ ALTER TABLE `estado_documentacion`
 -- Indices de la tabla `estado_incorporaciones`
 --
 ALTER TABLE `estado_incorporaciones`
-  ADD PRIMARY KEY (`idEstadoIncorporar`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `estado_inscripciones`
 --
 ALTER TABLE `estado_inscripciones`
-  ADD PRIMARY KEY (`idEstadoInscripciones`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `estudiantes`
 --
 ALTER TABLE `estudiantes`
-  ADD PRIMARY KEY (`idEstudiante`),
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `dni_2` (`dni`),
   ADD KEY `fk_estudiantes_domicilios` (`idDomicilio`);
 
@@ -515,51 +556,51 @@ ALTER TABLE `estudiantes`
 -- Indices de la tabla `incorporaciones`
 --
 ALTER TABLE `incorporaciones`
-  ADD PRIMARY KEY (`idIncorporaciones`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `inscripciones`
 --
 ALTER TABLE `inscripciones`
-  ADD PRIMARY KEY (`idInscripcion`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `fk_inscripcion_estudiante` (`idEstudiante`);
 
 --
 -- Indices de la tabla `localidades`
 --
 ALTER TABLE `localidades`
-  ADD PRIMARY KEY (`idLocalidades`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `fk_localidades_provincias` (`idPcia`);
 
 --
 -- Indices de la tabla `materias`
 --
 ALTER TABLE `materias`
-  ADD PRIMARY KEY (`idMaterias`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `modalidades`
 --
 ALTER TABLE `modalidades`
-  ADD PRIMARY KEY (`idModalidades`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `modulos`
 --
 ALTER TABLE `modulos`
-  ADD PRIMARY KEY (`idModulos`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `personal_institucion`
 --
 ALTER TABLE `personal_institucion`
-  ADD PRIMARY KEY (`idPersonalInst`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `provincias`
 --
 ALTER TABLE `provincias`
-  ADD PRIMARY KEY (`idPcias`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `usuarios`
@@ -576,49 +617,49 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `anio_plan`
 --
 ALTER TABLE `anio_plan`
-  MODIFY `idAnioPlan` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `area_estudio`
 --
 ALTER TABLE `area_estudio`
-  MODIFY `idAreaEstudio` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `barrios`
 --
 ALTER TABLE `barrios`
-  MODIFY `idBarrios` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT de la tabla `cargos`
 --
 ALTER TABLE `cargos`
-  MODIFY `idCargos` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_incorporacion`
 --
 ALTER TABLE `detalle_incorporacion`
-  MODIFY `idDetalleInc` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_inscripciones`
 --
 ALTER TABLE `detalle_inscripciones`
-  MODIFY `idDetalleInscp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `idDetalleInscp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT de la tabla `documentaciones`
 --
 ALTER TABLE `documentaciones`
-  MODIFY `idDocumentacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `domicilios`
 --
 ALTER TABLE `domicilios`
-  MODIFY `idDomicilio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `idDomicilio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT de la tabla `estado_documentacion`
@@ -630,73 +671,73 @@ ALTER TABLE `estado_documentacion`
 -- AUTO_INCREMENT de la tabla `estado_incorporaciones`
 --
 ALTER TABLE `estado_incorporaciones`
-  MODIFY `idEstadoIncorporar` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `estado_inscripciones`
 --
 ALTER TABLE `estado_inscripciones`
-  MODIFY `idEstadoInscripciones` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `estudiantes`
 --
 ALTER TABLE `estudiantes`
-  MODIFY `idEstudiante` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT de la tabla `incorporaciones`
 --
 ALTER TABLE `incorporaciones`
-  MODIFY `idIncorporaciones` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `inscripciones`
 --
 ALTER TABLE `inscripciones`
-  MODIFY `idInscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `localidades`
 --
 ALTER TABLE `localidades`
-  MODIFY `idLocalidades` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `materias`
 --
 ALTER TABLE `materias`
-  MODIFY `idMaterias` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `modalidades`
 --
 ALTER TABLE `modalidades`
-  MODIFY `idModalidades` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `modulos`
 --
 ALTER TABLE `modulos`
-  MODIFY `idModulos` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `personal_institucion`
 --
 ALTER TABLE `personal_institucion`
-  MODIFY `idPersonalInst` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `provincias`
 --
 ALTER TABLE `provincias`
-  MODIFY `idPcias` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2571;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2572;
 
 --
 -- Restricciones para tablas volcadas
@@ -706,28 +747,28 @@ ALTER TABLE `usuarios`
 -- Filtros para la tabla `barrios`
 --
 ALTER TABLE `barrios`
-  ADD CONSTRAINT `fk_barrios_localidades` FOREIGN KEY (`idLocalidad`) REFERENCES `localidades` (`idLocalidades`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_barrios_localidades` FOREIGN KEY (`idLocalidad`) REFERENCES `localidades` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `detalle_inscripciones`
 --
 ALTER TABLE `detalle_inscripciones`
-  ADD CONSTRAINT `detalle_inscripciones_ibfk_1` FOREIGN KEY (`idTDocumentacion`) REFERENCES `documentaciones` (`idDocumentacion`) ON DELETE CASCADE,
-  ADD CONSTRAINT `detalle_inscripciones_ibfk_2` FOREIGN KEY (`idInscripcion`) REFERENCES `inscripciones` (`idInscripcion`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_detalle_inscripcion` FOREIGN KEY (`idInscripcion`) REFERENCES `inscripciones` (`idInscripcion`);
+  ADD CONSTRAINT `detalle_inscripciones_ibfk_1` FOREIGN KEY (`idTDocumentacion`) REFERENCES `documentaciones` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `detalle_inscripciones_ibfk_2` FOREIGN KEY (`idInscripcion`) REFERENCES `inscripciones` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_detalle_inscripcion` FOREIGN KEY (`idInscripcion`) REFERENCES `inscripciones` (`id`);
 
 --
 -- Filtros para la tabla `domicilios`
 --
 ALTER TABLE `domicilios`
-  ADD CONSTRAINT `fk_domicilios_barrios` FOREIGN KEY (`idBarrio`) REFERENCES `barrios` (`idBarrios`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_domicilios_barrios` FOREIGN KEY (`idBarrio`) REFERENCES `barrios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `estado_documentacion`
 --
 ALTER TABLE `estado_documentacion`
-  ADD CONSTRAINT `estado_documentacion_ibfk_1` FOREIGN KEY (`idEstudiante`) REFERENCES `estudiantes` (`idEstudiante`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `estado_documentacion_ibfk_2` FOREIGN KEY (`idDocumentaciones`) REFERENCES `documentaciones` (`idDocumentacion`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `estado_documentacion_ibfk_1` FOREIGN KEY (`idEstudiante`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `estado_documentacion_ibfk_2` FOREIGN KEY (`idDocumentaciones`) REFERENCES `documentaciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `estudiantes`
@@ -739,14 +780,14 @@ ALTER TABLE `estudiantes`
 -- Filtros para la tabla `inscripciones`
 --
 ALTER TABLE `inscripciones`
-  ADD CONSTRAINT `fk_inscripcion_estudiante` FOREIGN KEY (`idEstudiante`) REFERENCES `estudiantes` (`idEstudiante`),
-  ADD CONSTRAINT `inscripciones_ibfk_1` FOREIGN KEY (`idEstudiante`) REFERENCES `estudiantes` (`idEstudiante`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_inscripcion_estudiante` FOREIGN KEY (`idEstudiante`) REFERENCES `estudiantes` (`id`),
+  ADD CONSTRAINT `inscripciones_ibfk_1` FOREIGN KEY (`idEstudiante`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `localidades`
 --
 ALTER TABLE `localidades`
-  ADD CONSTRAINT `fk_localidades_provincias` FOREIGN KEY (`idPcia`) REFERENCES `provincias` (`idPcias`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_localidades_provincias` FOREIGN KEY (`idPcia`) REFERENCES `provincias` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

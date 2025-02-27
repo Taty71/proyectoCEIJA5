@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 08-12-2024 a las 01:20:38
+-- Tiempo de generación: 25-02-2025 a las 20:20:59
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `anio_plan` (
-  `idAnioPlan` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `descripcionAnioPlan` varchar(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -40,7 +40,7 @@ CREATE TABLE `anio_plan` (
 -- Indices de la tabla `anio_plan`
 --
 ALTER TABLE `anio_plan`
-  ADD PRIMARY KEY (`idAnioPlan`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -50,7 +50,7 @@ ALTER TABLE `anio_plan`
 -- AUTO_INCREMENT de la tabla `anio_plan`
 --
 ALTER TABLE `anio_plan`
-  MODIFY `idAnioPlan` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 11-12-2024 a las 03:41:46
+-- Tiempo de generación: 25-02-2025 a las 20:22:55
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `documentaciones` (
-  `idDocumentacion` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `descripDocumentacion` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -36,16 +36,16 @@ CREATE TABLE `documentaciones` (
 -- Volcado de datos para la tabla `documentaciones`
 --
 
-INSERT INTO `documentaciones` (`idDocumentacion`, `descripDocumentacion`) VALUES
+INSERT INTO `documentaciones` (`id`, `descripDocumentacion`) VALUES
 (1, 'DNI '),
 (2, 'CUIL'),
 (3, 'FICHA MEDICA '),
 (4, 'PARTIDA NACIMIENTO'),
 (5, 'TITULO'),
-(6, 'FOTO'),
-(7, 'NivelPrimario'),
-(8, 'AnaliticoProvisorio'),
-(9, 'SolicitudPase');
+(6, 'NivelPrimario'),
+(7, 'AnaliticoProvisorio'),
+(8, 'SolicitudPase'),
+(13, 'FOTO');
 
 --
 -- Índices para tablas volcadas
@@ -55,7 +55,7 @@ INSERT INTO `documentaciones` (`idDocumentacion`, `descripDocumentacion`) VALUES
 -- Indices de la tabla `documentaciones`
 --
 ALTER TABLE `documentaciones`
-  ADD PRIMARY KEY (`idDocumentacion`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -65,7 +65,7 @@ ALTER TABLE `documentaciones`
 -- AUTO_INCREMENT de la tabla `documentaciones`
 --
 ALTER TABLE `documentaciones`
-  MODIFY `idDocumentacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

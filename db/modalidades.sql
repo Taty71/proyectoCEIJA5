@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 08-12-2024 a las 01:20:02
+-- Tiempo de generación: 25-02-2025 a las 20:26:44
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `modalidades` (
-  `idModalidades` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `modalidad` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -36,7 +36,7 @@ CREATE TABLE `modalidades` (
 -- Volcado de datos para la tabla `modalidades`
 --
 
-INSERT INTO `modalidades` (`idModalidades`, `modalidad`) VALUES
+INSERT INTO `modalidades` (`id`, `modalidad`) VALUES
 (1, 'PRESENCIAL'),
 (2, 'SEMIPRESENCIAL');
 
@@ -48,7 +48,7 @@ INSERT INTO `modalidades` (`idModalidades`, `modalidad`) VALUES
 -- Indices de la tabla `modalidades`
 --
 ALTER TABLE `modalidades`
-  ADD PRIMARY KEY (`idModalidades`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -58,7 +58,7 @@ ALTER TABLE `modalidades`
 -- AUTO_INCREMENT de la tabla `modalidades`
 --
 ALTER TABLE `modalidades`
-  MODIFY `idModalidades` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

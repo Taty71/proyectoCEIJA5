@@ -10,14 +10,14 @@ $conn = getDbConnection(); // Asegúrate de iniciar la conexión aquí
 // Obtener los datos de la solicitud
 $input = json_decode(file_get_contents("php://input"), true);
 $action = $input['action'] ?? '';
-
+error_log("Action: " . $action);
 // Manejar la acción de login
 if ($action === 'login') {
     $email = $input['email'] ?? '';
     $password = $input['password'] ?? '';
 
     if (!empty($email) && !empty($password)) {
-        $query = "SELECT id, nombre, rol, password FROM usuarios WHERE email = ?";
+        $query = "SELECT id, nombre, rol, password, email FROM usuarios WHERE email = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -32,7 +32,8 @@ if ($action === 'login') {
                     "user" => [
                         "id" => $user['id'],
                         "nombre" => $user['nombre'],
-                        "rol" => $user['rol']
+                        "rol" => $user['rol'],
+                        "email" => $user['email']
                     ]
                 ]);
             } else {

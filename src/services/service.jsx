@@ -154,27 +154,49 @@ const getModulos = async (modalidadId) => {
     }
 };
 // Obtener áreas de estudio por módulo
+
 const getAreasEstudio = async (idModulo) => {
+    idModulo = parseInt(idModulo, 10);  // 🔹 Convierte a número
+
+    if (isNaN(idModulo)) {
+        console.error("Error: idModulo no es un número válido.");
+        return;
+    }
+
     try {
-        const response = await axiosInstance.get(`funciones/obtenerAreaEstudio.php?modulo=${idModulo}`);
+        const response = await axiosInstance.get(`funciones/obtenerAreaEstudio.php?idModulo=${idModulo}`);
         if (response.status !== 200) {
             throw new Error(`Error al obtener las áreas de estudio: ${response.statusText}`);
         }
         return response.data;
     } catch (error) {
         if (error.response) {
-            console.error('Error al obtener los módulos:', error.response.data);
+            console.error('Error al obtener las áreas de estudio:', error.response.data);
             return { error: true, message: error.response.data.message || error.response.statusText };
         } else if (error.request) {
-            console.error('Error al obtener los módulos: No se recibió respuesta del servidor', error.request);
+            console.error('Error al obtener las áreas de estudio: No se recibió respuesta del servidor', error.request);
             return { error: true, message: 'No se recibió respuesta del servidor' };
         } else {
-            console.error('Error al obtener los módulos:', error.message);
+            console.error('Error al obtener las áreas de estudio:', error.message);
             return { error: true, message: error.message };
         }
     }
 };
-// Obtener materias por año o plan y módulo
+const getMateriasPorArea = async (idAreaEstudio) => {
+    try {
+        const response = await axiosInstance.get(`funciones/obtenerMaterias.phpidAreaEstudio=${ idAreaEstudio }`);
+        if (response.status !== 200) {
+            throw new Error(`Error al obtener las materias: ${response.statusText}`);
+        }
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener materias:", error);
+        return { status: "error", message: "No se pudieron obtener las materias" };
+    }
+};
+
+
+
 
 // Exportar todas las funciones
 export default {
@@ -187,5 +209,6 @@ export default {
     deleteEstd,
     getUser,
     getModulos,
-    getAreasEstudio
+    getAreasEstudio,
+    getMateriasPorArea
 };

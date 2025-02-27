@@ -1,55 +1,51 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import BotonCargando from './BotonCargando';
 import service from '../services/service';
+import MateriasSelector from './MateriasSelector';
+import BotonCargando from './BotonCargando';
 import AlertaMens from './AlertaMens';
 
 const AreaEstudioSelector = ({ idModulo, modalidadId }) => {
+    console.log("Valores enviados a la API:", { idModulo, modalidadId });
+  
     const [areasEstudio, setAreasEstudio] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [alerta] = useState(false);
-    const [idAreaEstudio, setIdAreaEstudio] = useState('');
-
-    const handleAreaEstudioChange = (event) => {
-        setIdAreaEstudio(event.target.value);
-    };
-    useEffect(() => {
-        const fetchAreasEstudio = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const response = await service.getAreasEstudio(idModulo, modalidadId);
-                console.log("Respuesta de la API:", response);
-                
-                // Verifica si la respuesta tiene el formato correcto
-                if (response && Array.isArray(response)) {
-                    setAreasEstudio(response);
-                } else if (response.data && Array.isArray(response.data)) {
-                    setAreasEstudio(response.data);
-                } else {
-                    setError('La respuesta no es un array de áreas de estudio');
-                }
-            } catch {
-                setError(alerta ? 'Hubo un error al obtener las áreas de estudio.' : null);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const [loading] = useState(false);
+    const [error] = useState(null);
+    const [idAreaEstudio, setIdAreaEstudio] = useState("");
    
-        if (idModulo && modalidadId) {
-            fetchAreasEstudio();
+    const handleAreaEstudioChange = (e) => {
+        setIdAreaEstudio(Number(e.target.value)); 
+    };
+    
+   useEffect(() => {
+    const fetchMaterias = async () => {
+        try {
+            // Usamos el estado idAreaEstudio para pasar como parámetro
+            const response = await service.getAreasEstudio (Number(idModulo)); // Llamada a la API con idAreaEstudio
+            
+            if (response.status === "success" && Array.isArray(response.data)) {
+                setAreasEstudio(response.data); // Guardamos las materias en el estado
+            } else {
+                console.error("Error al obtener las materias:", response.message);
+            }
+        } catch (error) {
+            console.error("Error de conexión:", error);
         }
-    }, [idModulo, modalidadId, alerta]);
+    };
+
+    fetchMaterias();
+}, [idModulo]); // Solo se ejecuta cuando cambia idAreaEstudio
+    
     return (
         <div className="form-group">
             <label htmlFor="areaEstudio">Seleccionar Área de Estudio:</label>
+            
             {loading ? (
-                <BotonCargando /> // Muestra un mensaje mientras carga
+                <BotonCargando /> // Muestra un spinner o mensaje de carga
             ) : error ? (
-               <AlertaMens mensaje={error} /> // Muestra un mensaje de error si ocurre un problema
+                <AlertaMens mensaje={error} /> // Muestra un mensaje de error
             ) : (
-                <select id={idModulo} value={idAreaEstudio} onChange={handleAreaEstudioChange}>
+                <select id="areaEstudio" value={idAreaEstudio || ""} onChange={handleAreaEstudioChange}>
                     <option value="">Seleccionar Área de Estudio</option>
                     {areasEstudio.length > 0 ? (
                         areasEstudio.map((area) => (
@@ -62,14 +58,20 @@ const AreaEstudioSelector = ({ idModulo, modalidadId }) => {
                     )}
                 </select>
             )}
-        </div>
-    );
-};
+
+    {idAreaEstudio ? (
+        <MateriasSelector idAreaEstudio={idAreaEstudio} handleChange={handleAreaEstudioChange} />
+    ) : (
+        <p>No hay área de estudio seleccionada.</p>
+    )}
+</div>
+    )
+}
 
 AreaEstudioSelector.propTypes = {
     idModulo: PropTypes.number.isRequired,
     modalidadId: PropTypes.number.isRequired,
-    idAreaEstudio: PropTypes.number.isRequired,
+    idAreaEstudio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     handleAreaEstudioChange: PropTypes.func.isRequired,
 };
 

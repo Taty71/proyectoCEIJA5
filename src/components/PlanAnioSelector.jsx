@@ -120,7 +120,7 @@ const PlanAnioSelector = ({ modalidad, handleChange, value, modalidadId }) => {
             )}
             {idModulo && (
                 <AreaEstudioSelector idModulo={idModulo} modalidadId={modalidadId} handleChange={handleModuloChange} />
-            )}
+           )}
         </div>
     );
 };

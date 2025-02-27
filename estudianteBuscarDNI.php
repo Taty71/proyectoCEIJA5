@@ -19,9 +19,7 @@ if ($conn->connect_error) {
 
 }
 
-$input = json_decode(file_get_contents("php://input"), true);
-
-$dni = $input['dni'];
+$dni = $_GET['dni'];
 
 $SQL_SELECT = "SELECT 	e.id,
                             e.nombre,
@@ -50,15 +48,9 @@ $result = $conn->query($SQL_SELECT);
 
 if ($result->num_rows > 0) {
 
-    $estudiantes = [];
+    $estudiante = $result->fetch_assoc();
 
-    while ($row = $result->fetch_assoc()) {
-
-        $estudiantes[] = $row;
-
-    }
-
-    echo json_encode(["status" => "success", "data" => $estudiantes]);
+    echo json_encode(["status" => "success", "data" => $estudiante]);
 
 } else {
 

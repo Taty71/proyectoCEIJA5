@@ -45,15 +45,15 @@ $result = $conn->query($SQL_SELECT);
 
 if ($result->num_rows > 0) {
 
-    $estudiante = [];
+    $estudiantes = [];
 
     while ($row = $result->fetch_assoc()) {
 
-        $estudiante = $row;
+        $estudiantes[] = $row;
 
     }
 
-    echo json_encode(["status" => "success", "data" => $estudiante]);
+    echo json_encode(["status" => "success", "data" => $estudiantes]);
 
 } else {
 

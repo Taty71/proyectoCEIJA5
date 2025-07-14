@@ -1,0 +1,51 @@
+.accionesContainer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 90%;
+  max-height:5%;
+  margin-top: 2px;
+  padding: 5px; /* Reduce el padding */
+  border-radius: 8px;
+  box-shadow: 1px 1px 5px 1px #313030;
+}
+
+.buttonAcciones {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 5px;
+  padding: 8px; /* Reduce el padding */
+  background-color: #ccc2c2;
+  width: 140px; /* Reduce el ancho */
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem; /* Reduce el tamaño de fuente */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.buttonAcciones:hover {
+  background-color: #87ceeb;
+}
+
+.selectedButton {
+  background-color: #87ceeb;
+}
+.img {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 5px;
+}
+
+/* Styles to position the buttons below the form */
+@media (max-width: 768px) {
+  .accionesContainer {
+    flex-direction: column;
+  }
+  .buttonAcciones {
+    width: 75%;
+    margin: 10px 0;
+  }
+}

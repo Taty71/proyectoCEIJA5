@@ -1,0 +1,12 @@
+html {
+    font-size: 16px; /* Tamaño base */
+}
+body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto Slab', serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}   

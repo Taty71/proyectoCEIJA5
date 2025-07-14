@@ -1,0 +1,86 @@
+.consultaEstdContainer {
+  padding: 20px;
+  background-color: #87ceeb; /* Light blue background */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: #2d4177; /* Dark blue text */
+  font-family: Arial, sans-serif;
+}
+
+.consultaEstdHeader {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #2d4177;
+}
+
+.consultaEstdRow {
+  display: flex;
+  justify-content: space-between; /* Space between sections */
+  gap: 20px; /* Space between columns */
+}
+
+.consultaEstdSection {
+  flex: 1; /* Each section takes equal space */
+  background-color: #87ceeb; /* Light background for sections */
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.consultaEstdSection h3 {
+  font-size: 1.2rem;
+  color: #2d4177; /* White text for section headers */
+  margin: 5px 0;
+  font-weight: bold;
+}
+
+.consultaEstdSection p {
+  font-size: 1rem;
+  margin: 5px 0;
+  color: #000000;
+  text-align: left; /* Alinea el texto al lado izquierdo */
+}
+
+.noDataMessage {
+  text-align: center;
+  font-size: 1.2rem;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal container */
+.modal-container {
+  background-color: #ccc2c2; /* Dark background for modal */
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 600px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+/* Close button */
+.modal-close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}

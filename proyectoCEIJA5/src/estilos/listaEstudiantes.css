@@ -1,0 +1,100 @@
+/* Contenedor principal */
+.lista-estudiantes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  padding: 5px;
+  background-color: #ffffff; /* Fondo blanco */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  color: #333; /* Texto oscuro */
+  font-family: Arial, sans-serif;
+}
+
+/* Título */
+.lista-estudiantes h2 {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #2d4177; /* Azul oscuro */
+}
+
+/* Tabla */
+.lista-estudiantes table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8em;
+}
+
+.lista-estudiantes th,
+.lista-estudiantes td {
+  border: 1px solid #ddd;
+  padding: 3px; /* Reduce el padding para disminuir el alto */
+  text-align: left;
+}
+
+.lista-estudiantes tr {
+  height: 20px; /* Reduce el alto de las filas */
+}
+
+.lista-estudiantes th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+  text-align: center; /* Centra el texto en el encabezado */
+}
+
+/* Filas alternas */
+.lista-estudiantes tr:nth-child(even) {
+  background-color: #f9f9f9; /* Color de fila alterna claro */
+}
+
+/* Ajustar ancho de las columnas de fechas */
+.lista-estudiantes th:nth-child(6),
+.lista-estudiantes td:nth-child(6),
+.lista-estudiantes th:nth-child(12),
+.lista-estudiantes td:nth-child(12) {
+  width: 150px; /* Ajusta el ancho de las columnas de fechas */
+  text-align: center; /* Centra el texto */
+}
+
+/* Dividir texto en dos filas en encabezado */
+.lista-estudiantes th:nth-child(6),
+.lista-estudiantes th:nth-child(12) {
+  white-space: normal; /* Permite que el texto se divida en varias líneas */
+  line-height: 1.2; /* Ajusta el espacio entre líneas */
+}
+
+/* Paginación */
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.pagination button {
+  margin: 0 5px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+  .lista-estudiantes table {
+    font-size: 0.75rem; /* Reduce el tamaño de la letra en pantallas pequeñas */
+  }
+
+  .lista-estudiantes th,
+  .lista-estudiantes td {
+    padding: 4px; /* Reduce el padding en pantallas pequeñas */
+  }
+}

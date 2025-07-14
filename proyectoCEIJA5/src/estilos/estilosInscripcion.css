@@ -1,0 +1,206 @@
+/* Estilo del contenedor del formulario */
+.inscripcion-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Mantiene el contenido en la parte superior */
+  min-height: 100vh; /* Ocupa toda la altura de la pantalla */
+  margin-top: 5px; /* Separación desde el NavMain */
+  padding: 10px;
+  background-color: #ccc2c2; /* Fondo claro */
+  box-shadow: 0 4px 8px #313030; /* Sombra elegante */
+}
+
+/* Estilo para el título */
+.inscripcion-container h2 {
+  color: #000;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  text-align: center;
+}
+
+/* Estilo para el span de modalidad */
+.modalidad-span {
+  font-size: 0.9rem; /* Tamaño más pequeño */
+  font-style: italic; /* Texto en cursiva */
+  color: #2d4177; /* Color gris oscuro */
+}
+
+/* Estilo para el contenedor de acciones */
+.accionesContainer {
+  margin-top: 10px; /* Separación entre el título y las acciones */
+  width: 100%; /* Ocupa todo el ancho disponible */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 5px;
+  border-radius: 8px;
+  box-shadow: 1px 1px 5px 1px #313030;
+  background-color: #f5f5f5; /* Fondo claro */
+}
+
+/* Estilo para el formulario */
+.formulario-inscripcion-adm {
+  display: flex;
+  flex-direction: column;
+  min-height: 110vh;
+  color: #000;
+}
+
+.formd {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.form-datos,
+.form-domicilio,
+.form-eleccion {
+  flex: 1; /* Ajusta el ancho para que todas las columnas sean iguales */
+  margin: 10px; /* Opcional: margen entre columnas */
+  min-width: 300px; /* Mínimo ancho para buena responsividad */
+  max-width: calc(33.333% - 20px); /* Asegura que haya espacio entre columnas */
+}
+
+.form-eleccion {
+  display: flex; /* Alinea los elementos en una fila */
+  flex-wrap: wrap; /* Permite que los elementos se ajusten si no hay suficiente espacio */
+  justify-content: space-between; /* Espacia los elementos uniformemente */
+  align-items: center; /* Alinea verticalmente los elementos */
+  gap: 20px; /* Espaciado entre los elementos */
+  margin: 10px 0; /* Espaciado superior e inferior */
+}
+
+/* Asegurar que ambos botones tengan el mismo ancho */
+.form-eleccion input .selectModalidad,
+.form-eleccion select .selectPlanAnio {
+  width: 100%;
+}
+.form-eleccion .buttonD {
+  flex: 1; /* Permite que el botón ocupe el mismo espacio que el select */
+  max-width: 200px; /* Limita el ancho máximo del botón */
+  margin: 25% 25% 0 25%; /* Centra el botón horizontalmente */
+}
+/* Asegurar que ambos placeholders tengan el mismo tamaño de letra */
+.form-eleccion input::placeholder,
+.form-eleccion select::placeholder {
+  font-size: 1rem;
+  color: #313030;
+  font-style: oblique;
+}
+.form-eleccion .estado-inscripcion-container {
+  flex: 1; /* Permite que el componente EstadoInscripcion ocupe el mismo espacio que el botón */
+  max-width: 300px; /* Limita el ancho máximo del select */
+}
+/* Contenedor para centrar los botones */
+.button-container {
+  display: flex;
+  justify-content: center; /* Centra los botones horizontalmente */
+  align-items:end; /* Centra los botones verticalmente */
+  gap: 20px; /* Espaciado entre los botones */
+  margin-top: 20px; /* Espaciado superior */
+}
+
+/* Estilos para los botones */
+.buttonD,
+.buttonF {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  background-color: #313030; /* Color de fondo */
+  color: #ffffff; /* Color del texto */
+  width: 35%; /* Ajusta el ancho al 25% */
+  font-style: italic;
+  font-weight: bold;
+  text-align: center; /* Centra el texto dentro del botón */
+}
+
+/* Hover para ambos botones */
+.buttonD:hover,
+.buttonF:hover {
+  background-color: #87ceeb; /* Cambia el color de fondo al pasar el mouse */
+  color: #000; /* Cambia el color del texto al pasar el mouse */
+}
+
+.buttonF.disabled {
+  background-color: #ccc; /* Color para el estado deshabilitado */
+  cursor: not-allowed; /* Cambia el cursor cuando está deshabilitado */
+}
+
+/* Estilos para las etiquetas y entradas */
+.form-group label {
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 5px;
+}
+
+.form-group input.buscar {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc2c2;
+  border-radius: 4px;
+  width: 10%;
+}
+.form-group input {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc2c2;
+  border-radius: 4px;
+}
+.form-group input::placeholder {
+  color: #222222;
+  font-style: oblique;
+}
+.form-group select {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc2c2;
+  border-radius: 4px;
+  width: 100%;
+}
+select::placeholder {
+  color: #313030;
+  font-style: oblique;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+  .inscripcion-container {
+    padding: 10px;
+  }
+
+  .accionesContainer {
+    flex-direction: column; /* Cambia a diseño vertical en pantallas pequeñas */
+    gap: 10px; /* Espaciado entre botones */
+  }
+}
+
+@media (max-width: 600px) {
+  .inscripcion-container form {
+    padding: 15px;
+  }
+
+  .form-columns {
+    flex-direction: column;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group button {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  button[type="submit"] {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+}

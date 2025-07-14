@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 22-06-2025 a las 22:09:22
+-- Tiempo de generación: 14-07-2025 a las 05:12:36
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -41,7 +41,6 @@ CREATE TABLE `domicilios` (
 --
 
 INSERT INTO `domicilios` (`id`, `calle`, `numero`, `idBarrio`, `idLocalidad`, `idProvincia`) VALUES
-(4, 'San Martin', 785, 1, NULL, NULL),
 (5, 'San Martin', 785, 1, NULL, NULL),
 (6, 'San Martin', 785, 1, NULL, NULL),
 (7, 'San Martin', 785, 2, NULL, NULL),
@@ -75,7 +74,29 @@ INSERT INTO `domicilios` (`id`, `calle`, `numero`, `idBarrio`, `idLocalidad`, `i
 (35, 'José Hernández', 323, 6, NULL, NULL),
 (36, 'San Martin', 785, 1, NULL, NULL),
 (37, 'San Martin', 563, 8, 2, 2),
-(38, 'San Martin', 563, 8, 2, 2);
+(38, 'San Martin', 563, 8, 2, 2),
+(39, 'San Martin', 318, 8, 2, 2),
+(40, 'San Martin', 318, 8, 2, 2),
+(41, 'José Mujica', 1024, 9, 3, 1),
+(42, 'Estanislao del Campo', 8184, 10, 3, 1),
+(43, 'Luis Kausullet', 785, 11, 3, 1),
+(44, 'Luis Kausullet', 785, 11, 3, 1),
+(45, 'Av. Ameghino', 328, 12, 1, 1),
+(46, 'Estanislao del Campo', 1235, 6, 1, 1),
+(47, 'Estanislao del Campo', 1235, 6, 1, 1),
+(48, 'San Martin', 785, 13, 3, 1),
+(49, 'Estanislao del Campo', 563, 14, 1, 1),
+(50, 'Sucre', 435, 12, 1, 1),
+(51, 'Sucre', 435, 12, 1, 1),
+(52, 'Sucre', 435, 12, 1, 1),
+(53, 'Sucre', 435, 12, 1, 1),
+(54, 'Sucre', 435, 12, 1, 1),
+(55, 'Sucre', 435, 12, 1, 1),
+(56, 'Sucre', 435, 12, 1, 1),
+(57, 'Sucre', 435, 12, 1, 1),
+(58, 'Sucre', 435, 12, 1, 1),
+(59, 'Sucre', 435, 12, 1, 1),
+(60, 'Sucre', 435, 12, 1, 1);
 
 --
 -- Índices para tablas volcadas
@@ -98,7 +119,7 @@ ALTER TABLE `domicilios`
 -- AUTO_INCREMENT de la tabla `domicilios`
 --
 ALTER TABLE `domicilios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- Restricciones para tablas volcadas

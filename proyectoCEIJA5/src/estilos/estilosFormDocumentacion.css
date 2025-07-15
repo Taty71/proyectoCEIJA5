@@ -1,25 +1,25 @@
 .form-documentacion {
-    width: 80%;
-    margin-top: 10px;
-    margin: 0 2% 2% 7%;
-    display: flex;
-    flex-direction:column;
-    align-items: center; /* Centra el contenedor en la página */
-    justify-content: center;
-    background-color: #939396;
-    border-radius: 10px;
-    padding: 2%;
-    box-shadow: 1px 3px #2f2f31;
-  }
-  
+  width: 90%; /* Ajusta el ancho del modal */
+  max-width: 800px; /* Limita el ancho máximo */
+  margin: 20px auto; /* Centra el modal */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f4f4f4; /* Fondo claro */
+  border-radius: 12px; /* Bordes redondeados */
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra suave */
+  position: relative;
+}
+
 .form-h3 span {
-    display: block; /* Asegura que el span ocupe una nueva línea */
-    font-size: 0.85em;
-    font-style: italic;
-    color: #555;
-    margin-top: 5px;
-    text-align: center; /* Centra el texto */
-  }
+  display: block; /* Asegura que el span ocupe una nueva línea */
+  font-size: 0.85em;
+  font-style: italic;
+  color: #555;
+  margin-top: 5px;
+  text-align: center; /* Centra el texto */
+}
 .form-doc-table {
   width: 100%;
   margin-top: 20px;
@@ -28,14 +28,13 @@
   gap: 8px;
 }
 
-
 /* Ajusta el grid para mejor proporción y separación */
 .doc-table-header,
 .doc-table-row {
   display: grid;
-  grid-template-columns: 70px 1.2fr 1.5fr 1.5fr;
+  grid-template-columns: 70px 1.2fr 1.5fr 1.5fr; /* Ajusta las proporciones de las columnas */
   align-items: center;
-  gap: 0;
+  gap: 20px; /* Espaciado entre las columnas */
   padding: 10px;
 }
 
@@ -46,18 +45,16 @@
   background-color: #71728b;
   box-shadow: inset 0 0 8px #bfc4f7, 0 0 0 transparent;
 }
-* Columna Documento separada visualmente */
-.doc-table-header > :nth-child(2),
+* Columna Documento separada visualmente */ .doc-table-header > :nth-child(2),
 .doc-table-row > span:nth-child(2) {
   border-right: 2px solid #d1d5e9;
   padding-right: 18px;
   margin-right: 8px;
   font-weight: 500;
   background: #f6f8ff;
-  
 }
 .doc-table-row > span:nth-child(2) {
-   font-weight: bold;
+  font-weight: bold;
   font-size: 1rem;
   text-align: center;
   padding: 8px 0;
@@ -66,10 +63,10 @@
 .doc-table-header > :nth-child(4),
 .doc-table-row > .preview-container {
   border-left: 2px solid #d1d5e9;
-  padding-left: 18px;
-  margin-left: 0;
+  padding-left: 12px;
+  margin-left: 10px;
 }
-.doc-table-header > span{
+.doc-table-header > span {
   font-weight: 600;
   color: #555;
   font-size: 1.1rem;
@@ -83,26 +80,30 @@
   flex-direction: column;
   width: 100%;
   max-width: 350px;
-  padding-right: 0;
+  padding-right: 10px;
   align-items: flex-start;
+  margin-bottom: 20px; /* Espaciado entre el input y la vista previa */
 }
-
-
 
 input[type="file"].small-select {
-  border: 2px solid #999;
-  border-radius: 6px;
-  background-color: #f6f8ff;
-  color: #313030;
-  font-size: 1rem;
-  padding: 8px 10px;
-  width: 100%;
-  max-width: 320px;
-  box-shadow: 1px 1px 4px #bfc4e6;
-  margin-right: 0;
-  margin-bottom: 4px;
+  border: 1px solid #ccc; /* Borde gris claro */
+  border-radius: 6px; /* Bordes redondeados */
+  background-color: #f9f9f9; /* Fondo claro */
+  color: #333; /* Texto oscuro */
+  font-size: 0.9rem; /* Tamaño del texto */
+  padding: 8px 10px; /* Espaciado interno */
+  width: 100%; /* Ancho completo */
+  max-width: 300px; /* Limita el ancho máximo */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra interna */
+  margin-bottom: 10px; /* Espaciado inferior */
   transition: border 0.3s, background-color 0.3s;
 }
+
+input[type="file"].small-select:hover {
+  border-color: #4e53e6; /* Azul oscuro */
+  background-color: #f0f4ff; /* Fondo más claro */
+}
+
 input[type="file"].small-select:disabled {
   background-color: #e0e7ff;
   border-color: #999;
@@ -123,7 +124,7 @@ input[type="file"].small-select::-webkit-file-upload-button {
 }
 input[type="file"].small-select:hover::-webkit-file-upload-button {
   background: #4e53e6;
-   color: #fff;
+  color: #fff;
 }
 input[type="file"].small-select::file-selector-button {
   background: #bfc4e6;
@@ -144,12 +145,12 @@ input[type="file"].small-select::file-selector-button {
   align-items: center;
   justify-content: flex-start;
   gap: 10px;
-  padding: 10px 0 10px 0;
+  margin-left: 20px; /* Espaciado desde el input-container-doc */
   background-color: #f4f6fb;
   border: 1px solid #555;
   border-radius: 6px;
   min-height: 80px;
-  width: 70%;
+  width: 75%;
   box-shadow: 0 1px 3px #e0e0e0;
 }
 
@@ -170,19 +171,20 @@ input[type="file"].small-select::file-selector-button {
   display: inline-block;
   margin-top: 0;
   margin-left: 8px;
-  font-size: 0.8rem;
-  background: #bfc4e6;
-  color: #777;
-  padding: 4px 8px;
-  border-radius: 4px;
+  font-size: 0.9rem; /* Tamaño del texto */
+  background: #4e53e6; /* Azul oscuro */
+  color: #fff; /* Texto blanco */
+  padding: 6px 12px; /* Espaciado interno */
+  border-radius: 4px; /* Bordes redondeados */
   text-decoration: none;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, transform 0.2s;
   align-self: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra suave */
 }
 
 .btn-descargar:hover {
- background: #4e53e6;
-  color: #fff;
+  background: #3b42c4; /* Azul más oscuro */
+  transform: scale(1.05); /* Efecto de zoom */
 }
 
 .sin-archivo,
@@ -191,38 +193,16 @@ input[type="file"].small-select::file-selector-button {
   color: #777;
   font-style: italic;
 }
-/* Responsive para móviles */
+/* Responsive para pantallas pequeñas */
 @media (max-width: 900px) {
-  .doc-table-header,
-  .doc-table-row {
-    grid-template-columns: 1fr;
-    display: block;
-  }
-  .doc-table-header span,
-  .doc-table-row > * {
-    display: block;
-    margin: 8px 0;
-  }
-  .preview-container {
-    width: 100%;
-    justify-content: flex-start;
+  .doc-table-header span {
+    display: none; /* Oculta los títulos de la tabla */
   }
 }
+
+/* Responsive para pantallas muy pequeñas */
 @media (max-width: 768px) {
-  .doc-table-header,
-  .doc-table-row {
-    grid-template-columns: 1fr;
-    display: block;
-  }
-
-  .doc-table-header span,
-  .doc-table-row > * {
-    display: block;
-    margin: 8px 0;
-  }
-
-  .preview-container {
-    width: 100%;
-    justify-content: flex-start;
+  .doc-table-header span {
+    display: none; /* Oculta los títulos de la tabla */
   }
 }

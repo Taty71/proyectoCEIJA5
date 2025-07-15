@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import service from '../services/serviceInscripcion';
 import '../estilos/listaEstudiantes.css';
+import CloseButton from '../components/CloseButton'; // Importa el componente CloseButton
+import VolverButton from '../components/VolverButton'; // Importa el componente VolverButton
+import PropTypes from 'prop-types';
 
-const ListaEstudiantes = () => {
+const ListaEstudiantes = ({ onClose, onVolver }) => {
   const [estudiantes, setEstudiantes] = useState([]);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1); // Página actual
@@ -39,6 +42,11 @@ const ListaEstudiantes = () => {
 
   return (
     <div className="lista-estudiantes">
+      {/* Contenedor para los botones arriba a la derecha */}
+      <div className="button-container-right">
+        <CloseButton onClose={onClose} />
+        <VolverButton onClick={onVolver} />
+      </div>
       {error && <p className="error">{error}</p>}
       <h2>Lista de Estudiantes</h2>
       <table>
@@ -100,6 +108,10 @@ const ListaEstudiantes = () => {
       </div>
     </div>
   );
+};
+ListaEstudiantes.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  onVolver: PropTypes.func.isRequired,
 };
 
 export default ListaEstudiantes;

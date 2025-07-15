@@ -1,17 +1,22 @@
 import { useState } from 'react';
 import { Formik} from 'formik';
+import { useNavigate } from 'react-router-dom';
 import serviceRegInscripcion from '../services/serviceRegInscripcion';
 import serviceInscripcion from '../services/serviceInscripcion';
 import RegistroEstd from './RegistroEstd';
 import PropTypes from 'prop-types';
 import AlertaMens from '../components/AlertaMens';
 import '../estilos/estilosInscripcion.css';
-import { Logo } from '../components/Logo';
 import { DocumentacionNameToId } from '../utils/DocumentacionMap'; 
+import VolverButton from '../components/VolverButton';
+import CloseButton from '../components/CloseButton';
+
+
 
 const max_file_size = 600 * 1024; // 600 KB
 
-const FormularioInscripcion = ({ modalidad, maxFileSize = max_file_size, accion, isAdmin }) => {
+const FormularioInscripcion = ({ modalidad, maxFileSize = max_file_size, accion, isAdmin, onClose }) => {
+    const navigate = useNavigate();
     const [files, setFiles] = useState({});
     const [previews, setPreviews] = useState({
         dni: null,
@@ -172,41 +177,49 @@ const FormularioInscripcion = ({ modalidad, maxFileSize = max_file_size, accion,
     //** */
     const modalidadId = modalidad === 'Presencial' ? 1 : modalidad === 'Semipresencial' ? 2 : '';
 
+    const handleClose = () => {
+        onClose(); // Notifica al componente padre que el formulario debe cerrarse
+    };
+
     return (
         <div className={`formulario-inscripcion-${isAdmin ? 'adm' : 'est'}`}>
-            <Logo />
+            
+           
+                <div className="button-container-right">
+                    <CloseButton onClose={handleClose} />
+                    <VolverButton onClick={() => navigate('/dashboard')} />
+                </div>
+            
           
             {alert.text && <AlertaMens text={alert.text} variant={alert.variant} />}
             <Formik
                 initialValues={{
-                        nombre: '', apellido: '', dni: '', cuil: '', fechaNacimiento: '', calle: '', numero: '',
-                        barrio: '', localidad: '', pcia: '',
-                        modalidad: modalidad || '',
-                        modalidadId: typeof modalidadId === 'number' ? modalidadId : null,
-                        planAnio: '',
-                        modulos: '',
-                        idEstadoInscripcion: ''
-                    }}
-                    onSubmit={handleSubmit}
-                >
-                {({ setFieldValue, values, isSubmitting, resetForm, handleChange  }) => (
-                  
-                        <RegistroEstd
-                            modalidad={modalidad}
-                            previews={previews}
-                            handleFileChange={handleFileChange}
-                            handleChange={handleChange}  
-                            alert={alert}
-                            accion={accion}
-                            resetForm={resetForm}
-                            handleSubmit={handleSubmit}
-                            handleReset={handleReset}
-                            setFieldValue={setFieldValue}
-                            values={values}
-                            isAdmin={isAdmin} 
-                            isSubmitting={isSubmitting}// Pasa la prop isAdmin al componente RegistroEstd
-                        />
-                       
+                    nombre: '', apellido: '', dni: '', cuil: '', fechaNacimiento: '', calle: '', numero: '',
+                    barrio: '', localidad: '', pcia: '',
+                    modalidad: modalidad || '',
+                    modalidadId: typeof modalidadId === 'number' ? modalidadId : null,
+                    planAnio: '',
+                    modulos: '',
+                    idEstadoInscripcion: ''
+                }}
+                onSubmit={handleSubmit}
+            >
+                {({ setFieldValue, values, isSubmitting, resetForm, handleChange }) => (
+                    <RegistroEstd
+                        modalidad={modalidad}
+                        previews={previews}
+                        handleFileChange={handleFileChange}
+                        handleChange={handleChange}
+                        alert={alert}
+                        accion={accion}
+                        resetForm={resetForm}
+                        handleSubmit={handleSubmit}
+                        handleReset={handleReset}
+                        setFieldValue={setFieldValue}
+                        values={values}
+                        isAdmin={isAdmin}
+                        isSubmitting={isSubmitting}
+                    />
                 )}
             </Formik>
         </div>
@@ -218,6 +231,7 @@ FormularioInscripcion.propTypes = {
     maxFileSize: PropTypes.number,
     accion: PropTypes.string.isRequired,
     isAdmin: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired, // Nueva prop para manejar el cierre
 };
 
 export default FormularioInscripcion;

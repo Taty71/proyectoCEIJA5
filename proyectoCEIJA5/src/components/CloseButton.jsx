@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
+import '../estilos/botonCloseVolver.css'; // Importa los estilos propios
 
 const CloseButton = ({ onClose }) => {
     return (
-        <button className="modal-close" onClick={onClose}>✖</button>
+        <button className="cerrar-button modal-close" onClick={onClose}>✖</button>
     );
 };
 

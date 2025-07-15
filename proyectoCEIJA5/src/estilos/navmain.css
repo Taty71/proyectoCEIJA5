@@ -1,42 +1,60 @@
 /* Estilos generales para el contenedor del nav */
-nav {
-    display: flex;
-    justify-content: flex-start; 
-    align-items: center;
-    background-color: #2d4177; /* Azul vibrante */
-    padding: 10px 20px;
-    border-radius: 3px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 1); /* Sombra suave */
-    margin: 0.3% 1%;
-    width: 97%;
-    max-width: 95%;
+.nav-main {
+  display: flex;
+  justify-content: space-between; /* Distribuye los elementos a los extremos */
+  align-items: center;
+  background-color: #2d4177; /* Azul vibrante */
+  padding: 10px 20px;
+  border-radius: 3px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  margin: 0.3% 1%;
+  width: 97%;
+  max-width: 95%;
 }
 
 /* Estilos para los enlaces de navegación */
-nav a {
-    color: #ffffff; /* Blanco */
-    text-decoration: none;
-    margin: 0 10px;
-    font-size: 1rem;
-    transition: color 0.3s ease;
+.nav-links {
+  display: flex;
+  gap: 20px; /* Espaciado entre los enlaces */
 }
 
-nav a:hover {
-    color: #87CEEB; /* Azul claro al pasar el mouse */
+.nav-links a {
+  color: #ffffff; /* Blanco */
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #87ceeb; /* Azul claro al pasar el mouse */
+}
+
+/* Estilos para el contenedor del usuario */
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espaciado entre el nombre y el botón */
+}
+
+/* Estilos para el nombre del usuario */
+.user-name {
+  color: #ffffff; /* Blanco */
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 /* Estilos para el botón de logout */
-nav button {
-    background-color: #313030; /* Azul más oscuro */
-    color: #ffffff; /* Blanco */
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.logout-button {
+  background-color: #313030; /* Azul más oscuro */
+  color: #ffffff; /* Blanco */
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-nav button:hover {
-    background-color: #ccc2c2; /* Azul más oscuro al pasar el mouse */
+.logout-button:hover {
+  background-color: #ccc2c2; /* Azul más oscuro al pasar el mouse */
 }

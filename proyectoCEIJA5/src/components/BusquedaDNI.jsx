@@ -5,12 +5,13 @@ import serviceDatos from '../services/serviceDatos';
 import BotonCargando from '../components/BotonCargando'; // ajusta la ruta si cambia
 import Input from '../components/Input'; // Importa el componente Input
 import VolverButton from '../components/VolverButton'; // Importa el componente
+import CloseButton from '../components/CloseButton'; // Importa el componente CloseButton
 import '../estilos/Modal.css'; // Importa los estilos del modal
 import '../estilos/estilosInscripcion.css';
 import '../estilos/botonCargando.css';
 
 
-const BusquedaDNI = ({ onEstudianteEncontrado, onVolver }) => {
+const BusquedaDNI = ({ onEstudianteEncontrado, onVolver, onClose }) => {
     const [dni, setDni] = useState('');
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -64,6 +65,11 @@ const BusquedaDNI = ({ onEstudianteEncontrado, onVolver }) => {
 
     return (
         <div className="busqueda-dni-container">
+            {/* Contenedor para los botones arriba a la derecha */}
+            <div className="button-container-right">
+                <CloseButton onClose={onClose} />
+                <VolverButton onClick={onVolver} />
+            </div>
             <h2>Consulta de Estudiante por DNI</h2>
             <form onSubmit={handleSubmit} className="busqueda-dni-form">
                 <div className="input-container">
@@ -78,9 +84,8 @@ const BusquedaDNI = ({ onEstudianteEncontrado, onVolver }) => {
                         error={error}
                     />
                 </div>
-                <div className="button-container"style={{ justifyContent: 'flex-end' }}> {/* Alinea los botones a la derecha */}
+                <div className="button-container" style={{ justifyContent: 'flex-end' }}>
                     <BotonCargando loading={loading}>Consultar</BotonCargando>
-                    <VolverButton onClick={onVolver} />
                 </div>
             </form>
         </div>
@@ -95,8 +100,8 @@ const BusquedaDNI = ({ onEstudianteEncontrado, onVolver }) => {
  */
 BusquedaDNI.propTypes = {
   onEstudianteEncontrado: PropTypes.func.isRequired,
-  onVolver: PropTypes.func, // Optional: Callback for "Volver" button
-  accion: PropTypes.string,
+  onVolver: PropTypes.func.isRequired, // Callback para el botón "Volver"
+  onClose: PropTypes.func.isRequired, // Callback para el botón "Cerrar"
 };
 
 

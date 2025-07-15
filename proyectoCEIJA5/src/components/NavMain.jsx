@@ -3,8 +3,7 @@ import { useUserContext } from "../context/useUserContext";
 import '../estilos/navMain.css';
 
 const NavMain = () => {
-    const context = useUserContext();  
-    console.log("Context in NavMain:", context); // 🔍 Verifica si el contexto está disponible
+    const context = useUserContext();
 
     if (!context || !context.user) {
         console.error("UserContext is not available");
@@ -12,20 +11,25 @@ const NavMain = () => {
     }
 
     const { user, setUser } = context;
-    console.log(user, "en NavMain");
 
     return (
-        <nav>
-            <NavLink to="/">Inicio</NavLink>
-            {user && (
-                <>
-                    <NavLink to="/dashboard">Panel-Administracion CEIJA5</NavLink>
-                    <button onClick={() => {
+        <nav className="nav-main">
+            <div className="nav-links">
+                <NavLink to="/">Inicio</NavLink>
+                <NavLink to="/dashboard">Panel-Administracion CEIJA5</NavLink>
+            </div>
+            <div className="nav-user">
+                <span className="user-name">Bienvenido, {user.nombre}</span>
+                <button
+                    className="logout-button"
+                    onClick={() => {
                         setUser(null);
                         localStorage.removeItem("user"); // Limpia el usuario en localStorage
-                    }}>Logout</button>
-                </>
-            )}
+                    }}
+                >
+                    Logout
+                </button>
+            </div>
         </nav>
     );
 };

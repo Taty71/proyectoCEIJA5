@@ -3,19 +3,21 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* Mantiene el contenido en la parte superior */
-  min-height: 100vh; /* Ocupa toda la altura de la pantalla */
-  margin-top: 5px; /* Separación desde el NavMain */
-  padding: 10px;
-  background-color: #ccc2c2; /* Fondo claro */
-  box-shadow: 0 4px 8px #313030; /* Sombra elegante */
+  justify-content: flex-start;
+  min-height: 100vh;
+  margin-top: 5px;
+  padding: 20px;
+  background-color: #e6f7ff; /* Fondo celeste claro */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra elegante */
+  border-radius: 10px;
 }
 
 /* Estilo para el título */
 .inscripcion-container h2 {
-  color: #000;
-  margin-bottom: 10px;
-  font-size: 1.2em;
+  color: #2d4177; /* Azul oscuro */
+  margin-bottom: 20px;
+  font-size: 1.5em;
+  font-weight: bold;
   text-align: center;
 }
 
@@ -43,32 +45,41 @@
 .formulario-inscripcion-adm {
   display: flex;
   flex-direction: column;
-  min-height: 110vh;
+  margin-top: 15px;
+  max-width: 900px; /* Limita el ancho total del formulario */
   color: #000;
+  background-color: #f5f5f5; /* Fondo blanco */
+  padding: 20px;
+  border-radius: 10px; /* Bordes redondeados */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  position: relative; /* Permite posicionar elementos dentro del formulario */
 }
 
+/* Contenedor de las columnas */
 .formd {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  gap: 20px; /* Espaciado entre columnas */
 }
 
+/* Columnas del formulario */
 .form-datos,
 .form-domicilio,
 .form-eleccion {
-  flex: 1; /* Ajusta el ancho para que todas las columnas sean iguales */
-  margin: 10px; /* Opcional: margen entre columnas */
-  min-width: 300px; /* Mínimo ancho para buena responsividad */
-  max-width: calc(33.333% - 20px); /* Asegura que haya espacio entre columnas */
+  flex: 1;
+  margin: 10px;
+  min-width: 250px; /* Ajusta el ancho mínimo para buena responsividad */
+  max-width: calc(33.333% - 20px); /* Divide en tres columnas */
 }
 
 .form-eleccion {
   display: flex; /* Alinea los elementos en una fila */
+  justify-content: space-between; /* Distribuye los contenedores a los extremos */
+  align-items: center; /* Centra los elementos verticalmente */
+  margin-top: 20px; /* Espaciado superior */
   flex-wrap: wrap; /* Permite que los elementos se ajusten si no hay suficiente espacio */
-  justify-content: space-between; /* Espacia los elementos uniformemente */
-  align-items: center; /* Alinea verticalmente los elementos */
   gap: 20px; /* Espaciado entre los elementos */
-  margin: 10px 0; /* Espaciado superior e inferior */
 }
 
 /* Asegurar que ambos botones tengan el mismo ancho */
@@ -95,10 +106,10 @@
 /* Contenedor para centrar los botones */
 .button-container {
   display: flex;
-  justify-content: center; /* Centra los botones horizontalmente */
-  align-items:end; /* Centra los botones verticalmente */
-  gap: 20px; /* Espaciado entre los botones */
-  margin-top: 20px; /* Espaciado superior */
+  flex-direction: column; /* Cambia a diseño vertical */
+  align-items: center;/* Alinea los botones a la izquierda */
+  gap: 10px; /* Espaciado entre botones */
+  position: relative; /* Asegura que el botón "Cerrar" esté en la parte superior */
 }
 
 /* Estilos para los botones */
@@ -106,69 +117,59 @@
 .buttonF {
   padding: 10px;
   font-size: 1rem;
+  margin-left: 10px;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  background-color: #313030; /* Color de fondo */
-  color: #ffffff; /* Color del texto */
-  width: 35%; /* Ajusta el ancho al 25% */
-  font-style: italic;
-  font-weight: bold;
-  text-align: center; /* Centra el texto dentro del botón */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  background-color: #2d4177; /* Azul oscuro */
+  color: #ffffff; /* Texto blanco */
+  width: 140px; /* Ajusta el ancho de los botones */
+  text-align: center;
+  border: none;
 }
 
-/* Hover para ambos botones */
+/* Hover para los botones */
 .buttonD:hover,
 .buttonF:hover {
-  background-color: #87ceeb; /* Cambia el color de fondo al pasar el mouse */
-  color: #000; /* Cambia el color del texto al pasar el mouse */
+  background-color: #87ceeb; /* Azul claro */
+  color: #000; /* Texto negro */
+  transform: scale(1.05); /* Efecto de zoom */
 }
 
+/* Botón deshabilitado */
 .buttonF.disabled {
   background-color: #ccc; /* Color para el estado deshabilitado */
-  cursor: not-allowed; /* Cambia el cursor cuando está deshabilitado */
+  cursor: not-allowed;
 }
 
-/* Estilos para las etiquetas y entradas */
+/* Select "Estado de Inscripción" */
+.estado-inscripcion-container {
+  flex: 1;
+  max-width: 300px; /* Limita el ancho máximo del select */
+}
+
+/* Estilo para las etiquetas y entradas */
 .form-group label {
   font-weight: bold;
-  color: #000;
+  color: #2d4177; /* Azul oscuro */
   margin-bottom: 5px;
 }
 
-.form-group input.buscar {
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #ccc2c2;
-  border-radius: 4px;
-  width: 10%;
-}
-.form-group input {
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #ccc2c2;
-  border-radius: 4px;
-}
-.form-group input::placeholder {
-  color: #222222;
-  font-style: oblique;
-}
+.form-group input,
 .form-group select {
   padding: 10px;
   font-size: 1rem;
-  border: 1px solid #ccc2c2;
-  border-radius: 4px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   width: 100%;
-}
-select::placeholder {
-  color: #313030;
-  font-style: oblique;
+  background-color: #f9f9f9; /* Fondo claro */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra interna */
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 15px;
+.form-group input::placeholder,
+.form-group select::placeholder {
+  color: #999;
+  font-style: italic;
 }
 
 /* Ajustes responsivos */
@@ -180,6 +181,26 @@ select::placeholder {
   .accionesContainer {
     flex-direction: column; /* Cambia a diseño vertical en pantallas pequeñas */
     gap: 10px; /* Espaciado entre botones */
+  }
+
+  .formd {
+    flex-direction: column; /* Cambia a diseño vertical en pantallas pequeñas */
+  }
+
+  .form-datos,
+  .form-domicilio,
+  .form-eleccion {
+    max-width: 100%; /* Ocupa todo el ancho disponible */
+  }
+
+  .button-container {
+    flex-direction: column; /* Cambia a diseño vertical en pantallas pequeñas */
+    gap: 10px;
+  }
+
+  .buttonD,
+  .buttonF {
+    width: 100%; /* Ocupa todo el ancho disponible */
   }
 }
 

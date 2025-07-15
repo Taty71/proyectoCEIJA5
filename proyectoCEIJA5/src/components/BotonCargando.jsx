@@ -9,7 +9,7 @@ const BotonCargando = ({ loading, children = "Cargando..." }) => {
     return (
         <button
             type="submit"
-            className={`buttonF boton-cargando ${loading ? 'disabled' : ''}`} // Usa la clase buttonF
+            className={`boton-cargando ${loading ? 'disabled' : ''}`} // Usa la clase buttonF
             disabled={loading} // Desactiva el botón mientras está cargando
         >
             {loading ? (

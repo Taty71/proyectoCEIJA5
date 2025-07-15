@@ -47,16 +47,38 @@ const RegistroEstd = ({
                         handleChange={handleChange}
                        
                     />
-                    <button type="button" className="buttonD" onClick={() => setIsModalOpen(true)}>
-                        Adjuntar Documentación
-                    </button>
-                    {isAdmin && (
-                        <EstadoInscripcion
-                            value={values.idEstadoInscripcion}
-                            handleChange={e => setFieldValue('idEstadoInscripcion', e.target.value)}
-                        />
-                    )}
-                </div>
+            </div>
+            <div className="left-container">
+                        <button type="button" className="buttonD" onClick={() => setIsModalOpen(true)}>
+                            Adjuntar Documentación
+                        </button>
+                        {isAdmin && (
+                            <EstadoInscripcion
+                                value={values.idEstadoInscripcion}
+                                handleChange={e => setFieldValue('idEstadoInscripcion', e.target.value)}
+                            />
+                        )}
+            </div>
+            <div className="right-container">
+                        {isSubmitting ? (
+                            <BotonCargando loading={true}>{accion || "Registrando..."}</BotonCargando>
+                        ) : (
+                            <>
+                                <button type="submit" className="buttonF">{accion || "Registrar"}</button>
+                                <button
+                                    type="button"
+                                    className="buttonF"
+                                    onClick={() => {
+                                        handleReset(); // tu función personalizada
+                                        resetForm();   // resetea los campos de Formik
+                                    }}
+                                >
+                                    Limpiar
+                                </button>
+                            </>
+                        )}
+            </div>
+                
                 {isModalOpen && (
                     <FormDocumentacion
                         onClose={closeModal}
@@ -67,25 +89,6 @@ const RegistroEstd = ({
                 )}
             </div>
             {alert.text && <AlertaMens text={alert.text} variant={alert.variant} />}
-           {isSubmitting ? (
-                    <BotonCargando loading={true}>{accion || "Registrando..."}</BotonCargando>
-                ) : (
-                    <>
-                    <div className="button-container">
-                        <button type="submit" className="buttonF">{accion || "Registrar"}</button>
-                        <button
-                            type="button"
-                            className="buttonF"
-                            onClick={() => {
-                                handleReset(); // tu función personalizada
-                                resetForm();   // resetea los campos de Formik
-                            }}
-                        >
-                            Limpiar
-                        </button>
-                    </div>
-                    </>
-            )}
         </Form>
     );
 };

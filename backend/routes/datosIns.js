@@ -66,6 +66,7 @@ router.get('/:dni', async (req, res) => {
         // Consulta para obtener los datos completos de inscripción
         const [inscripcionResult] = await db.query(`
             SELECT 
+                inscripciones.id AS idInscripcion,
                 inscripciones.fechaInscripcion,
                 modalidades.modalidad AS modalidad,
                 anio_plan.descripcionAnioPlan AS plan,
@@ -83,12 +84,32 @@ router.get('/:dni', async (req, res) => {
 
         const inscripcion = inscripcionResult.length > 0 ? inscripcionResult[0] : null;
 
+        // Consulta para obtener la documentación si existe inscripción
+        let documentacion = [];
+        if (inscripcion && inscripcion.idInscripcion) {
+            const [documentacionResult] = await db.query(`
+                SELECT
+                    d.idDocumentaciones,
+                    doc.descripcionDocumentacion,
+                    d.estadoDocumentacion,
+                    d.fechaEntrega,
+                    d.archivoDocumentacion
+                FROM detalle_inscripcion d
+                JOIN documentaciones doc ON doc.id = d.idDocumentaciones
+                WHERE d.idInscripcion = ?
+            `, [inscripcion.idInscripcion]);
+            
+            documentacion = documentacionResult || [];
+            console.log('Documentación obtenida:', documentacion);
+        }
+
         // Respuesta combinada
         res.status(200).json({
             success: true,
             estudiante,
             domicilio,
-            inscripcion
+            inscripcion,
+            documentacion
         });
     } catch (error) {
         console.error('Error al obtener datos completos del estudiante:', error);

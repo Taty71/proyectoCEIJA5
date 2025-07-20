@@ -4,23 +4,27 @@ import '../estilos/busquedaDNI.css'; // Importa los estilos propios
 import serviceDatos from '../services/serviceDatos';
 import BotonCargando from '../components/BotonCargando'; // ajusta la ruta si cambia
 import Input from '../components/Input'; // Importa el componente Input
-import VolverButton from '../components/VolverButton'; // Importa el componente
 import CloseButton from '../components/CloseButton'; // Importa el componente CloseButton
+import VolverButton from '../components/VolverButton'; // Importa el componente VolverButton
 import '../estilos/Modal.css'; // Importa los estilos del modal
 import '../estilos/estilosInscripcion.css';
 import '../estilos/botonCargando.css';
 
 
-const BusquedaDNI = ({ onEstudianteEncontrado, onVolver, onClose }) => {
+const BusquedaDNI = ({ onEstudianteEncontrado, onClose, onVolver, esConsultaDirecta = false, modoModificacion = false, modoEliminacion = false }) => {
     const [dni, setDni] = useState('');
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
 
 
     const handleChange = (e) => {
-    const soloDigitos = e.target.value.replace(/\D/g, '');
-    setDni(soloDigitos);
+        const soloDigitos = e.target.value.replace(/\D/g, '');
+        setDni(soloDigitos);
         if (error) setError(null);            // limpia error al tipear
+    };
+
+    const clearError = () => {
+        setError(null);
     };
 
     const handleSubmit = async (e) => {
@@ -48,10 +52,18 @@ const BusquedaDNI = ({ onEstudianteEncontrado, onVolver, onClose }) => {
                     setError(null);
                     onEstudianteEncontrado(resultado); // Muestra el modal con los datos
                 } else {
-                    setError(resultado.error || 'No se encontró un estudiante con ese DNI.');
-                    onEstudianteEncontrado(null);
+                    // Solo mostrar el error localmente, no duplicar en GestionCRUD
+                    const errorMessage = resultado.error || 'No se encontró un estudiante con ese DNI.';
+                    setError(errorMessage);
+                    
+                    // Auto-limpiar el error después de 5 segundos
+                    setTimeout(() => {
+                        setError(null);
+                    }, 5000);
+                    
+                    // No llamar a onEstudianteEncontrado para evitar alertas duplicadas
                 }
-            }, 2000); // Retraso de 1 segundo
+            }, 2000); // Retraso de 2 segundos
         } catch (err) {
             console.error(err);
 
@@ -59,33 +71,62 @@ const BusquedaDNI = ({ onEstudianteEncontrado, onVolver, onClose }) => {
             setTimeout(() => {
                 setLoading(false); // Desactiva el estado de carga después del retraso
                 setError('Hubo un problema al realizar la consulta.');
+                
+                // Auto-limpiar el error después de 5 segundos
+                setTimeout(() => {
+                    setError(null);
+                }, 5000);
             }, 1000); // Retraso de 1 segundo
         }
     };
 
     return (
         <div className="busqueda-dni-container">
-            {/* Contenedor para los botones arriba a la derecha */}
-            <div className="button-container-right">
-                <CloseButton onClose={onClose} />
-                <VolverButton onClick={onVolver} />
-            </div>
-            <h2>Consulta de Estudiante por DNI</h2>
+            {/* Contenedor de botones superior */}
+            {!esConsultaDirecta && (
+                <div className="modal-header-buttons">
+                    {onVolver && (
+                        <VolverButton onClick={onVolver} />
+                    )}
+                    {onClose && (
+                        <CloseButton onClose={onClose} variant="modal" />
+                    )}
+                </div>
+            )}
+                  
+            <h2>{modoEliminacion ? "Eliminar Estudiante por DNI" : modoModificacion ? "Modificar Estudiante por DNI" : "Consulta de Estudiante por DNI"}</h2>
             <form onSubmit={handleSubmit} className="busqueda-dni-form">
                 <div className="input-container">
                     <Input
                         label="DNI"
-                        placeholder="Ingresa el DNI"
+                        placeholder={modoEliminacion ? "Ingrese el DNI del estudiante que desea eliminar" : modoModificacion ? "Ingrese el DNI del estudiante que desea modificar" : "Ingresa el DNI"}
                         type="text"
                         registro={{
                             value: dni,
                             onChange: handleChange,
                         }}
-                        error={error}
                     />
+                    {/* Mostrar error personalizado con botón de cerrar */}
+                    {error && (
+                        <div className="error-message">
+                            <div className="error-message-content">
+                                <span>{error}</span>
+                            </div>
+                            <button 
+                                type="button"
+                                className="error-close-btn"
+                                onClick={clearError}
+                                title="Cerrar mensaje"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    )}
                 </div>
                 <div className="button-container" style={{ justifyContent: 'flex-end' }}>
-                    <BotonCargando loading={loading}>Consultar</BotonCargando>
+                    <BotonCargando loading={loading}>
+                        {modoEliminacion ? "Buscar para Eliminar" : modoModificacion ? "Buscar para Modificar" : "Buscar"}
+                    </BotonCargando>
                 </div>
             </form>
         </div>
@@ -100,8 +141,11 @@ const BusquedaDNI = ({ onEstudianteEncontrado, onVolver, onClose }) => {
  */
 BusquedaDNI.propTypes = {
   onEstudianteEncontrado: PropTypes.func.isRequired,
-  onVolver: PropTypes.func.isRequired, // Callback para el botón "Volver"
   onClose: PropTypes.func.isRequired, // Callback para el botón "Cerrar"
+  onVolver: PropTypes.func, // Callback para el botón "Volver"
+  esConsultaDirecta: PropTypes.bool, // Indica si es consulta directa (oculta botón cerrar)
+  modoModificacion: PropTypes.bool, // Indica si está en modo modificación
+  modoEliminacion: PropTypes.bool, // Indica si está en modo eliminación
 };
 
 

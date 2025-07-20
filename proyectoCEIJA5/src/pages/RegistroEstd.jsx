@@ -1,5 +1,5 @@
 import { Form } from 'formik';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import ModalidadSelection from '../components/ModalidadSelection';
 import FormDocumentacion from '../components/FormDocumentacion';
 import { DatosPersonales } from '../components/DatosPersonales';
@@ -14,14 +14,17 @@ const RegistroEstd = ({
     previews,
     handleFileChange,
     handleChange,
+    handleSubmit,
     alert,
+    setAlert,
     isSubmitting,
     accion,
     resetForm,
     handleReset,
     values,
     setFieldValue,
-    isAdmin
+    isAdmin,
+    onClose
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -29,11 +32,22 @@ const RegistroEstd = ({
         setIsModalOpen(false);
     };
 
-    const showMateriasList = values.planAnio !== '' && values.modalidad !== '';
-    // handleChange is passed as a prop, no need to redeclare it here
+    // Memoizar el cálculo para evitar re-renders innecesarios
+    const showMateriasList = useMemo(() => {
+        return values.planAnio !== '' && values.modalidad !== '';
+    }, [values.planAnio, values.modalidad]);
+
+    const customHandleSubmit = (e) => {
+        e.preventDefault();
+        if (!values.idEstadoInscripcion) {
+            setAlert({ text: 'Debe seleccionar un estado de inscripción.', variant: 'error' });
+            return;
+        }
+        handleSubmit(values, { setSubmitting: () => {} });
+    };
 
     return (
-        <Form encType="multipart/form-data">
+        <Form encType="multipart/form-data" onSubmit={customHandleSubmit}>
             <div className="formd">
                 <DatosPersonales />
                 <Domicilio />
@@ -60,7 +74,17 @@ const RegistroEstd = ({
                         )}
             </div>
             <div className="right-container">
-                        {isSubmitting ? (
+                        {accion === "Eliminar" ? (
+                                <button
+                                    type="button"
+                                    className="buttonF"
+                                    onClick={() => {
+                                        handleSubmit(values, { setSubmitting: () => {} }); // Llama a la función de eliminación
+                                    }}
+                                >
+                                    Confirmar eliminación
+                                </button>
+                        ) : isSubmitting ? (
                             <BotonCargando loading={true}>{accion || "Registrando..."}</BotonCargando>
                         ) : (
                             <>
@@ -75,6 +99,15 @@ const RegistroEstd = ({
                                 >
                                     Limpiar
                                 </button>
+                                {onClose && (
+                                    <button
+                                        type="button"
+                                        className="buttonF button-close"
+                                        onClick={onClose}
+                                    >
+                                        Cerrar
+                                    </button>
+                                )}
                             </>
                         )}
             </div>
@@ -98,7 +131,9 @@ RegistroEstd.propTypes = {
     previews: PropTypes.object.isRequired,
     handleFileChange: PropTypes.func.isRequired,
     handleChange: PropTypes.func.isRequired,
+    handleSubmit: PropTypes.func.isRequired,
     alert: PropTypes.object.isRequired,
+    setAlert: PropTypes.func.isRequired,
     values: PropTypes.object.isRequired,
     setFieldValue: PropTypes.func.isRequired,
     resetForm: PropTypes.func.isRequired,
@@ -106,6 +141,7 @@ RegistroEstd.propTypes = {
     accion: PropTypes.string,
     isAdmin: PropTypes.bool.isRequired,
     isSubmitting: PropTypes.bool.isRequired,
+    onClose: PropTypes.func,
 };
 
 export default RegistroEstd;

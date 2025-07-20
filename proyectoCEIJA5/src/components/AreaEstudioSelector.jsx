@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import MateriasSelector from './MateriasSelector';
 import BotonCargando from './BotonCargando';
@@ -6,7 +6,23 @@ import AlertaMens from './AlertaMens';
 import serviceObtenerAcad from '../services/serviceObtenerAcad';
 
 const AreaEstudioSelector = ({ idModulo, modalidadId }) => {
-    console.log("Valores enviados a la API:", { idModulo, modalidadId });
+    const prevValuesRef = useRef();
+
+    // Solo hacer log cuando cambien los valores
+    useEffect(() => {
+        if (import.meta.env.DEV) {
+            const currentValues = { idModulo, modalidadId };
+            const prevValues = prevValuesRef.current;
+            
+            if (!prevValues || 
+                prevValues.idModulo !== idModulo || 
+                prevValues.modalidadId !== modalidadId) {
+                
+                console.log("[AreaEstudioSelector] Valores para API:", currentValues);
+                prevValuesRef.current = currentValues;
+            }
+        }
+    }, [idModulo, modalidadId]);
   
     const [areasEstudio, setAreasEstudio] = useState([]);
     const [loading] = useState(false);
@@ -40,7 +56,7 @@ const AreaEstudioSelector = ({ idModulo, modalidadId }) => {
             <label htmlFor="areaEstudio">Seleccionar Área de Estudio:</label>
             
             {loading ? (
-                <BotonCargando /> // Muestra un spinner o mensaje de carga
+                <BotonCargando loading={loading} /> // Muestra un spinner o mensaje de carga
             ) : error ? (
                 <AlertaMens mensaje={error} /> // Muestra un mensaje de error
             ) : (
@@ -68,9 +84,9 @@ const AreaEstudioSelector = ({ idModulo, modalidadId }) => {
 }
 
 AreaEstudioSelector.propTypes = {
-    idModulo: PropTypes.number.isRequired,
-    modalidadId: PropTypes.number.isRequired,
-    idAreaEstudio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    idModulo: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    modalidadId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    idAreaEstudio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default AreaEstudioSelector;

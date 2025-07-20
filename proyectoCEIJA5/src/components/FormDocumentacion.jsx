@@ -6,10 +6,12 @@ import CloseButton from '../components/CloseButton'; // Importa el componente Cl
 
 const FormDocumentacion = ({ previews, handleFileChange, onClose }) => {
     const faltaDocumento = useMemo(() => {
-        return !["SolicitudPase", "AnaliticoParcial", "CertfNivelPrimario"].some(
+        return !["archivo_solicitudPase", "archivo_analiticoParcial", "archivo_certificadoNivelPrimario"].some(
             (doc) => previews?.[doc]?.url
         );
-    }, [previews]);
+        }, [previews]);
+
+
 
     return (
         <>
@@ -36,13 +38,13 @@ const FormDocumentacion = ({ previews, handleFileChange, onClose }) => {
                     </div>
                     {[
                         { label: "Foto", name: "foto" },
-                        { label: "DNI", name: "dni" },
-                        { label: "CUIL", name: "cuil" },
-                        { label: "Partida de Nacimiento", name: "partidaNacimiento" },
-                        { label: "Ficha Médica", name: "fichaMedica" },
-                        { label: "Solicitud Pase", name: "SolicitudPase" },
-                        { label: "Analítico Parcial/Pase", name: "AnaliticoParcial" },
-                        { label: "Certificado Nivel Primario", name: "CertfNivelPrimario" },
+                        { label: "DNI", name: "archivo_dni" },
+                        { label: "CUIL", name: "archivo_cuil" },
+                        { label: "Ficha Médica", name: "archivo_fichaMedica" },
+                        { label: "Partida de Nacimiento", name: "archivo_partidaNacimiento" },
+                        { label: "Solicitud Pase", name: "archivo_solicitudPase" },
+                        { label: "Analítico Parcial/Pase", name: "archivo_analiticoParcial" }, // Corregido
+                        { label: "Certificado Nivel Primario", name: "archivo_certificadoNivelPrimario" }, // Corregido
                     ].map(({ label, name }) => (
                         <div className="doc-table-row" key={name}>
                             {/* Checkbox entregado/faltante */}
@@ -61,9 +63,9 @@ const FormDocumentacion = ({ previews, handleFileChange, onClose }) => {
                             <div className="input-container-doc">
                                 <input
                                     type="file"
-                                    name={name} // <-- agrega esto
+                                    name={name}
                                     className="small-select"
-                                    onChange={e => handleFileChange(e, name)}
+                                    onChange={(e) => handleFileChange(e, name)} // Llama a handleFileChange
                                     accept="image/*,application/pdf"
                                 />
                             </div>
@@ -78,15 +80,19 @@ const FormDocumentacion = ({ previews, handleFileChange, onClose }) => {
                                         ) : (
                                             <span className="archivo-desconocido">Archivo cargado</span>
                                         )}
-                                        <a
-                                            href={previews[name].url}
-                                            download={label}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="btn-descargar"
-                                        >
-                                            Descargar
-                                        </a>
+                                        <div className="archivo-status">
+                                            <span className="archivo-subido">✓ Archivo subido</span>
+                                            <a
+                                                href={previews[name].url}
+                                                download={`${label}_${new Date().toISOString().split('T')[0]}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="btn-ver"
+                                                title="Ver archivo"
+                                            >
+                                                Ver
+                                            </a>
+                                        </div>
                                     </>
                                 ) : (
                                     <span className="sin-archivo">Sin archivo</span>
@@ -108,31 +114,31 @@ FormDocumentacion.propTypes = {
             url: PropTypes.string,
             type: PropTypes.string,
         }),
-        dni: PropTypes.shape({
+        archivo_dni: PropTypes.shape({
             url: PropTypes.string,
             type: PropTypes.string,
         }),
-        cuil: PropTypes.shape({
+        archivo_cuil: PropTypes.shape({
             url: PropTypes.string,
             type: PropTypes.string,
         }),
-        partidaNacimiento: PropTypes.shape({
+        archivo_partidaNacimiento: PropTypes.shape({
             url: PropTypes.string,
             type: PropTypes.string,
         }),
-        fichaMedica: PropTypes.shape({
+        archivo_fichaMedica: PropTypes.shape({
             url: PropTypes.string,
             type: PropTypes.string,
         }),
-        SolicitudPase: PropTypes.shape({
+        archivo_solicitudPase: PropTypes.shape({
             url: PropTypes.string,
             type: PropTypes.string,
         }),
-        AnaliticoParcial: PropTypes.shape({
-            url: PropTypes.string,
-            type: PropTypes.string,
+        archivo_analiticoParcial: PropTypes.shape({
+        url: PropTypes.string,
+        type: PropTypes.string,
         }),
-        CertfNivelPrimario: PropTypes.shape({
+        archivo_certificadoNivelPrimario: PropTypes.shape({
             url: PropTypes.string,
             type: PropTypes.string,
         }),

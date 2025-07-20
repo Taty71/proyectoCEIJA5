@@ -1,51 +1,80 @@
-.accionesContainer {
+.acciones-formulario-container {
   display: flex;
   justify-content: space-around;
   align-items: center;
   width: 90%;
-  max-height:5%;
-  margin-top: 2px;
-  padding: 5px; /* Reduce el padding */
-  border-radius: 8px;
-  box-shadow: 1px 1px 5px 1px #313030;
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
 }
 
 .buttonAcciones {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 5px;
-  padding: 8px; /* Reduce el padding */
-  background-color: #ccc2c2;
-  width: 140px; /* Reduce el ancho */
-  color: #000;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.9rem; /* Reduce el tamaño de fuente */
+  justify-content: center;
+  margin: 8px;
+  padding: 15px 10px;
+  background-color: #f8f9fa;
+  width: 150px;
+  height: 100px;
+  color: #333;
+  border: 2px solid #dee2e6;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .buttonAcciones:hover {
-  background-color: #87ceeb;
+  background-color: #e3f2fd;
+  border-color: #2196f3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .selectedButton {
-  background-color: #87ceeb;
+  background-color: #e3f2fd;
+  border-color: #2196f3;
+  color: #1976d2;
 }
 .img {
-  width: 30px;
-  height: 30px;
-  margin-bottom: 5px;
+  width: 35px;
+  height: 35px;
+  margin-bottom: 8px;
+  filter: brightness(0.8);
+  transition: filter 0.3s ease;
+}
+
+.buttonAcciones:hover .img {
+  filter: brightness(1);
 }
 
 /* Styles to position the buttons below the form */
 @media (max-width: 768px) {
-  .accionesContainer {
+  .acciones-formulario-container {
     flex-direction: column;
+    width: 95%;
+    padding: 10px;
   }
   .buttonAcciones {
-    width: 75%;
-    margin: 10px 0;
+    width: 80%;
+    height: 80px;
+    margin: 8px 0;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 10px 15px;
+  }
+  .img {
+    margin-right: 15px;
+    margin-bottom: 0;
+    width: 30px;
+    height: 30px;
   }
 }

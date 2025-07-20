@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
 import service from '../services/serviceInscripcion';
 import '../estilos/listaEstudiantes.css';
+import '../estilos/estilosInscripcion.css'; // Importa los estilos para modal-header-buttons
 import CloseButton from '../components/CloseButton'; // Importa el componente CloseButton
 import VolverButton from '../components/VolverButton'; // Importa el componente VolverButton
 import PropTypes from 'prop-types';
 
-const ListaEstudiantes = ({ onClose, onVolver }) => {
+const ListaEstudiantes = ({ onClose, onAccion, onVolver, soloParaEliminacion = false }) => {
   const [estudiantes, setEstudiantes] = useState([]);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1); // Página actual
+  const [totalPages, setTotalPages] = useState(1); // Total de páginas
+  const [totalEstudiantes, setTotalEstudiantes] = useState(0); // Total de estudiantes
   const limit = 10; // Cantidad de estudiantes por página
 
   useEffect(() => {
@@ -17,6 +20,8 @@ const ListaEstudiantes = ({ onClose, onVolver }) => {
         const data = await service.getPaginatedEstudiantes(page, limit);
         console.log('Datos obtenidos:', data); // Verifica los datos aquí
         setEstudiantes(data.estudiantes || []);
+        setTotalPages(data.totalPages || 1);
+        setTotalEstudiantes(data.total || 0);
         setError(null);
       } catch (err) {
         const mensaje =
@@ -33,22 +38,36 @@ const ListaEstudiantes = ({ onClose, onVolver }) => {
   }, [page, limit]); // Actualiza los datos cuando cambia la página o el límite
 
   const handleNextPage = () => {
-    setPage(page + 1);
+    if (page < totalPages) {
+      setPage(page + 1);
+    }
   };
 
   const handlePreviousPage = () => {
-    setPage(page - 1);
+    if (page > 1) {
+      setPage(page - 1);
+    }
   };
 
   return (
     <div className="lista-estudiantes">
-      {/* Contenedor para los botones arriba a la derecha */}
-      <div className="button-container-right">
-        <CloseButton onClose={onClose} />
-        <VolverButton onClick={onVolver} />
+      {/* Contenedor de botones superior */}
+      <div className="modal-header-buttons">
+        {onVolver && (
+          <VolverButton onClick={onVolver} />
+        )}
+        {onClose && (
+          <CloseButton onClose={onClose} variant="modal" />
+        )}
       </div>
+
+      {/* Título delicado más arriba */}
+      <div className="lista-header">
+        <h2 className="lista-titulo">Lista de Estudiantes</h2>
+        <p className="lista-subtitulo">Total: {totalEstudiantes} estudiantes</p>
+      </div>
+
       {error && <p className="error">{error}</p>}
-      <h2>Lista de Estudiantes</h2>
       <table>
         <thead>
           <tr>
@@ -66,6 +85,7 @@ const ListaEstudiantes = ({ onClose, onVolver }) => {
             <th>Fecha de Inscripción</th>
             <th>Modalidad</th>
             <th>Curso/Plan</th>
+            {onAccion && <th>Acciones</th>}
           </tr>
         </thead>
         <tbody>
@@ -93,25 +113,63 @@ const ListaEstudiantes = ({ onClose, onVolver }) => {
               </td>
               <td>{estudiante.modalidad || '—'}</td>
               <td>{estudiante.cursoPlan || '—'}</td>
+              {onAccion && (
+                <td>
+                  <div className="acciones-estudiante">
+                    <button 
+                      className="btn-accion btn-ver"
+                      onClick={() => onAccion('Ver', estudiante)}
+                      title="Ver estudiante"
+                    >
+                      👁️
+                    </button>
+                    {!soloParaEliminacion && (
+                      <button 
+                        className="btn-accion btn-modificar"
+                        onClick={() => onAccion('Modificar', estudiante)}
+                        title="Modificar estudiante"
+                      >
+                        ✏️
+                      </button>
+                    )}
+                  </div>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
       </table>
-      <div className="pagination">
-        <button onClick={handlePreviousPage} disabled={page === 1}>
-          Anterior
-        </button>
-        <span>Página {page}</span>
-        <button onClick={handleNextPage} disabled={estudiantes.length < limit}>
-          Siguiente
-        </button>
-      </div>
+      
+      {/* Paginación - mostrar siempre que haya estudiantes y más de una página */}
+      {estudiantes.length > 0 && totalPages > 1 && (
+        <div className="pagination">
+          <button 
+            onClick={handlePreviousPage} 
+            disabled={page === 1}
+            className="pagination-btn"
+          >
+            Anterior
+          </button>
+          <span className="pagination-info">
+            Página {page} de {totalPages}
+          </span>
+          <button 
+            onClick={handleNextPage} 
+            disabled={page >= totalPages}
+            className="pagination-btn"
+          >
+            Siguiente
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 ListaEstudiantes.propTypes = {
   onClose: PropTypes.func.isRequired,
-  onVolver: PropTypes.func.isRequired,
+  onAccion: PropTypes.func,
+  onVolver: PropTypes.func,
+  soloParaEliminacion: PropTypes.bool,
 };
 
 export default ListaEstudiantes;

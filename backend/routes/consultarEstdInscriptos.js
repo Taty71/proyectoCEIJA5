@@ -19,8 +19,8 @@ router.get('/dni/:dni', async (req, res) => {
             return res.status(400).json({ success: false, message: 'DNI inválido.' });
         }
 
-        // Consulta para obtener datos del estudiante
-        const [estudiante] = await db.query('SELECT * FROM estudiantes WHERE dni = ?', [dni]);
+        // Consulta para obtener datos del estudiante (solo activos)
+        const [estudiante] = await db.query('SELECT * FROM estudiantes WHERE dni = ? AND activo = 1', [dni]);
         if (estudiante.length === 0) {
             return res.status(404).json({ success: false, message: 'Estudiante no encontrado.' });
         }
@@ -56,14 +56,15 @@ router.get('/', async (req, res) => {
         const { page = 1, limit = 10 } = req.query; // Recibe los parámetros de paginación
         const offset = (page - 1) * limit;
 
-        // Consulta para obtener estudiantes con modalidad y curso/plan
+        // Consulta para obtener estudiantes activos con modalidad y curso/plan
         const [result] = await db.query(`
             SELECT 
                 e.id, e.nombre, e.apellido, e.dni, e.cuil, e.fechaNacimiento, 
                 d.calle, d.numero, b.nombre AS barrio, l.nombre AS localidad, p.nombre AS provincia,
                 i.fechaInscripcion, 
                 m.modalidad, 
-                a.descripcionAnioPlan AS cursoPlan
+                a.descripcionAnioPlan AS cursoPlan,
+                ei.descripcionEstado AS estadoInscripcion
             FROM estudiantes e
             LEFT JOIN domicilios d ON e.idDomicilio = d.id
             LEFT JOIN barrios b ON d.idBarrio = b.id
@@ -72,11 +73,14 @@ router.get('/', async (req, res) => {
             LEFT JOIN inscripciones i ON e.id = i.idEstudiante
             LEFT JOIN modalidades m ON i.idModalidad = m.id
             LEFT JOIN anio_plan a ON i.idAnioPlan = a.id
+            LEFT JOIN estado_inscripciones ei ON i.idEstadoInscripcion = ei.id
+            WHERE e.activo = 1
             ORDER BY i.fechaInscripcion DESC, e.id ASC
             LIMIT ? OFFSET ?
         `, [parseInt(limit), parseInt(offset)]);
 
-        const [total] = await db.query('SELECT COUNT(*) AS total FROM estudiantes');
+        // Contar total de estudiantes activos
+        const [total] = await db.query('SELECT COUNT(*) AS total FROM estudiantes WHERE activo = 1');
 
         res.status(200).json({
             success: true,
@@ -85,10 +89,12 @@ router.get('/', async (req, res) => {
                 fechaInscripcion: estudiante.fechaInscripcion || 'Sin inscripción',
                 modalidad: estudiante.modalidad || 'Sin modalidad',
                 cursoPlan: estudiante.cursoPlan || 'Sin curso/plan',
+                estadoInscripcion: estudiante.estadoInscripcion || 'Sin estado',
             })),
             total: total[0].total,
             page: parseInt(page),
             limit: parseInt(limit),
+            totalPages: Math.ceil(total[0].total / parseInt(limit)),
         });
     } catch (error) {
         console.error('Error al obtener estudiantes inscritos:', error);

@@ -32,7 +32,8 @@ const getEstudianteCompletoByDni = async (dni) => {
     }
     try {
         const { data } = await axiosInstance.get(`/consultar-estudiantes-dni/${dni}`);
-        console.log('Respuesta del servicio:', data); // Verifica la respuesta aquí
+        console.log('Respuesta completa del servicio:', data); // Verifica la respuesta aquí
+        console.log('Documentación recibida:', data.documentacion); // Verifica específicamente la documentación
         return data;
     } catch (error) {
         const message = FormatError(error);

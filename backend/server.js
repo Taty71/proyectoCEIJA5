@@ -18,11 +18,30 @@ const faltantesRoutes = require('./routes/faltantes');
 const consultarEstdInscriptosRoutes = require('./routes/consultarEstdInscriptos');
 const datosInsRoutes = require('./routes/datosIns');
 const datosDomicilioRoutes = require('./routes/datosDomicilio');
+const modificarEstRoutes = require('./routes/modificarEst');
+const eliminarEstRoutes = require('./routes/eliminarEst'); // Importa la ruta
+const documentacionRoutes = require('./routes/buscarDocumentacion');
+
+const path = require('path');
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// en app.js o server.js, antes de las rutas
+
+app.use(
+  '/archivosDocumentacion',                              // URL pública
+  express.static(path.join(__dirname, 'archivosDocumentacion')) // carpeta real
+);
+
+// También servir desde archivosDocumento (sin 's') para compatibilidad
+app.use(
+  '/archivosDocumento',                              // URL pública
+  express.static(path.join(__dirname, 'archivosDocumento')) // carpeta real
+);
+
 
 // Rutas
 app.use('/api/users', userRoutes);
@@ -37,6 +56,9 @@ app.use('/api/faltantes', faltantesRoutes);
 app.use('/api/consultar-estudiantes', consultarEstdInscriptosRoutes);
 app.use('/api/consultar-estudiantes-dni', datosInsRoutes);
 app.use('/api/datos-domicilio', datosDomicilioRoutes);
+app.use('/api/modificar-estudiante', modificarEstRoutes);
+app.use('/api/eliminar-estudiante', eliminarEstRoutes); // Registra la ruta bajo el prefijo /api
+app.use('/api/documentacion', documentacionRoutes);
 
 // Middleware para manejo de errores globales
 app.use((err, req, res, next) => {

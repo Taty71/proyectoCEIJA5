@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 14-07-2025 a las 05:11:23
+-- Tiempo de generación: 18-07-2025 a las 16:20:24
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -42,16 +42,14 @@ CREATE TABLE `inscripciones` (
 --
 
 INSERT INTO `inscripciones` (`id`, `fechaInscripcion`, `idEstudiante`, `idModalidad`, `idAnioPlan`, `idModulos`, `idEstadoInscripcion`) VALUES
-(5, '2025-06-22', 21, 2, 4, 1, 1),
-(6, '2025-06-22', 25, 2, 6, 7, 1),
-(7, '2025-06-22', 26, 2, 6, 8, 1),
-(8, '2025-06-22', 27, 1, 3, 0, 1),
-(9, '2025-06-22', 29, 1, 3, 0, 2),
-(11, '2025-06-22', 31, 1, 2, 0, 1),
-(12, '2025-06-22', 32, 2, 5, 5, 1),
-(13, '2025-07-10', 33, 2, 4, 1, 1),
-(15, '2025-07-13', 41, 1, 1, 0, 1),
-(16, '2025-07-13', 43, 1, 2, 0, 1);
+(17, '2025-07-14', 46, 2, 4, 0, 1),
+(24, '2025-07-16', 54, 2, 6, 8, 1),
+(33, '2025-07-17', 63, 1, 1, 1, 1),
+(37, '2025-07-17', 67, 1, 2, 0, 2),
+(38, '2025-07-17', 68, 1, 2, 0, 2),
+(39, '2025-07-17', 69, 1, 3, 0, 2),
+(40, '2025-07-17', 70, 1, 3, 0, 2),
+(41, '2025-07-17', 71, 1, 3, 0, 2);
 
 --
 -- Índices para tablas volcadas
@@ -75,7 +73,7 @@ ALTER TABLE `inscripciones`
 -- AUTO_INCREMENT de la tabla `inscripciones`
 --
 ALTER TABLE `inscripciones`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- Restricciones para tablas volcadas

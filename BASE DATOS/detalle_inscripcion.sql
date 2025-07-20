@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 14-07-2025 a las 05:11:47
+-- Tiempo de generación: 16-07-2025 a las 03:27:46
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -95,7 +95,17 @@ INSERT INTO `detalle_inscripcion` (`id`, `estadoDocumentacion`, `fechaEntrega`, 
 (58, 'Entregado', '2025-07-14', 4, 16, NULL),
 (59, 'Entregado', '2025-07-14', 3, 16, NULL),
 (60, 'Entregado', '2025-07-14', 7, 16, NULL),
-(61, 'Entregado', '2025-07-14', 6, 16, NULL);
+(61, 'Entregado', '2025-07-14', 6, 16, NULL),
+(62, 'Entregado', '2025-07-14', 1, 17, NULL),
+(63, 'Faltante', NULL, 2, 17, NULL),
+(64, 'Entregado', '2025-07-14', 8, 17, NULL),
+(65, 'Entregado', '2025-07-14', 4, 17, NULL),
+(66, 'Faltante', NULL, 3, 17, NULL),
+(72, 'Entregado', '2025-07-16', 1, 19, NULL),
+(73, 'Entregado', '2025-07-16', 2, 19, NULL),
+(74, 'Entregado', '2025-07-16', 8, 19, NULL),
+(75, 'Entregado', '2025-07-16', 4, 19, NULL),
+(76, 'Entregado', '2025-07-16', 3, 19, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -117,7 +127,7 @@ ALTER TABLE `detalle_inscripcion`
 -- AUTO_INCREMENT de la tabla `detalle_inscripcion`
 --
 ALTER TABLE `detalle_inscripcion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
 --
 -- Restricciones para tablas volcadas

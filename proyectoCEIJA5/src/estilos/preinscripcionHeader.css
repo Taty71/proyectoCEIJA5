@@ -1,0 +1,172 @@
+/* Estilos para el header de Preinscripción */
+.header-inscripcion {
+  background: linear-gradient(135deg, #e8f4f8 0%, #d1e7dd 100%);
+  color: #495057;
+  padding: 15px 30px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  border-radius: 0 0 10px 10px;
+  margin-bottom: 25px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.header-inscripcion::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.1) 25%,
+      transparent 25%
+    ),
+    linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.1) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.1) 75%);
+  background-size: 20px 20px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Información de modalidad en header */
+.modalidad-header-info {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.modalidad-badge {
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(74, 144, 226, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  position: relative;
+  z-index: 1;
+}
+
+.cambiar-modalidad-btn {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(108, 117, 125, 0.3);
+}
+
+.cambiar-modalidad-btn:hover {
+  background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(108, 117, 125, 0.4);
+}
+
+.modalidad-badge::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 100%
+  );
+  border-radius: 23px;
+  pointer-events: none;
+}
+
+.logo-inscripcion {
+  position: absolute;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+}
+
+.titulo-principal {
+  font-size: 1.6rem;
+  font-weight: 500;
+  margin: 0;
+  text-shadow: none;
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
+  color: #495057;
+}
+
+.subtitulo {
+  font-size: 0.95rem;
+  margin: 5px 0 0 0;
+  opacity: 0.8;
+  font-weight: 400;
+  position: relative;
+  z-index: 1;
+  color: #6c757d;
+}
+
+.contenido-principal {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.container-preinscripcion {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-inscripcion {
+    padding: 15px 20px;
+    text-align: center;
+  }
+
+  .logo-inscripcion {
+    position: static;
+    transform: none;
+    margin: 0 auto 15px auto;
+    display: block;
+    width: 50px;
+    height: 50px;
+  }
+
+  .titulo-principal {
+    font-size: 1.6rem;
+  }
+
+  .subtitulo {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .titulo-principal {
+    font-size: 1.4rem;
+  }
+
+  .subtitulo {
+    font-size: 0.9rem;
+  }
+
+  .header-inscripcion {
+    padding: 12px 15px;
+  }
+}

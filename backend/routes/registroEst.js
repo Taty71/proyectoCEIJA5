@@ -1,165 +1,197 @@
 const express = require('express');
-const router = express.Router();
-const db = require('../db');
-const upload = require('../middleware/upload');
-const guardarDetalleDocumentacion = require('../utils/guardarDetalleDocumentacion');
-const buscarOInsertarProvincia = require('../utils/buscarOInsertarProvincia');
-const buscarOInsertarLocalidad = require('../utils/buscarOInsertarLocalidad');
-const buscarOInsertarBarrio = require('../utils/buscarOInsertarBarrio');
-const obtenerRutaFoto = require('../utils/obtenerRutaFoto');
-const insertarInscripcion = require('../utils/insertarInscripcion');
-// Registrar estudiante y preinscripción
+const router  = express.Router();
+const db      = require('../db');
+const multer  = require('multer');
+const path    = require('path');
+
+const buscarOInsertarProvincia  = require('../utils/buscarOInsertarProvincia');
+const buscarOInsertarLocalidad  = require('../utils/buscarOInsertarLocalidad');
+const buscarOInsertarBarrio     = require('../utils/buscarOInsertarBarrio');
+const obtenerRutaFoto           = require('../utils/obtenerRutaFoto');
+const insertarInscripcion       = require('../utils/insertarInscripcion');
+const buscarOInsertarDetalleDocumentacion = require('../utils/buscarOInsertarDetalleDocumentacion');
+
+// ────────────────────────────────────────────────────────────
+//  Multer: guarda los archivos en /archivosDocumento
+//  nombre archivo  ➜  <nombre>_<apellido>_<dni>.<ext>
+// ────────────────────────────────────────────────────────────
+const storage = multer.diskStorage({
+  // 1️⃣ Carpeta física donde quedan los PDF/JPG
+  destination: (_req, _file, cb) => {
+    cb(null, path.join(__dirname, '../archivosDocumento'));
+  },
+  // 2️⃣ Nombre del archivo:  <nombre>_<apellido>_<campo>.<ext>
+  filename: (req, file, cb) => {
+  const nombre   = (req.body.nombre   || 'sin_nombre').trim().replace(/\s+/g, '_');
+  const apellido = (req.body.apellido || 'sin_apellido').trim().replace(/\s+/g, '_');
+  const dni      = (req.body.dni      || 'sin_dni');
+  const campo    = file.fieldname;                           // dni, cuil, partidaNacimiento…
+  const ext      = path.extname(file.originalname);
+
+  cb(null, `${nombre}_${apellido}_${dni}_${campo}${ext}`);
+  // Ej: Juan_Perez_12345678_dni.pdf
+  }
+});
+const upload = multer({ storage });
+
+
+// ────────────────────────────────────────────────────────────
+//  POST /registrar
+// ────────────────────────────────────────────────────────────
 router.post('/registrar', upload.any(), async (req, res) => {
-    try {
-        // Extraer datos personales
-        function getFirstValue(val) {
-            if (Array.isArray(val)) return val[0];
-            return val;
-        }
-        const nombre = getFirstValue(req.body.nombre);
-        const apellido = getFirstValue(req.body.apellido);
-        const dni = getFirstValue(req.body.dni);
-        const cuil = getFirstValue(req.body.cuil);
-        const fechaNacimiento = getFirstValue(req.body.fechaNacimiento);
+  try {
+    // Verificar los archivos recibidos por multer
+    console.log("Archivos recibidos por multer:", req.files);
 
-        // Extraer datos de domicilio
-        const pcia = getFirstValue(req.body.pcia);
-        const localidad = getFirstValue(req.body.localidad);
-        const barrio = getFirstValue(req.body.barrio);
-        const calle = getFirstValue(req.body.calle);
-        const numero = Number(getFirstValue(req.body.numero));
+    // util para campos que a veces llegan como array
+    const getFirst = v => Array.isArray(v) ? v[0] : v;
 
-        // idUsuarios puede venir o no
-        const idUsuarios = req.body.idUsuarios ? Number(req.body.idUsuarios) : null;
+    // ─── 1) Datos personales ───────────────────────────────
+    const nombre          = getFirst(req.body.nombre);
+    const apellido        = getFirst(req.body.apellido);
+    const tipoDocumento   = getFirst(req.body.tipoDocumento);
+    const dni             = getFirst(req.body.dni);
+    let paisEmision       = getFirst(req.body.paisEmision);
+    const cuil            = getFirst(req.body.cuil);
+    const fechaNacimiento = getFirst(req.body.fechaNacimiento);
 
-        // Validación básica
-        if (!nombre || !apellido || !dni || !cuil || !fechaNacimiento ||
-            !pcia || !localidad || !barrio || !calle || isNaN(numero)) {
-            return res.status(400).json({ message: 'Faltan datos obligatorios.' });
-        }
+    // validación básica
+    if (!nombre || !apellido || !tipoDocumento || !dni || !fechaNacimiento) {
+      return res.status(400).json({ message: 'Datos personales obligatorios incompletos.' });
+    }
 
-        // Buscar o insertar provincia, localidad y barrio
-        const idProvincia = await buscarOInsertarProvincia(db, pcia);
-        const idLocalidad = await buscarOInsertarLocalidad(db, localidad, idProvincia);
-        const idBarrio = await buscarOInsertarBarrio(db, barrio, idLocalidad);
+    // Validación específica para DNI argentino
+    if (tipoDocumento === 'DNI' && !cuil) {
+      return res.status(400).json({ message: 'CUIL es requerido para DNI argentino.' });
+    }
 
-        // Insertar domicilio
-        const [domicilioResult] = await db.query(
-            'INSERT INTO domicilios (calle, numero, idBarrio, idLocalidad, idProvincia) VALUES (?, ?, ?, ?, ?)',
-            [calle, numero, idBarrio, idLocalidad, idProvincia]
-        );
-        const idDomicilio = domicilioResult.insertId;
+    // Validación para documentos extranjeros
+    if (tipoDocumento !== 'DNI' && !paisEmision) {
+      return res.status(400).json({ message: 'País de emisión es requerido para documentos extranjeros.' });
+    }
 
-        // Mapear archivos subidos y obtener la ruta de la foto
+    // Auto-asignar "Argentina" para documentos DNI si paisEmision está vacío
+    if (tipoDocumento === 'DNI' && !paisEmision) {
+      paisEmision = 'Argentina';
+    }
+
+    // ─── 1.1) DNI duplicado ────────────────────────────────
+    const [existente] = await db.query('SELECT 1 FROM estudiantes WHERE dni = ?', [dni]);
+    if (existente.length) {
+      return res.status(400).json({ message: 'El DNI ya está registrado.' });
+    }
+
+    // ─── 2) Datos de domicilio ─────────────────────────────
+    const pcia      = getFirst(req.body.pcia);
+    const localidad = getFirst(req.body.localidad);
+    const barrio    = getFirst(req.body.barrio);
+    const calle     = getFirst(req.body.calle);
+    const numero    = Number(getFirst(req.body.numero));
+
+    if (!pcia || !localidad || !barrio || !calle || isNaN(numero)) {
+      return res.status(400).json({ message: 'Datos de domicilio incompletos.' });
+    }
+
+    const idProvincia  = await buscarOInsertarProvincia(db, pcia);
+    const idLocalidad  = await buscarOInsertarLocalidad(db, localidad, idProvincia);
+    const idBarrio     = await buscarOInsertarBarrio(db, barrio, idLocalidad);
+
+    const [domicilioRes] = await db.query(
+      'INSERT INTO domicilios (calle, numero, idBarrio, idLocalidad, idProvincia) VALUES (?,?,?,?,?)',
+      [calle, numero, idBarrio, idLocalidad, idProvincia]
+    );
+    const idDomicilio = domicilioRes.insertId;
+
+    // ─── 3) Archivos subidos ───────────────────────────────
+    // justo después de subirlos
         const archivosMap = {};
         if (Array.isArray(req.files)) {
-            req.files.forEach(file => {
-                archivosMap[file.fieldname] = '/archivosDocumento/' + file.filename;
+            req.files.forEach(f => {
+                archivosMap[f.fieldname] = '/archivosDocumento/' + f.filename;
             });
         }
-        const fotoUrl = obtenerRutaFoto(archivosMap);
-     
-        // Insertar estudiante
-        const [estudianteResult] = await db.query(
-            'INSERT INTO estudiantes (nombre, apellido, dni, cuil, fechaNacimiento, foto, idDomicilio,idUsuarios) VALUES (?, ?, ?, ?, ?, ?, ?,?)',
-            [nombre, apellido, dni, cuil, fechaNacimiento, fotoUrl, idDomicilio, idUsuarios]
-        );
-        const idEstudiante = estudianteResult.insertId;
-         
-        // 5. Validar e insertar inscripción (con estado de inscripción)
-        const modalidadId = Number(getFirstValue(req.body.modalidadId));
-        const planAnioId = Number(getFirstValue(req.body.planAnio));
-        const modulosId = Number(getFirstValue(req.body.idModulo)); // ✅ corregido
-        const estadoInscripcionId = Number(getFirstValue(req.body.idEstadoInscripcion));
 
- 
-        // Insertar inscripción principal y obtener idInscripcion
-        if (
-            isNaN(modalidadId) ||
-            isNaN(planAnioId) ||
-            isNaN(modulosId) ||
-            isNaN(estadoInscripcionId)
-        ) {
-            return res.status(400).json({ message: 'Datos de inscripción incompletos o inválidos.' });
-        }
-        // Depuración de datos
-           console.log('Datos recibidos:', {
-                nombre, apellido, dni, cuil, fechaNacimiento, idDomicilio,
-                modalidadId, planAnioId, modulosId, estadoInscripcionId
-                });
+    const fotoUrl = obtenerRutaFoto(archivosMap);
 
-            console.log('IDs convertidos:', {
-            modalidadId, planAnioId, modulosId, estadoInscripcionId
-            });
-        // Insertar inscripción principal
-        const idInscripcion = await insertarInscripcion(
-            db,
-            idEstudiante,
-            modalidadId,
-            planAnioId,
-            modulosId,
-            estadoInscripcionId
-        );
-        console.log('🧾 Backend Datos inscripción que se insertarán:', {
-            idEstudiante, modalidadId, planAnioId, modulosId, estadoInscripcionId
-            });
+    // ─── 4) Insertar estudiante ────────────────────────────
+    const idUsuarios = req.body.idUsuarios ? Number(req.body.idUsuarios) : null;
 
-        // Procesar detalleDocumentacion
-        detalleDocumentacion = [];
-        try {
-             detalleDocumentacion = JSON.parse(req.body.detalleDocumentacion || '[]');
-        } catch (e) {
-           return res.status(400).json({ message: 'detalle Documentacion mal formado.' });
-        }
-        if (!Array.isArray(detalleDocumentacion) || detalleDocumentacion.length === 0) {
-            return res.status(400).json({ message: 'Detalle de documentación vacío o mal formado.' });
-        }
-        console.log('Detalle de documentación:', detalleDocumentacion);
-        // Guardar cada detalle en la tabla detalle_inscripcion
-        await guardarDetalleDocumentacion(detalleDocumentacion, archivosMap, idInscripcion, db);    
+    const [estRes] = await db.query(
+      `INSERT INTO estudiantes
+       (nombre, apellido, tipoDocumento, paisEmision, dni, cuil, fechaNacimiento, foto, idDomicilio, idUsuarios)
+       VALUES (?,?,?,?,?,?,?,?,?,?)`,
+      [nombre, apellido, tipoDocumento, paisEmision, dni, cuil, fechaNacimiento, fotoUrl, idDomicilio, idUsuarios]
+    );
+    const idEstudiante = estRes.insertId;
 
-    res.status(201).json({ 
-        success: true, 
-        message: 'Estudiante registrado con éxito', 
-        idEstudiante, idInscripcion });
-    } catch (error) {
-        console.error('Error en el registro de estudiante:', error.message, error.stack);
-        return res.status(500).json({ message: `Error en el registro de estudiante: ${error.message}` });
+    // ─── 5) Parámetros de inscripción ──────────────────────
+    const modalidadId        = Number(getFirst(req.body.modalidadId));
+    const planAnioId         = Number(getFirst(req.body.planAnio));
+    const modulosId          = Number(getFirst(req.body.idModulo));
+    const idEstadoInscripcion= Number(getFirst(req.body.idEstadoInscripcion));
+
+    if ([modalidadId, planAnioId, modulosId, idEstadoInscripcion].some(isNaN)) {
+      return res.status(400).json({ message: 'Datos de inscripción incompletos o inválidos.' });
     }
-});
 
-router.post('/registrar', upload.any(), async (req, res) => {
+    if (![1, 2, 3].includes(idEstadoInscripcion)) {
+        return res.status(400).json({ message: 'Estado de inscripción inválido.' });
+    }
+
+    // ─── 6) Insertar inscripción ───────────────────────────
+    const idInscripcion = await insertarInscripcion(
+      db,
+      idEstudiante,
+      modalidadId,
+      planAnioId,
+      modulosId,
+      idEstadoInscripcion,
+      'CURDATE()' // Inserta solo la fecha
+    );
+
+    // ─── 7) Detalle de documentación ──────────────────────
+    let detalleDocumentacion = [];
     try {
-        const { dni } = req.body;
-
-        // Verificar si el DNI ya existe
-        const [estudianteExistente] = await db.query('SELECT * FROM estudiantes WHERE dni = ?', [dni]);
-        if (estudianteExistente.length > 0) {
-            return res.status(400).json({ message: 'El DNI ya está registrado.' });
-        }
-
-        // Continuar con el registro si el DNI no existe
-        const [domicilioResult] = await db.query(
-            'INSERT INTO domicilios (calle, numero, idBarrio, idLocalidad, idProvincia) VALUES (?, ?, ?, ?, ?)',
-            [calle, numero, idBarrio, idLocalidad, idProvincia]
-        );
-        const idDomicilio = domicilioResult.insertId;
-
-        const [estudianteResult] = await db.query(
-            'INSERT INTO estudiantes (nombre, apellido, dni, cuil, fechaNacimiento, foto, idDomicilio, idUsuarios) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [nombre, apellido, dni, cuil, fechaNacimiento, fotoUrl, idDomicilio, idUsuarios]
-        );
-        const idEstudiante = estudianteResult.insertId;
-
-        res.status(201).json({
-            success: true,
-            message: 'Estudiante registrado con éxito',
-            idEstudiante,
-        });
-    } catch (error) {
-        console.error('Error en el registro de estudiante:', error.message, error.stack);
-        return res.status(500).json({ message: `Error en el registro de estudiante: ${error.message}` });
+      detalleDocumentacion = JSON.parse(req.body.detalleDocumentacion || '[]');
+    } catch (_e) {
+      return res.status(400).json({ message: 'detalleDocumentacion mal formado.' });
     }
+
+    console.log("Datos recibidos en el cuerpo:", req.body);
+    console.log("Detalle de documentación recibido:", req.body.detalleDocumentacion);
+
+    if (!Array.isArray(detalleDocumentacion) || !detalleDocumentacion.length) {
+      return res.status(400).json({ message: 'Detalle de documentación vacío.' });
+    }
+
+    for (const det of detalleDocumentacion) {
+        const url = archivosMap[det.nombreArchivo] || null; // Busca la URL del archivo en archivosMap
+
+        const idDetalle = await buscarOInsertarDetalleDocumentacion(
+            db,
+            idInscripcion,
+            det.idDocumentaciones,
+            det.estadoDocumentacion || 'Pendiente',
+            det.fechaEntrega || null,
+            url
+        );
+
+        console.log(`Detalle insertado o encontrado with ID: ${idDetalle}`);
+    }
+
+
+    // ─── 8) OK ─────────────────────────────────────────────
+    res.status(201).json({
+      success: true,
+      message: 'Estudiante e inscripción creados con éxito.',
+      idEstudiante,
+      idInscripcion
+    });
+
+  } catch (err) {
+    console.error('Error en /registrar:', err);
+    res.status(500).json({ message: 'Error interno: ' + err.message });
+  }
 });
 
 module.exports = router;

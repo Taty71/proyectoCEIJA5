@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 20-05-2025 a las 04:47:47
+-- Tiempo de generación: 18-07-2025 a las 15:37:55
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -33,6 +33,15 @@ CREATE TABLE `estado_inscripciones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Volcado de datos para la tabla `estado_inscripciones`
+--
+
+INSERT INTO `estado_inscripciones` (`id`, `descripcionEstado`) VALUES
+(1, 'pendiente'),
+(2, 'aprobado'),
+(3, 'anulado');
+
+--
 -- Índices para tablas volcadas
 --
 
@@ -50,7 +59,7 @@ ALTER TABLE `estado_inscripciones`
 -- AUTO_INCREMENT de la tabla `estado_inscripciones`
 --
 ALTER TABLE `estado_inscripciones`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

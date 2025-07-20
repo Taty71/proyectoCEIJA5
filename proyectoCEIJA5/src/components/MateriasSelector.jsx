@@ -1,10 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import service from "../services/serviceObtenerAcad";
 import BotonCargando from "./BotonCargando";
 
 const MateriasSelector = ({ idAreaEstudio }) => {
-    console.log("Valores enviados a la API para materias:", { idAreaEstudio });
+    const prevIdAreaEstudioRef = useRef();
+
+    // Solo hacer log cuando cambie idAreaEstudio
+    useEffect(() => {
+        if (import.meta.env.DEV) {
+            if (prevIdAreaEstudioRef.current !== idAreaEstudio) {
+                console.log("[MateriasSelector] Valores para API de materias:", { idAreaEstudio });
+                prevIdAreaEstudioRef.current = idAreaEstudio;
+            }
+        }
+    }, [idAreaEstudio]);
     const [materias, setMaterias] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -40,7 +50,7 @@ const MateriasSelector = ({ idAreaEstudio }) => {
             <label htmlFor="materias">Materias:</label>
             <div>
                 {loading ? (
-                    <BotonCargando />
+                    <BotonCargando loading={loading} />
                 ) : error ? (
                     <p>{error}</p>
                 ) : materias.length > 0 ? (

@@ -1,101 +1,467 @@
 /* Contenedor principal */
+.lista-estudiantes-container,
 .lista-estudiantes {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-top: 20px;
-  padding: 5px;
-  background-color: #ffffff; /* Fondo blanco */
+  margin: 20px;
+  padding: 20px;
+  background-color: #ffffff;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
-  color: #333; /* Texto oscuro */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: #333;
   font-family: Arial, sans-serif;
-  position:relative;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
-/* Título */
-.lista-estudiantes h2 {
+/* Header de la lista */
+.lista-header {
   text-align: center;
+  margin-bottom: 15px;
+  margin-top: 10px;
+}
+
+.lista-titulo {
+  font-size: 1.4rem;
+  font-weight: 300;
+  margin-bottom: 5px;
+  color: #2d4177;
+  letter-spacing: 0.5px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.lista-subtitulo {
+  color: #666;
+  font-size: 0.85rem;
+  margin: 0;
+  font-weight: 300;
+  opacity: 0.8;
+}
+
+.lista-header h2 {
   font-size: 1.8rem;
   font-weight: bold;
+  margin-bottom: 10px;
+  color: #2d4177;
+}
+
+.lista-header p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Loading container */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+/* Error y mensajes */
+.error-message {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #721c24;
+}
+
+.mensaje-eliminacion {
+  background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
+  border: 1px solid #7dcea0;
+  border-radius: 8px;
+  padding: 12px 20px;
   margin-bottom: 15px;
-  color: #2d4177; /* Azul oscuro */
+  text-align: center;
+  color: #0e6251;
+  font-weight: 500;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-message p {
+  margin: 0 0 10px 0;
+  color: #721c24;
+}
+
+.btn-reintentar {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn-reintentar:hover {
+  background-color: #c82333;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+/* Contenedor de tabla */
+.tabla-container {
+  overflow-x: auto;
+  margin-bottom: 20px;
 }
 
 /* Tabla */
-.lista-estudiantes table {
+.tabla-estudiantes {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8em;
+  font-size: 0.85rem;
 }
 
-.lista-estudiantes th,
-.lista-estudiantes td {
-  border: 1px solid #ddd;
-  padding: 3px; /* Reduce el padding para disminuir el alto */
+.tabla-estudiantes th {
+  background-color: #2d4177;
+  color: white;
+  padding: 10px 6px;
   text-align: left;
-}
-
-.lista-estudiantes tr {
-  height: 20px; /* Reduce el alto de las filas */
-}
-
-.lista-estudiantes th {
-  background-color: #f4f4f4;
   font-weight: bold;
-  text-align: center; /* Centra el texto en el encabezado */
+  border-bottom: 2px solid #1a2654;
+  font-size: 0.8rem;
 }
 
-/* Filas alternas */
-.lista-estudiantes tr:nth-child(even) {
-  background-color: #f9f9f9; /* Color de fila alterna claro */
+.tabla-estudiantes td {
+  padding: 10px 6px;
+  border-bottom: 1px solid #ddd;
+  vertical-align: middle;
 }
 
-/* Ajustar ancho de las columnas de fechas */
-.lista-estudiantes th:nth-child(6),
-.lista-estudiantes td:nth-child(6),
-.lista-estudiantes th:nth-child(12),
-.lista-estudiantes td:nth-child(12) {
-  width: 150px; /* Ajusta el ancho de las columnas de fechas */
-  text-align: center; /* Centra el texto */
+/* Ancho específico para columnas */
+.tabla-estudiantes th:nth-child(1), /* ID */
+.tabla-estudiantes td:nth-child(1) {
+  width: 60px;
+  text-align: center;
 }
 
-/* Dividir texto en dos filas en encabezado */
-.lista-estudiantes th:nth-child(6),
-.lista-estudiantes th:nth-child(12) {
-  white-space: normal; /* Permite que el texto se divida en varias líneas */
-  line-height: 1.2; /* Ajusta el espacio entre líneas */
+.tabla-estudiantes th:nth-child(2), /* DNI */
+.tabla-estudiantes td:nth-child(2) {
+  width: 90px;
+}
+
+.tabla-estudiantes th:nth-child(8), /* Acciones */
+.tabla-estudiantes td:nth-child(8) {
+  width: 120px;
+  text-align: center;
+}
+
+.tabla-estudiantes tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Estados */
+.estado {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.estado-inscripto {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.estado-pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.estado-rechazado {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.estado-sin-estado {
+  background-color: #e9ecef;
+  color: #6c757d;
+}
+
+/* Grupo de acciones */
+.acciones-grupo {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-accion {
+  padding: 4px 6px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-modificar {
+  background-color: #e8f4fd;
+  color: #2980b9;
+  border: 1px solid #bee5eb;
+}
+
+.btn-modificar:hover {
+  background-color: #d1ecf1;
+  color: #1c5460;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-eliminar {
+  background-color: #fdf2f2;
+  color: #e74c3c;
+  border: 1px solid #f8d7da;
+}
+
+.btn-eliminar:hover {
+  background-color: #f8d7da;
+  color: #c0392b;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-ver {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #e9ecef;
+}
+
+.btn-ver:hover {
+  background-color: #e9ecef;
+  color: #495057;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Paginación */
+.paginacion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  padding: 15px;
+}
+
+.btn-paginacion {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+}
+
+.btn-paginacion:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.btn-paginacion:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.info-paginacion {
+  font-weight: 500;
+  color: #495057;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .lista-estudiantes-container {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  .tabla-estudiantes {
+    font-size: 0.8rem;
+  }
+
+  .tabla-estudiantes th,
+  .tabla-estudiantes td {
+    padding: 8px 6px;
+  }
+
+  .acciones-grupo {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .btn-accion {
+    width: 26px;
+    height: 26px;
+    font-size: 11px;
+  }
+
+  .acciones-estudiante {
+    gap: 4px;
+  }
+}
+
+/* Estilos para botones de acciones - Elegantes y más pequeños */
+.acciones-estudiante {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-accion {
+  border: none;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Botón Ver - Degradado azul elegante del sitio */
+.btn-ver {
+  background: linear-gradient(135deg, #2d4177 0%, #4a69bd 50%, #74b9ff 100%);
+  color: white;
+  box-shadow: 0 2px 6px rgba(45, 65, 119, 0.25);
+}
+
+.btn-ver:hover {
+  background: linear-gradient(135deg, #1e2d5a 0%, #3c5aa6 50%, #0984e3 100%);
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(45, 65, 119, 0.4);
+}
+
+/* Botón Modificar - Degradado naranja suave con gris */
+.btn-modificar {
+  background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 50%, #a29bfe 100%);
+  color: #2d3436;
+}
+
+.btn-modificar:hover {
+  background: linear-gradient(135deg, #fdcb6e 0%, #e17055 50%, #6c5ce7 100%);
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 8px rgba(250, 177, 160, 0.3);
+}
+
+/* Botón Eliminar - Degradado rojo suave */
+.btn-eliminar {
+  background: linear-gradient(135deg, #fd79a8 0%, #e84393 50%, #a29bfe 100%);
+  color: white;
+}
+
+.btn-eliminar:hover {
+  background: linear-gradient(135deg, #fd5585 0%, #e01e7c 50%, #6c5ce7 100%);
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 8px rgba(253, 121, 168, 0.3);
+}
+
+.btn-accion:active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* Efecto de ondas al hacer clic */
+.btn-accion::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.btn-accion:active::before {
+  width: 100%;
+  height: 100%;
 }
 
 /* Paginación */
 .pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
   margin-top: 20px;
-  text-align: center;
+  padding: 15px 0;
+  border-top: 1px solid #e0e0e0;
 }
 
+.pagination-btn,
 .pagination button {
-  margin: 0 5px;
-  padding: 5px 10px;
-  background-color: #007bff;
+  background-color: #2d4177;
   color: white;
   border: none;
-  border-radius: 4px;
+  padding: 8px 16px;
+  border-radius: 5px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  min-width: 80px;
 }
 
+.pagination-btn:hover:not(:disabled),
+.pagination button:hover:not(:disabled) {
+  background-color: #1e2d5a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.pagination-btn:disabled,
 .pagination button:disabled {
-  background-color: #ccc;
+  background-color: #cccccc;
+  color: #666666;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-/* Ajustes responsivos */
-@media (max-width: 768px) {
-  .lista-estudiantes table {
-    font-size: 0.75rem; /* Reduce el tamaño de la letra en pantallas pequeñas */
-  }
-
-  .lista-estudiantes th,
-  .lista-estudiantes td {
-    padding: 4px; /* Reduce el padding en pantallas pequeñas */
-  }
+.pagination-info,
+.pagination span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2d4177;
+  padding: 8px 12px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  min-width: 100px;
+  text-align: center;
 }

@@ -1,28 +1,6 @@
 import axiosInstance from '../config/axios';
 import FormatError from '../utils/MensajeError';
 
-// Modificar inscripción Adm
-const updateEstd = async (data) => {
-    try {
-        const response = await axiosInstance.put('/inscripcion', data);
-        return response.data;
-    } catch (error) {
-        const message = FormatError(error);
-        throw new Error(message); 
-    }
-};
-
-// Eliminar inscripción Adm
-const deleteEstd = async (dni) => {
-    try {
-        const response = await axiosInstance.delete(`/inscriptions/${dni}`);
-        return response.data;
-    } catch (error) {
-        const message = FormatError(error);
-        return { error: message };
-    }
-};
-
 // Obtener todas las inscripciones
 const getAll = async () => {
     try {
@@ -46,9 +24,43 @@ const getPaginatedEstudiantes = async (page, limit) => {
     }
 };
 
+const updateEstd = async (data, dni) => {
+  try {
+    const response = await axiosInstance.put(`/modificar-estudiante/${dni}`, data);
+    return response.data;
+  } catch (error) {
+    const message = FormatError(error);
+    throw new Error(message); 
+  }
+};
+
+
+// Eliminar inscripción Adm (eliminación física)
+const deleteEstd = async (dni) => {
+    try {
+        const response = await axiosInstance.delete(`/eliminar-estudiante/${dni}`);
+        return response.data;
+    } catch (error) {
+        const message = FormatError(error);
+        return { error: message };
+    }
+};
+
+// Desactivar estudiante (eliminación lógica)
+const deactivateEstd = async (dni) => {
+    try {
+        const response = await axiosInstance.patch(`/eliminar-estudiante/desactivar/${dni}`);
+        return response.data;
+    } catch (error) {
+        const message = FormatError(error);
+        return { error: message };
+    }
+};
+
 export default {
     updateEstd,
     deleteEstd,
+    deactivateEstd,
     getAll,
-    getPaginatedEstudiantes, // Nueva función para paginación
+    getPaginatedEstudiantes,
 };

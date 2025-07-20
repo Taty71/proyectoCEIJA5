@@ -17,21 +17,15 @@ const createWebInscription = async (formDataToSend) => {
 const createEstd = async (formDataToSend) => {
     try {
         const response = await axiosInstance.post('/estudiantes/registrar', formDataToSend);
+        if (import.meta.env.DEV) {
+            console.log('Respuesta del servidor:', response.data);
+        }
         return response.data;
     } catch (error) {
-        if (error.response) {
+        if (import.meta.env.DEV) {
             console.error('Error en createEstd - respuesta servidor:', error.response.data);
-
-            // Manejo específico del error "DNI ya registrado"
-            if (error.response.data.message === 'El DNI ya está registrado.') {
-                throw new Error('El DNI ingresado ya está registrado en el sistema.');
-            }
-        } else if (error.request) {
-            console.error('Error en createEstd - no se recibió respuesta:', error.request);
-        } else {
-            console.error('Error en createEstd - configuración:', error.message);
         }
-        throw error; // Lanza el error para manejarlo en el componente
+        throw new Error(error.response.data.message || 'Ocurrió un error al enviar los datos.');
     }
 };
 export default {

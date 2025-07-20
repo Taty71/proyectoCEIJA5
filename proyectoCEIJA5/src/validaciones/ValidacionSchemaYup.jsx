@@ -4,11 +4,31 @@ import * as yup from 'yup';
 export const formularioInscripcionSchema = yup.object().shape({
     nombre: yup.string().required('Nombre es requerido'),
     apellido: yup.string().required('Apellido es requerido'),
-    dni: yup.string().required('DNI es requerido, sin espacios y puntos'),
+    tipoDocumento: yup.string().required('Tipo de documento es requerido'),
+    dni: yup
+        .string()
+        .required('Número de documento es requerido')
+        .when('tipoDocumento', {
+            is: 'DNI',
+            then: (schema) => schema.matches(/^\d{8}$/, 'DNI debe tener exactamente 8 dígitos, sin espacios ni puntos'),
+            otherwise: (schema) => schema.min(5, 'Número de documento debe tener al menos 5 caracteres')
+        }),
+    paisEmision: yup
+        .string()
+        .when('tipoDocumento', {
+            is: (val) => val && val !== 'DNI',
+            then: (schema) => schema.required('País de emisión es requerido para documentos extranjeros'),
+            otherwise: (schema) => schema.notRequired()
+        }),
     cuil: yup
         .string()
-        .required('CUIL es requerido')
-        .matches(/^\d{2}-\d{7,8}-\d$/, 'CUIL debe tener el formato 00-12345678-0'),
+        .when('tipoDocumento', {
+            is: 'DNI',
+            then: (schema) => schema
+                .required('CUIL es requerido para DNI argentino')
+                .matches(/^\d{2}-\d{8}-\d$/, 'CUIL debe tener el formato 00-00000000-0 (11 dígitos con guiones)'),
+            otherwise: (schema) => schema.notRequired()
+        }),
    fechaNacimiento: yup
         .date()
         .required('Fecha de nacimiento es requerida')

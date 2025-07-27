@@ -21,6 +21,7 @@ const datosDomicilioRoutes = require('./routes/datosDomicilio');
 const modificarEstRoutes = require('./routes/modificarEst');
 const eliminarEstRoutes = require('./routes/eliminarEst'); // Importa la ruta
 const documentacionRoutes = require('./routes/buscarDocumentacion');
+const documentosFaltantesRoutes = require('./routes/documentosFaltantes');
 
 const path = require('path');
 
@@ -59,6 +60,7 @@ app.use('/api/datos-domicilio', datosDomicilioRoutes);
 app.use('/api/modificar-estudiante', modificarEstRoutes);
 app.use('/api/eliminar-estudiante', eliminarEstRoutes); // Registra la ruta bajo el prefijo /api
 app.use('/api/documentacion', documentacionRoutes);
+app.use('/api/documentos-faltantes', documentosFaltantesRoutes);
 
 // Middleware para manejo de errores globales
 app.use((err, req, res, next) => {

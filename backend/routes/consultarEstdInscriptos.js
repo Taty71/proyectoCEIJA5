@@ -10,26 +10,36 @@ const obtenerRutaFoto = require('../utils/obtenerRutaFoto');
 
 
 
-router.get('/dni/:dni', async (req, res) => {
+router.get('/buscar/:dni', async (req, res) => {
     try {
         const { dni } = req.params;
+        const modalidadId = Number(req.query.modalidadId); // <-- recibe modalidadId
 
-        // Validar que el DNI sea un número
         if (isNaN(dni)) {
             return res.status(400).json({ success: false, message: 'DNI inválido.' });
         }
 
-        // Consulta para obtener datos del estudiante (solo activos)
-        const [estudiante] = await db.query('SELECT * FROM estudiantes WHERE dni = ? AND activo = 1', [dni]);
+        const [estudiante] = await db.query('SELECT *, email FROM estudiantes WHERE dni = ? AND activo = 1', [dni]);
         if (estudiante.length === 0) {
-            return res.status(404).json({ success: false, message: 'Estudiante no encontrado.' });
+            return res.status(404).json({ success: false, message: 'Estudiante no encontrado o inactivo.' });
         }
 
-        // Consulta para obtener datos del domicilio
-        const [domicilio] = await db.query('SELECT * FROM domicilios WHERE id = ?', [estudiante[0].idDomicilio]);
+        const [domicilio] = await db.query(`
+            SELECT 
+                d.calle,
+                d.numero,
+                b.nombre AS barrio,
+                l.nombre AS localidad,
+                p.nombre AS provincia
+            FROM domicilios d
+            LEFT JOIN barrios b ON d.idBarrio = b.id
+            LEFT JOIN localidades l ON d.idLocalidad = l.id
+            LEFT JOIN provincias p ON d.idProvincia = p.id
+            WHERE d.id = ?
+        `, [estudiante[0].idDomicilio]);
 
-        // Consulta para obtener información académica
-        const [inscripcion] = await db.query(`
+        // Filtrar inscripción por modalidadId
+        let inscripcionQuery = `
             SELECT 
                 i.fechaInscripcion, 
                 m.modalidad, 
@@ -37,14 +47,27 @@ router.get('/dni/:dni', async (req, res) => {
             FROM inscripciones i
             LEFT JOIN modalidades m ON i.idModalidad = m.id
             LEFT JOIN anio_plan a ON i.idAnioPlan = a.id
-            WHERE i.idEstudiante = ? AND (i.idModulos = 0 OR i.idModulos IS NOT NULL)
-        `, [estudiante[0].id]);
+            WHERE i.idEstudiante = ?
+        `;
+        const queryParams = [estudiante[0].id];
+
+        if (modalidadId) {
+            inscripcionQuery += ' AND i.idModalidad = ?';
+            queryParams.push(modalidadId);
+        }
+
+        const [inscripcion] = await db.query(inscripcionQuery, queryParams);
+
+        // Si no hay inscripción para esa modalidad, devuelve error
+        if (!inscripcion.length) {
+            return res.status(404).json({ success: false, message: 'No existe inscripción en la modalidad seleccionada.' });
+        }
 
         res.status(200).json({
             success: true,
             estudiante: estudiante[0],
             domicilio: domicilio[0],
-            inscripcion: inscripcion.length > 0 ? inscripcion[0] : null, // Devuelve null si no hay inscripción
+            inscripcion: inscripcion[0],
         });
     } catch (error) {
         console.error('Error al obtener estudiante por DNI:', error);
@@ -53,17 +76,40 @@ router.get('/dni/:dni', async (req, res) => {
 });
 router.get('/', async (req, res) => {
     try {
-        const { page = 1, limit = 10 } = req.query; // Recibe los parámetros de paginación
+        const { page = 1, limit = 10, activo } = req.query; // Recibe los parámetros de paginación y filtro
         const offset = (page - 1) * limit;
 
-        // Consulta para obtener estudiantes activos con modalidad y curso/plan
+        console.log('🔍 Parámetros recibidos:', { page, limit, activo });
+
+        // Construir la cláusula WHERE según el filtro
+        let whereClause = '';
+        let countWhereClause = '';
+        let queryParams = [parseInt(limit), parseInt(offset)];
+        let countParams = [];
+
+        if (activo !== undefined) {
+            // Si se especifica activo (0 o 1), filtrar por ese valor
+            whereClause = 'WHERE e.activo = ?';
+            countWhereClause = 'WHERE activo = ?';
+            queryParams = [parseInt(activo), parseInt(limit), parseInt(offset)];
+            countParams = [parseInt(activo)];
+            console.log('📋 Filtrando por activo:', activo);
+        } else {
+            // Si no se especifica, mostrar todos (comportamiento por defecto)
+            whereClause = '';
+            countWhereClause = '';
+            console.log('📋 Mostrando todos los estudiantes');
+        }
+
+        // Consulta para obtener estudiantes con modalidad y curso/plan
         const [result] = await db.query(`
             SELECT 
-                e.id, e.nombre, e.apellido, e.dni, e.cuil, e.fechaNacimiento, 
+                e.id, e.nombre, e.apellido, e.dni, e.cuil, e.fechaNacimiento, e.activo, e.email,
                 d.calle, d.numero, b.nombre AS barrio, l.nombre AS localidad, p.nombre AS provincia,
                 i.fechaInscripcion, 
                 m.modalidad, 
                 a.descripcionAnioPlan AS cursoPlan,
+                ei.id AS idEstadoInscripcion, -- <--- AGREGAR ESTA LINEA
                 ei.descripcionEstado AS estadoInscripcion
             FROM estudiantes e
             LEFT JOIN domicilios d ON e.idDomicilio = d.id
@@ -74,23 +120,29 @@ router.get('/', async (req, res) => {
             LEFT JOIN modalidades m ON i.idModalidad = m.id
             LEFT JOIN anio_plan a ON i.idAnioPlan = a.id
             LEFT JOIN estado_inscripciones ei ON i.idEstadoInscripcion = ei.id
-            WHERE e.activo = 1
+            ${whereClause}
             ORDER BY i.fechaInscripcion DESC, e.id ASC
             LIMIT ? OFFSET ?
-        `, [parseInt(limit), parseInt(offset)]);
+        `, queryParams);
 
-        // Contar total de estudiantes activos
-        const [total] = await db.query('SELECT COUNT(*) AS total FROM estudiantes WHERE activo = 1');
+        // Contar total de estudiantes según el filtro
+        const [total] = await db.query(`SELECT COUNT(*) AS total FROM estudiantes ${countWhereClause}`, countParams);
+
+        console.log('📊 Resultados:', {
+            total: total[0].total,
+            estudiantes: result.length,
+            filtro: activo !== undefined ? `activo=${activo}` : 'todos'
+        });
 
         res.status(200).json({
             success: true,
-            estudiantes: result.map(estudiante => ({
+            estudiantes: Array.isArray(result) ? result.map(estudiante => ({
                 ...estudiante,
                 fechaInscripcion: estudiante.fechaInscripcion || 'Sin inscripción',
                 modalidad: estudiante.modalidad || 'Sin modalidad',
                 cursoPlan: estudiante.cursoPlan || 'Sin curso/plan',
                 estadoInscripcion: estudiante.estadoInscripcion || 'Sin estado',
-            })),
+            })) : [],
             total: total[0].total,
             page: parseInt(page),
             limit: parseInt(limit),

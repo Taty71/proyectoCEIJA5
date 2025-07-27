@@ -1,20 +1,59 @@
 // utils/obtenerDocumentacionFaltante.js
 
-module.exports = async function obtenerDocumentacionFaltante(idEstudiante, db) {
-    const [result] = await db.query(`
-        SELECT d.id, d.descripcionDocumentacion
-        FROM documentaciones d
-        LEFT JOIN (
-            SELECT di.idDocumentaciones
-            FROM detalle_inscripcion di
-            INNER JOIN inscripciones i ON i.id = di.idInscripcion
-            WHERE i.idEstudiante = ?
-        ) AS docs_entregados
-        ON d.id = docs_entregados.idDocumentaciones
-        WHERE docs_entregados.idDocumentaciones IS NULL
-    `, [idEstudiante]);
+/**
+ * Devuelve un array con los nombres de la documentación faltante
+ * según estado de inscripción, modalidad y plan.
+ * 
+ * @param {Object} params
+ * @param {string} params.estadoInscripcion - "Aprobada" | "Pendiente"
+ * @param {string} params.modalidad - "Presencial" | "Semipresencial"
+ * @param {string|number} params.planAnio - Ej: "Plan A", 1, 4, etc.
+ * @param {Array} params.documentacionPresentada - Array de nombres de archivos presentados
+ * @returns {Array} - Array de nombres de documentación faltante
+ */
+function obtenerDocumentacionFaltante({ estadoInscripcion, modalidad, planAnio, documentacionPresentada }) {
+    // Documentos requeridos por plan/modalidad
+    const docsPrimario = [
+        'Certificado Nivel Primario',
+        'DNI',
+        'CUIL',
+        'Partida de Nacimiento',
+        'Ficha Médica'
+    ];
+    const docsAnalitico = [
+        'Analítico Parcial',
+        'DNI',
+        'CUIL',
+        'Partida de Nacimiento',
+        'Ficha Médica'
+    ];
 
-    return result;
-};
+    // Si está aprobada, no mostrar faltantes
+    if (estadoInscripcion?.toLowerCase() === 'aprobada') {
+        return [];
+    }
+
+    // Determinar si es plan A/1er año
+    const esPlanPrimario = (
+        String(planAnio).toLowerCase().includes('a') ||
+        String(planAnio) === '1' ||
+        String(planAnio) === '4'
+    );
+
+    // Si presentó solicitud de pase pero no analítico, solo mostrar analítico como faltante
+    if (documentacionPresentada.includes('Solicitud Pase') &&
+        !documentacionPresentada.includes('Analítico Parcial')) {
+        return ['Analítico Parcial'];
+    }
+
+    // Documentos requeridos según plan
+    const requeridos = esPlanPrimario ? docsPrimario : docsAnalitico;
+
+    // Filtrar los que faltan
+    return requeridos.filter(doc => !documentacionPresentada.includes(doc));
+}
+
+module.exports = obtenerDocumentacionFaltante;
+
 // Este módulo obtiene la documentación faltante para un estudiante dado su ID.
 // Realiza una consulta que selecciona las documentaciones que no han sido entregadas por el

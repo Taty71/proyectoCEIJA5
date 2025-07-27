@@ -6,9 +6,10 @@ const db = require('../db');
 router.get('/inscripciones/:idEstudiante', async (req, res) => {
     try {
         const { idEstudiante } = req.params;
+        const modalidadId = Number(req.query.modalidadId); // <-- recibe modalidadId
 
         // Consulta para obtener los datos completos de inscripción
-        const [result] = await db.query(`
+        let sql = `
             SELECT 
                 inscripciones.fechaInscripcion,
                 modalidades.modalidad AS modalidad,
@@ -21,12 +22,20 @@ router.get('/inscripciones/:idEstudiante', async (req, res) => {
             INNER JOIN modulos ON inscripciones.idModulos = modulos.id
             INNER JOIN estado_inscripciones ON inscripciones.idEstadoInscripcion = estado_inscripciones.id
             WHERE inscripciones.idEstudiante = ?
-        `, [idEstudiante]);
+        `;
+        const params = [idEstudiante];
+
+        if (modalidadId) {
+            sql += ' AND inscripciones.idModalidad = ?';
+            params.push(modalidadId);
+        }
+
+        const [result] = await db.query(sql, params);
 
         if (result.length > 0) {
             res.status(200).json({ success: true, inscripcion: result[0] });
         } else {
-            res.status(404).json({ success: false, message: 'Inscripción no encontrada.' });
+            res.status(404).json({ success: false, message: 'Inscripción no encontrada para la modalidad seleccionada.' });
         }
     } catch (error) {
         console.error('Error al obtener inscripción:', error);
@@ -38,11 +47,12 @@ router.get('/inscripciones/:idEstudiante', async (req, res) => {
 router.get('/:dni', async (req, res) => {
     try {
         const { dni } = req.params;
+        const modalidadId = Number(req.query.modalidadId); // <-- recibe modalidadId
 
-        // Consulta para obtener los datos del estudiante
-        const [estudianteResult] = await db.query('SELECT * FROM estudiantes WHERE dni = ?', [dni]);
+        // Consulta para obtener los datos del estudiante (incluyendo email y estado activo)
+        const [estudianteResult] = await db.query('SELECT * FROM estudiantes WHERE dni = ? AND activo = 1', [dni]);
         if (estudianteResult.length === 0) {
-            return res.status(404).json({ success: false, message: 'Estudiante no encontrado.' });
+            return res.status(404).json({ success: false, message: 'Estudiante no encontrado o inactivo.' });
         }
         const estudiante = estudianteResult[0];
 
@@ -63,8 +73,8 @@ router.get('/:dni', async (req, res) => {
 
         const domicilio = domicilioResult.length > 0 ? domicilioResult[0] : null;
 
-        // Consulta para obtener los datos completos de inscripción
-        const [inscripcionResult] = await db.query(`
+        // Consulta para obtener la inscripción filtrada por modalidad
+        let inscripcionQuery = `
             SELECT 
                 inscripciones.id AS idInscripcion,
                 inscripciones.fechaInscripcion,
@@ -78,15 +88,33 @@ router.get('/:dni', async (req, res) => {
             LEFT JOIN modulos ON inscripciones.idModulos = modulos.id
             LEFT JOIN estado_inscripciones ON inscripciones.idEstadoInscripcion = estado_inscripciones.id
             WHERE inscripciones.idEstudiante = ?
-        `, [estudiante.id]);
+        `;
+        const queryParams = [estudiante.id];
 
-        console.log('Inscripción obtenida:', inscripcionResult);
+        if (modalidadId) {
+            inscripcionQuery += ' AND inscripciones.idModalidad = ?';
+            queryParams.push(modalidadId);
+        }
 
-        const inscripcion = inscripcionResult.length > 0 ? inscripcionResult[0] : null;
+        const [inscripcionResult] = await db.query(inscripcionQuery, queryParams);
+
+        // Si no hay inscripción para esa modalidad, devuelve error
+        if (!inscripcionResult.length) {
+            return res.status(404).json({ success: false, message: 'No existe inscripción en la modalidad seleccionada.' });
+        }
+
+        const inscripcion = inscripcionResult[0];
 
         // Consulta para obtener la documentación si existe inscripción
         let documentacion = [];
         if (inscripcion && inscripcion.idInscripcion) {
+            // Traer todos los tipos de documentación
+            const [tiposDoc] = await db.query(`
+                SELECT id, descripcionDocumentacion
+                FROM documentaciones
+            `);
+
+            // Traer la documentación entregada
             const [documentacionResult] = await db.query(`
                 SELECT
                     d.idDocumentaciones,
@@ -98,9 +126,31 @@ router.get('/:dni', async (req, res) => {
                 JOIN documentaciones doc ON doc.id = d.idDocumentaciones
                 WHERE d.idInscripcion = ?
             `, [inscripcion.idInscripcion]);
-            
-            documentacion = documentacionResult || [];
-            console.log('Documentación obtenida:', documentacion);
+
+            // Mapear entregados por idDocumentaciones
+            const entregadosMap = {};
+            documentacionResult.forEach(doc => {
+                entregadosMap[doc.idDocumentaciones] = {
+                    ...doc,
+                    archivoDocumentacion: doc.archivoDocumentacion
+                        ? (doc.archivoDocumentacion.startsWith('/archivosDocumentacion/') ? `http://localhost:5000${doc.archivoDocumentacion}` : doc.archivoDocumentacion)
+                        : null
+                };
+            });
+
+            // Construir el array completo, marcando faltantes
+            documentacion = tiposDoc.map(tipo => {
+                if (entregadosMap[tipo.id]) {
+                    return entregadosMap[tipo.id];
+                }
+                return {
+                    idDocumentaciones: tipo.id,
+                    descripcionDocumentacion: tipo.descripcionDocumentacion,
+                    estadoDocumentacion: 'Faltante',
+                    fechaEntrega: null,
+                    archivoDocumentacion: null
+                };
+            });
         }
 
         // Respuesta combinada

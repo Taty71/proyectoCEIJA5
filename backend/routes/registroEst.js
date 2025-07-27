@@ -118,9 +118,9 @@ router.post('/registrar', upload.any(), async (req, res) => {
 
     const [estRes] = await db.query(
       `INSERT INTO estudiantes
-       (nombre, apellido, tipoDocumento, paisEmision, dni, cuil, fechaNacimiento, foto, idDomicilio, idUsuarios)
-       VALUES (?,?,?,?,?,?,?,?,?,?)`,
-      [nombre, apellido, tipoDocumento, paisEmision, dni, cuil, fechaNacimiento, fotoUrl, idDomicilio, idUsuarios]
+       (nombre, apellido, tipoDocumento, paisEmision, dni, cuil, email, fechaNacimiento, foto, idDomicilio, idUsuarios)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+      [nombre, apellido, tipoDocumento, paisEmision, dni, cuil, req.body.email || null, fechaNacimiento, fotoUrl, idDomicilio, idUsuarios]
     );
     const idEstudiante = estRes.insertId;
 
@@ -160,9 +160,9 @@ router.post('/registrar', upload.any(), async (req, res) => {
     console.log("Datos recibidos en el cuerpo:", req.body);
     console.log("Detalle de documentación recibido:", req.body.detalleDocumentacion);
 
-    if (!Array.isArray(detalleDocumentacion) || !detalleDocumentacion.length) {
-      return res.status(400).json({ message: 'Detalle de documentación vacío.' });
-    }
+   if (!Array.isArray(detalleDocumentacion)) {
+  return res.status(400).json({ message: 'Detalle de documentación mal formado.' });
+}
 
     for (const det of detalleDocumentacion) {
         const url = archivosMap[det.nombreArchivo] || null; // Busca la URL del archivo en archivosMap

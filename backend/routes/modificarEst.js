@@ -39,14 +39,8 @@ router.put('/:dni', upload.any(), async (req, res) => {
     await conn.beginTransaction();
 
     // Debug: Mostrar datos recibidos
-    console.log('Datos recibidos para modificar:', {
-      dni: req.body.dni,
-      nombre: req.body.nombre,
-      apellido: req.body.apellido,
-      cuil: req.body.cuil,
-      tipoDocumento: req.body.tipoDocumento,
-      paisEmision: req.body.paisEmision
-    });
+    console.log('Datos recibidos para modificar:', req.body);
+    console.log('Archivos recibidos:', req.files);
 
     // Auto-asignar "Argentina" para documentos DNI si paisEmision está vacío
     if (req.body.tipoDocumento === 'DNI' && !req.body.paisEmision) {
@@ -86,6 +80,7 @@ router.put('/:dni', upload.any(), async (req, res) => {
       apellido: req.body.apellido,
       dni: req.body.dni,
       cuil: req.body.cuil,
+      email: req.body.email,
       fechaNacimiento: req.body.fechaNacimiento,
       tipoDocumento: req.body.tipoDocumento,
       paisEmision: req.body.paisEmision
@@ -93,19 +88,52 @@ router.put('/:dni', upload.any(), async (req, res) => {
     
     const resultEstudiante = await conn.query(
       `UPDATE estudiantes
-         SET nombre=?, apellido=?, dni=?, cuil=?, fechaNacimiento=?, tipoDocumento=?, paisEmision=?
+         SET nombre=?, apellido=?, dni=?, cuil=?, email=?, fechaNacimiento=?, tipoDocumento=?, paisEmision=?
        WHERE id=?`,
-      [req.body.nombre, req.body.apellido, req.body.dni, req.body.cuil, req.body.fechaNacimiento, req.body.tipoDocumento, req.body.paisEmision, idEst]
+      [req.body.nombre, req.body.apellido, req.body.dni, req.body.cuil, req.body.email, req.body.fechaNacimiento, req.body.tipoDocumento, req.body.paisEmision, idEst]
     );
-    console.log('Resultado actualización estudiante:', resultEstudiante);
+    if (resultEstudiante.affectedRows === 0) {
+      console.error('No se pudo actualizar el estudiante. Verifica los datos enviados.');
+      await conn.rollback();
+      return res.status(400).json({ success: false, message: 'No se pudo actualizar el estudiante.' });
+    }
+
+    // Validar que idAnioPlan exista en la tabla anio_plan
+    console.log('Validando planAnioId:', req.body.planAnioId);
+    const [[anioPlan]] = await conn.query(
+      'SELECT id FROM anio_plan WHERE id = ?',
+      [req.body.planAnioId]
+    );
+    if (!anioPlan) {
+      await conn.rollback();
+      console.error('planAnioId no válido:', req.body.planAnioId);
+      return res.status(400).json({ success: false, message: 'El plan de año seleccionado no es válido.' });
+    }
+
+    // Validar que idEstadoInscripcion exista en la tabla estado_inscripciones
+    console.log('Validando estadoInscripcionId:', req.body.estadoInscripcionId);
+    const [[estadoInscripcion]] = await conn.query(
+      'SELECT id FROM estado_inscripciones WHERE id = ?',
+      [req.body.estadoInscripcionId]
+    );
+    if (!estadoInscripcion) {
+      await conn.rollback();
+      console.error('estadoInscripcionId no válido:', req.body.estadoInscripcionId);
+      return res.status(400).json({ success: false, message: 'El estado de inscripción seleccionado no es válido.' });
+    }
 
     // ─── actualización de inscripción ────────────────────
-    await conn.query(
+    const resultInscripcion = await conn.query(
       `UPDATE inscripciones
          SET idModalidad=?, idAnioPlan=?, idModulos=?, idEstadoInscripcion=?
-       WHERE idEstudiante=?`,
-      [req.body.modalidadId, req.body.planAnioId, req.body.modulosId, req.body.estadoInscripcionId, idEst]
+       WHERE idEstudiante=? AND idModalidad=?`, // <-- filtra por modalidad
+      [req.body.modalidadId, req.body.planAnioId, req.body.modulosId, req.body.estadoInscripcionId, idEst, req.body.modalidadId]
     );
+    if (resultInscripcion.affectedRows === 0) {
+      console.error('No se pudo actualizar la inscripción. Verifica los datos enviados.');
+      await conn.rollback();
+      return res.status(400).json({ success: false, message: 'No se pudo actualizar la inscripción.' });
+    }
 
     // ─── idInscripcion necesario para detalle_doc ────────
     const [[ins]] = await conn.query(
@@ -180,7 +208,7 @@ const documentacionActualizada = await obtenerDocumentacionPorInscripcion(idInsc
 await conn.commit();
 res.json({
   success: true,
-  message: 'Estudiante modificado con éxito.',
+  message: 'Los datos del estudiante se han modificado con éxito.',
   documentacion: documentacionActualizada,
   estadoInscripcion: infoInscripcion?.estado || null,
   fechaInscripcion: infoInscripcion?.fechaInscripcion || null

@@ -1,8 +1,20 @@
 import {Field, ErrorMessage, useFormikContext } from 'formik';
+import { useRef } from 'react';
 import { useEffect, memo } from 'react';
+import ValidadorDni from '../validaciones/ValidadorDNI.jsx';
 
 export const DatosPersonales = memo(() => {
     const { values, setFieldValue } = useFormikContext();
+    // Si no existe modalidadId, establecer un valor por defecto (ejemplo: 1)
+    if (!values.modalidadId && values.modalidad) {
+        // Si modalidad es string, puedes mapearlo a un id si es necesario
+        let modalidadId = values.modalidadId;
+        if (typeof values.modalidad === 'string') {
+            if (values.modalidad.toLowerCase() === 'presencial') modalidadId = 1;
+            else if (values.modalidad.toLowerCase() === 'semipresencial') modalidadId = 2;
+        }
+        if (modalidadId) setFieldValue('modalidadId', modalidadId);
+    }
 
     // Función para calcular el dígito verificador del CUIL
     const calcularDigitoVerificador = (prefijo, dni) => {
@@ -43,9 +55,24 @@ export const DatosPersonales = memo(() => {
         }
     }, [values.dni, values.tipoDocumento, setFieldValue, values.cuil]);
 
+    
+    // Referencia para evitar doble validación en el mismo blur
+    const blurTimeout = useRef();
+
+    // Validación manual al salir del input
+    const handleDniBlur = () => {
+        // Forzar re-render para que ValidadorDni (que depende de values.dni) se ejecute
+        // y el error se muestre inmediatamente
+        if (blurTimeout.current) clearTimeout(blurTimeout.current);
+        blurTimeout.current = setTimeout(() => {
+            // No hace nada, solo fuerza el ciclo de validación
+        }, 0);
+    };
+
     return (
     <>
-            <div className="form-datos">
+        <ValidadorDni />
+        <div className="form-datos">
                 <h3>Datos Personales</h3>
                 <div className="form-group">
                      <label>Nombre:</label>
@@ -88,6 +115,7 @@ export const DatosPersonales = memo(() => {
                         }
                         className="form-control" 
                         maxLength={values.tipoDocumento === 'DNI' ? "8" : "20"}
+                        onBlur={handleDniBlur}
                     />
                     <ErrorMessage name="dni" component="div" className="error" />
                 </div>
@@ -110,7 +138,14 @@ export const DatosPersonales = memo(() => {
                         </small>
                     </div>
                 )}
-
+                <div className="form-group">
+                    <label>Email:</label>
+                    <Field type="email" name="email" placeholder="Correo electrónico" className="form-control" />
+                    <ErrorMessage name="email" component="div" className="error" />
+                    <small className="form-text text-muted">
+                        Email para notificaciones y envío de comprobantes
+                    </small>
+                </div>
                 <div className="form-group">
                     <label>Fecha Nacimiento:</label>
                     <Field type="date" name="fechaNacimiento" className="form-control" />

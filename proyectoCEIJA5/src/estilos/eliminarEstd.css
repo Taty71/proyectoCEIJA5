@@ -50,6 +50,77 @@
   border: 2px solid #e0e0e0;
 }
 
+/* Documentación compacta */
+.eliminar-documentacion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.eliminar-documento-card {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.85em;
+}
+
+.eliminar-doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.eliminar-doc-header strong {
+  color: #495057;
+  font-size: 0.9em;
+  flex: 1;
+  margin-right: 8px;
+  word-break: break-word;
+}
+
+.eliminar-doc-estado {
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 0.75em;
+  font-weight: bold;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.eliminar-doc-estado.entregado {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.eliminar-doc-estado.pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.eliminar-doc-estado.rechazado {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.eliminar-doc-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.eliminar-doc-details small {
+  color: #6c757d;
+  font-size: 0.8em;
+}
+
+.eliminar-doc-archivo {
+  color: #007bff !important;
+  word-break: break-all;
+}
+
 /* Botones principales */
 .eliminar-btn-cancelar {
   padding: 10px 20px;

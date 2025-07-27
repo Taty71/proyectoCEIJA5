@@ -29,6 +29,10 @@ export const formularioInscripcionSchema = yup.object().shape({
                 .matches(/^\d{2}-\d{8}-\d$/, 'CUIL debe tener el formato 00-00000000-0 (11 dígitos con guiones)'),
             otherwise: (schema) => schema.notRequired()
         }),
+    email: yup
+        .string()
+        .email('Debe ser un email válido')
+        .required('Email es requerido'), // Email ahora es obligatorio
    fechaNacimiento: yup
         .date()
         .required('Fecha de nacimiento es requerida')

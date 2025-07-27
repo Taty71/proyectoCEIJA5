@@ -11,6 +11,7 @@ export default function useGestionDocumentacion() {
     // Manejar cambios en los archivos
     const handleFileChange = (e, field, setFieldValue) => {
         const file = e.target.files[0];
+        
         if (file) {
             if (file.size > maxFileSize) {
                 setAlert({ text: 'El archivo es demasiado grande. Máximo permitido: 600 KB.', variant: 'error' });

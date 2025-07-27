@@ -10,12 +10,76 @@
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   color: #333;
-  font-family: Arial, sans-serif;
+  font-family: "Roboto Slab", serif;
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
-  max-width: 900px;
-  width: 90vw;
+  max-width: 1200px;
+  width: 98vw;
+}
+
+/* Tarjetas pequeñas y acciones elegantes */
+.tarjeta-pequena {
+  /* Elimina max-width y margin para unificar el ancho */
+  width: 100%;
+  padding: 18px 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  background: #fff;
+  border: 1px solid #e0e0e0;
+}
+
+.tarjeta-editor,
+.tarjeta-pequena {
+  width: 100%;
+  max-width: 380px;
+  margin: 0 4px;
+  font-size: 0.8rem;
+}
+
+.tarjeta-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.btn-guardar-seccion,
+.btn-guardar {
+  background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(25, 118, 210, 0.12);
+}
+
+.btn-guardar-seccion:disabled,
+.btn-guardar:disabled {
+  background: #bdbdbd;
+  cursor: not-allowed;
+}
+
+.btn-cancelar-seccion,
+.btn-volver {
+  background: #fff;
+  color: #1976d2;
+  border: 1px solid #1976d2;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-cancelar-seccion:hover,
+.btn-volver:hover {
+  background: #e3f2fd;
+  color: #0d47a1;
+  border-color: #0d47a1;
 }
 
 /* Header del editor */
@@ -38,9 +102,12 @@
 .editor-contenido {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
-  gap: 15px;
+  gap: 2px;
   margin-bottom: 30px;
+}
+
+.tarjeta-contenido-editor {
+  gap: 1px;
 }
 
 /* Tarjetas del editor */
@@ -50,6 +117,26 @@
   border-radius: 10px;
   padding: 15px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.tarjetas-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  width: 100%;
+  align-items: start;
+}
+
+.tarjeta,
+.tarjeta-editor {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  padding: 18px 16px 12px 16px;
+  min-width: 0;
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 /* Nota informativa */
@@ -88,7 +175,7 @@
 .tarjeta-contenido-editor {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
 }
 
 /* Campos editables */
@@ -96,9 +183,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 0;
+  padding: 1px 0;
   border-bottom: 1px solid #e9ecef;
-  gap: 10px;
+  gap: 2px;
 }
 
 .campo-editable:last-child {
@@ -108,20 +195,20 @@
 .campo-contenido {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   flex: 1;
 }
 
 .campo-contenido label {
   font-weight: 500;
   color: #495057;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   min-width: 120px;
   white-space: nowrap;
 }
 
 .campo-contenido span {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #212529;
   flex: 1;
 }
@@ -131,7 +218,7 @@
   padding: 4px 8px;
   border: 1px solid #2d4177;
   border-radius: 4px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   background-color: #fff;
 }
 
@@ -185,7 +272,7 @@
 .documento-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   flex: 1;
 }
 

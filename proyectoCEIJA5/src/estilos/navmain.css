@@ -3,10 +3,10 @@
   display: flex;
   justify-content: space-between; /* Distribuye los elementos a los extremos */
   align-items: center;
-  background-color: #2d4177; /* Azul vibrante */
   padding: 10px 20px;
-  border-radius: 3px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  background-color: #2d4177; /* Azul oscuro */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Sombreado */
+  border-radius: 8px;
   margin: 0.3% 1%;
   width: 97%;
   max-width: 95%;
@@ -15,46 +15,45 @@
 /* Estilos para los enlaces de navegación */
 .nav-links {
   display: flex;
-  gap: 20px; /* Espaciado entre los enlaces */
+  gap: 15px; /* Espaciado entre los enlaces */
 }
 
-.nav-links a {
-  color: #ffffff; /* Blanco */
+.nav-link {
+  color: #ffffff; /* Texto blanco */
   text-decoration: none;
-  font-size: 1rem;
+  font-weight: bold;
   transition: color 0.3s ease;
 }
 
-.nav-links a:hover {
-  color: #87ceeb; /* Azul claro al pasar el mouse */
+.nav-link:hover {
+  color: #b3e5fc; /* Azul claro */
 }
 
 /* Estilos para el contenedor del usuario */
 .nav-user {
   display: flex;
   align-items: center;
-  gap: 15px; /* Espaciado entre el nombre y el botón */
+  gap: 10px; /* Espaciado entre el nombre y el botón */
 }
 
 /* Estilos para el nombre del usuario */
 .user-name {
-  color: #ffffff; /* Blanco */
-  font-size: 1rem;
+  color: #ffffff; /* Texto blanco */
   font-weight: bold;
 }
 
 /* Estilos para el botón de logout */
 .logout-button {
-  background-color: #313030; /* Azul más oscuro */
-  color: #ffffff; /* Blanco */
+  background-color: #ffffff; /* Fondo blanco */
+  color: #2d4177; /* Azul oscuro */
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 0.8rem;
+  border-radius: 5px;
+  padding: 5px 10px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .logout-button:hover {
-  background-color: #ccc2c2; /* Azul más oscuro al pasar el mouse */
+  background-color: #2d4177; /* Azul oscuro */
+  color: #ffffff; /* Texto blanco */
 }

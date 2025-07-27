@@ -6,6 +6,7 @@ import useGestionDocumentacion from '../hooks/useGestionDocumentacion';
 import FormularioModificar from '../components/FormularioModificar';
 import { DocumentacionDescripcionToName, DocumentacionNameToId } from '../utils/DocumentacionMap'; // Aseg
 import serviceInscripcion from '../services/serviceInscripcion';
+import { formularioInscripcionSchema } from '../validaciones/ValidacionSchemaYup';
 
 
 const ModificarEstd = ({
@@ -14,6 +15,8 @@ const ModificarEstd = ({
   isAdmin,
   estudiante,
   onSuccess,
+  modalidadId,
+  modalidadFiltrada,
 }) => {
     const {
         previews,
@@ -125,15 +128,18 @@ const ModificarEstd = ({
         apellido: '',
         dni: '',
         cuil: '',
+        email: '',
         calle: '',
         numero: '',
         barrio: '',
         localidad: '',
         pcia: '',
-        planAnio: '',
-        modalidad: '',
-        modalidadId: Number(estudiante?.modalidadId) || 0,
-        idEstadoInscripcion: estudiante?.idEstadoInscripcion || '',
+        planAnio: estudiante?.planAnio ? Number(estudiante.planAnio) : '',
+        planAnioId: estudiante?.planAnioId ? Number(estudiante.planAnioId) : '',
+        idModulo: estudiante?.idModulo ? Number(estudiante.idModulo) : '',
+        modalidad: estudiante?.modalidad || '',
+        modalidadId: estudiante?.modalidadId ? Number(estudiante.modalidadId) : 0,
+        idEstadoInscripcion: estudiante?.idEstadoInscripcion ? Number(estudiante.idEstadoInscripcion) : (estudiante?.estadoInscripcionId ? Number(estudiante.estadoInscripcionId) : ''),
         foto: null,
         dniDocumento: null,
         cuilDocumento: null,
@@ -143,24 +149,51 @@ const ModificarEstd = ({
         analiticoParcial: null,
         certificadoNivelPrimario: null,
         ...estudiante,
-         fechaNacimiento: estudiante?.fechaNacimiento
+        fechaNacimiento: estudiante?.fechaNacimiento
             ? new Date(estudiante.fechaNacimiento).toISOString().slice(0, 10)
             : '',
         fechaInscripcion: estudiante?.fechaInscripcion
-        ? new Date(estudiante.fechaInscripcion).toISOString().slice(0, 10)
-        : '',
+            ? new Date(estudiante.fechaInscripcion).toISOString().slice(0, 10)
+            : '',
 
     };
 
     const handleSubmit = async (values, { setSubmitting }) => {
         setSubmitting(true);
         try {
-            // NUEVO: Validación simple en el cliente
-            if (!values.nombre || !values.apellido) {
+            // Validación simple en el cliente
+            if (!values.nombre || !values.apellido || !values.dni || !values.planAnioId || !values.modalidadId) {
                 setAlert({ text: 'Por favor, completa todos los campos obligatorios', variant: 'error' });
                 setSubmitting(false);
                 return;
             }
+
+            // ModalidadId: debe ser numérico
+            let modalidadId = Number(values.modalidadId);
+            if (!modalidadId) {
+                if (values.modalidad?.toLowerCase() === 'semipresencial') modalidadId = 2;
+                else if (values.modalidad?.toLowerCase() === 'presencial') modalidadId = 1;
+            }
+
+            // PlanAnioId: debe ser numérico
+            let planAnioId = Number(values.planAnioId);
+            if (!planAnioId && values.planAnio && !isNaN(Number(values.planAnio))) {
+                planAnioId = Number(values.planAnio);
+            } else if (!planAnioId) {
+                // Asegurarse de que planAnioId sea válido y corresponda a un ID existente en la base de datos
+                setAlert({ text: 'El plan de año seleccionado no es válido', variant: 'error' });
+                setSubmitting(false);
+                return;
+            }
+
+            // ModulosId: debe ser numérico
+            let modulosId = Number(values.idModulo);
+            if (!modulosId && values.modulo && !isNaN(Number(values.modulo))) {
+                modulosId = Number(values.modulo);
+            }
+
+            // EstadoInscripcionId: debe ser numérico
+            let estadoInscripcionId = Number(values.idEstadoInscripcion);
 
             const detalleDocumentacion = Object.entries(previews)
                 .filter(([name]) => DocumentacionNameToId[name])
@@ -168,14 +201,18 @@ const ModificarEstd = ({
                     idDocumentaciones: DocumentacionNameToId[name],
                     estadoDocumentacion: doc?.url ? 'Entregado' : 'Faltante',
                     nombreArchivo: name,
-                    archivoDocumentacion: null, // Aquí está el problema
+                    archivoDocumentacion: null,
                     fechaEntrega: doc?.url ? new Date().toISOString().slice(0, 10) : null
                 }));
 
             const formDataToSend = new FormData();
             Object.entries(values).forEach(([key, value]) => {
-                const campo = key === 'modulos' ? 'idModulo' : key;
-                formDataToSend.append(campo, value);
+                // Mapear correctamente los campos para el backend
+                if (key === 'modalidadId') formDataToSend.append('modalidadId', modalidadId);
+                else if (key === 'planAnioId' || key === 'planAnio') formDataToSend.append('planAnioId', planAnioId);
+                else if (key === 'idModulo' || key === 'modulo') formDataToSend.append('modulosId', modulosId);
+                else if (key === 'idEstadoInscripcion') formDataToSend.append('estadoInscripcionId', estadoInscripcionId);
+                else formDataToSend.append(key, value);
             });
             Object.entries(previews).forEach(([key, value]) => {
                 if (value?.file) {
@@ -184,28 +221,40 @@ const ModificarEstd = ({
             });
             formDataToSend.append('detalleDocumentacion', JSON.stringify(detalleDocumentacion));
 
-            const response = await serviceInscripcion.updateEstd(formDataToSend);
+            // Llama al servicio de modificación
+            const response = await serviceInscripcion.updateEstd(formDataToSend, values.dni);
             if (response.success) {
-                setAlert({ text: response.message, variant: 'success' });
+                setAlert({ text: response.message || 'Los datos del estudiante se han modificado con éxito.', variant: 'success' });
                 onSuccess();
+                setTimeout(() => setAlert({ text: '', variant: '' }), 5000);
             } else {
-                setAlert({ text: response.message, variant: 'error' });
+                setAlert({ text: response.message || 'Error al modificar los datos del estudiante.', variant: 'error' });
             }
         } catch (error) {
             console.error('Error al modificar estudiante:', error);
             const mensaje = error.response?.data?.message || 'Error interno al modificar';
             setAlert({ text: mensaje, variant: 'error' });
         } finally {
-            setTimeout(() => setAlert({ text: '', variant: '' }), 8000);
-            setSubmitting(false);
+            setSubmitting(false); // Asegúrate de habilitar el botón después de la operación
         }
     };
 
+  useEffect(() => {
+    if (estudiante) {
+        // Debug: Mostrar datos del estudiante cargados
+        console.log('Datos del estudiante cargados:', estudiante);
+        // Debug modalidad recibida
+        console.log('modalidadId:', modalidadId, 'modalidadFiltrada:', modalidadFiltrada);
+    } else {
+        console.error('No se encontraron datos del estudiante.');
+    }
+}, [estudiante, modalidadId, modalidadFiltrada]);
 
   return (
     <Formik
       initialValues={initialValues}
       enableReinitialize
+      validationSchema={formularioInscripcionSchema}
       onSubmit={handleSubmit}
     >
       {({ values, handleChange, setFieldValue, isSubmitting, resetForm }) => (
@@ -236,6 +285,8 @@ ModificarEstd.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   estudiante: PropTypes.object,
   onSuccess: PropTypes.func,
+  modalidadId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  modalidadFiltrada: PropTypes.string.isRequired,
 };
 
 export default ModificarEstd;

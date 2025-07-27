@@ -31,10 +31,13 @@
 }
 
 .modificar-header h2 {
-  color: #2563eb;
+  color: #495057; /* Gris oscuro del sitio */
   margin-bottom: 0.5rem;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 600;
+  font-family: "Roboto Slab", serif; /* Letra más elegante */
+  text-shadow: 0 2px 8px rgba(74, 144, 226, 0.2); /* Sombreado azul claro suave */
+  letter-spacing: 0.5px;
 }
 
 .modificar-header p {

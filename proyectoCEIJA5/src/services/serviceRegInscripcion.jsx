@@ -14,18 +14,29 @@ const createWebInscription = async (formDataToSend) => {
 };
 
 // Inscripción Estudiante Adm
-const createEstd = async (formDataToSend) => {
+// Permite pasar setAlert para mostrar el error en un alert si ocurre
+const createEstd = async (formDataToSend, setAlert) => {
     try {
+        if (import.meta.env.DEV && formDataToSend instanceof FormData) {
+            // Mostrar todos los pares clave-valor enviados, tipo y valor
+            const entries = {};
+            for (let [key, value] of formDataToSend.entries()) {
+                entries[key] = { valor: value, tipo: typeof value };
+            }
+            console.log('[createEstd] FormData enviado:', entries);
+        }
         const response = await axiosInstance.post('/estudiantes/registrar', formDataToSend);
         if (import.meta.env.DEV) {
             console.log('Respuesta del servidor:', response.data);
         }
         return response.data;
     } catch (error) {
+        const msg = FormatError(error);
+        if (setAlert) setAlert({ text: msg, variant: 'error' });
         if (import.meta.env.DEV) {
-            console.error('Error en createEstd - respuesta servidor:', error.response.data);
+            console.error('Error en createEstd - respuesta servidor:', error.response?.data);
         }
-        throw new Error(error.response.data.message || 'Ocurrió un error al enviar los datos.');
+        throw new Error(msg);
     }
 };
 export default {

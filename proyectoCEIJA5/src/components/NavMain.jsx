@@ -15,8 +15,8 @@ const NavMain = () => {
     return (
         <nav className="nav-main">
             <div className="nav-links">
-                <NavLink to="/">Inicio</NavLink>
-                <NavLink to="/dashboard">Panel-Administracion CEIJA5</NavLink>
+                <NavLink to="/" className="nav-link">Inicio</NavLink>
+                <NavLink to="/dashboard" className="nav-link">Panel-Administracion CEIJA5</NavLink>
             </div>
             <div className="nav-user">
                 <span className="user-name">Bienvenido, {user.nombre}</span>

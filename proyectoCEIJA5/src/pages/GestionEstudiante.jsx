@@ -33,8 +33,12 @@ const GestionEstudiante = ({ modalidad, accion, isAdmin, onClose }) => {
 
             const detalleDocumentacion = buildDetalleDocumentacion();
             const formDataToSend = new FormData();
-            formDataToSend.append('modalidad', modalidad);
+          
+            for (let pair of formDataToSend.entries()) {
+                         console.log(pair[0], pair[1]);
+                }
 
+            // Solo iterar los values, no agregar modalidad manualmente para evitar duplicados
             Object.entries(values).forEach(([key, value]) => {
                 // Excluir campos de archivos para evitar conflictos
                 const archivosFields = ['archivo_dni', 'archivo_cuil', 'archivo_partidaNacimiento', 'archivo_fichaMedica', 
@@ -77,13 +81,34 @@ const GestionEstudiante = ({ modalidad, accion, isAdmin, onClose }) => {
     return (
         <Formik
             initialValues={{
-                nombre: '', apellido: '', tipoDocumento: '', dni: '', paisEmision: '', cuil: '', fechaNacimiento: '', calle: '', numero: '',
-                barrio: '', localidad: '', pcia: '',
-                modalidad: modalidad || '',
-                modalidadId: modalidad === 'Presencial' ? 1 : modalidad === 'Semipresencial' ? 2 : null,
-                planAnio: '',
-                modulos: '',
-                idEstadoInscripcion: '',
+                nombre: '',
+                    apellido: '',
+                    tipoDocumento: '',        // asegurate que esté en el formulario y tenga opciones válidas
+                    dni: '',
+                    paisEmision: '',          // lo mismo
+                    cuil: '',
+                    fechaNacimiento: '',      // debe estar en formato 'YYYY-MM-DD' para que sea válido
+                    calle: '',
+                    numero: '',               // si es numérico en backend, convertí luego
+                    barrio: '',
+                    localidad: '',
+                    pcia: '',
+
+                    modalidad: modalidad || '',  // viene como prop
+                    modalidadId: modalidad === 'Presencial' ? 1 : modalidad === 'Semipresencial' ? 2 : '',
+
+                    planAnio: '',              // asegurate de que esté presente en el formulario (input o select)
+                    modulos: '',               // idem arriba
+                    idEstadoInscripcion: '',  
+                    // Campos de documentación (archivos)
+                    archivo_dni: null,
+                    archivo_cuil: null,
+                    archivo_partidaNacimiento: null,
+                    archivo_fichaMedica: null,
+                    archivo_solicitudPase: null,
+                    archivo_analiticoParcial: null,
+                    archivo_certificadoNivelPrimario: null,
+                    foto: null, 
             }}
             onSubmit={handleSubmit}
         >

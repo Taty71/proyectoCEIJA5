@@ -51,10 +51,12 @@ const EliminarEstd = ({ data, onClose, onVolver, onEliminar }) => {
                     <VolverButton onClick={onVolver} />
                     <CloseButton onClose={onClose} variant="modal" />
                 </div>
-                <h1 className="consultaEstdHeader eliminar-title">Eliminar Estudiante</h1>
+                <div className="form-header">
+                    <h2 className="form-title">Eliminar Estudiante</h2>
+                </div>
                 
                 <div className="eliminar-warning-message">
-                    ⚠️ Esta acción eliminará permanentemente todos los datos del estudiante
+                    ⚠️ Seleccione el tipo de eliminación: puede desactivar el estudiante (recomendado) para mantener los datos en la base de datos pero ocultarlo de las listas, o eliminarlo definitivamente de la base de datos (acción irreversible)
                 </div>
                 
                 <div className="consultaEstdRow">
@@ -65,6 +67,7 @@ const EliminarEstd = ({ data, onClose, onVolver, onEliminar }) => {
                         <p><strong>Apellido:</strong> {estudiante?.apellido || 'No especificado'}</p>
                         <p><strong>DNI:</strong> {estudiante?.dni || 'No especificado'}</p>
                         <p><strong>CUIL:</strong> {estudiante?.cuil || 'No especificado'}</p>
+                        <p><strong>Email:</strong> {estudiante?.email || 'Sin email registrado'}</p>
                         <p><strong>Fecha de Nacimiento:</strong> {formatDate(estudiante?.fechaNacimiento)}</p>
                         <p><strong>Tipo de Documento:</strong> {estudiante?.tipoDocumento || 'DNI'}</p>
                         <p><strong>País de Emisión:</strong> {estudiante?.paisEmision || 'Argentina'}</p>
@@ -107,15 +110,21 @@ const EliminarEstd = ({ data, onClose, onVolver, onEliminar }) => {
                 <div className="consultaEstdSection">
                     <h3>Documentación</h3>
                     {documentacion && documentacion.length > 0 ? (
-                        <div className="documentacion-list">
+                        <div className="eliminar-documentacion-grid">
                             {documentacion.map((doc, index) => (
-                                <div key={index} className="documento-item">
-                                    <p><strong>Documento:</strong> {doc.descripcionDocumentacion || 'No especificado'}</p>
-                                    <p><strong>Estado:</strong> {doc.estadoDocumentacion || 'No especificado'}</p>
-                                    <p><strong>Fecha de Entrega:</strong> {formatDate(doc.fechaEntrega)}</p>
-                                    {doc.archivoDocumentacion && (
-                                        <p><strong>Archivo:</strong> {doc.archivoDocumentacion}</p>
-                                    )}
+                                <div key={index} className="eliminar-documento-card">
+                                    <div className="eliminar-doc-header">
+                                        <strong>{doc.descripcionDocumentacion || 'Documento'}</strong>
+                                        <span className={`eliminar-doc-estado ${doc.estadoDocumentacion?.toLowerCase()}`}>
+                                            {doc.estadoDocumentacion || 'N/A'}
+                                        </span>
+                                    </div>
+                                    <div className="eliminar-doc-details">
+                                        <small>📅 {formatDate(doc.fechaEntrega)}</small>
+                                        {doc.archivoDocumentacion && (
+                                            <small className="eliminar-doc-archivo">📎 {doc.archivoDocumentacion.split('/').pop()}</small>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>

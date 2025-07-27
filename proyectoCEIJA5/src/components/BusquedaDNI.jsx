@@ -11,10 +11,21 @@ import '../estilos/estilosInscripcion.css';
 import '../estilos/botonCargando.css';
 
 
-const BusquedaDNI = ({ onEstudianteEncontrado, onClose, onVolver, esConsultaDirecta = false, modoModificacion = false, modoEliminacion = false }) => {
+const BusquedaDNI = ({
+    onEstudianteEncontrado,
+    onClose,
+    onVolver,
+    modalidadId,
+    esConsultaDirecta = false,
+    modoModificacion = false,
+    modoEliminacion = false
+}) => {
     const [dni, setDni] = useState('');
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    // Log de depuración para modalidadId
+    console.log('🟦 modalidadId en BusquedaDNI:', modalidadId);
 
 
     const handleChange = (e) => {
@@ -38,48 +49,44 @@ const BusquedaDNI = ({ onEstudianteEncontrado, onClose, onVolver, esConsultaDire
             setError('El DNI no puede tener más de 8 dígitos.');
             return;
         }
+        // Eliminada la restricción de modalidadId obligatorio
 
-        setLoading(true); // Activa el estado de carga
+        setLoading(true);
 
         try {
-            const resultado = await serviceDatos.getEstudianteCompletoByDni(Number(dni));
-
-            // Introduce un retraso adicional antes de desactivar el estado de carga
+            const resultado = await serviceDatos.getEstudianteCompletoByDni(Number(dni), modalidadId);
             setTimeout(() => {
-                setLoading(false); // Desactiva el estado de carga después del retraso
+                setLoading(false);
 
-                if (resultado?.success) {
-                    setError(null);
-                    onEstudianteEncontrado(resultado); // Muestra el modal con los datos
-                } else {
-                    // Solo mostrar el error localmente, no duplicar en GestionCRUD
-                    const errorMessage = resultado.error || 'No se encontró un estudiante con ese DNI.';
-                    setError(errorMessage);
-                    
-                    // Auto-limpiar el error después de 5 segundos
-                    setTimeout(() => {
-                        setError(null);
-                    }, 5000);
-                    
-                    // No llamar a onEstudianteEncontrado para evitar alertas duplicadas
+                // Si el backend responde con error, mostrar mensaje y no renderizar datos
+                if (!resultado.success) {
+                    setError(resultado.message || 'No existe inscripción en la modalidad seleccionada.');
+                    onEstudianteEncontrado(null); // Limpia el estudiante en el padre
+                    return;
                 }
-            }, 2000); // Retraso de 2 segundos
-        } catch (err) {
-            console.error(err);
 
-            // Introduce un retraso adicional antes de desactivar el estado de carga en caso de error
-            setTimeout(() => {
-                setLoading(false); // Desactiva el estado de carga después del retraso
-                setError('Hubo un problema al realizar la consulta.');
-                
-                // Auto-limpiar el error después de 5 segundos
-                setTimeout(() => {
-                    setError(null);
-                }, 5000);
-            }, 1000); // Retraso de 1 segundo
+                // Si no hay inscripción, mostrar error
+                if (!resultado.inscripcion) {
+                    setError('No existe inscripción en la modalidad seleccionada.');
+                    onEstudianteEncontrado(null); // Limpia el estudiante en el padre
+                    return;
+                }
+
+                setError(null);
+                onEstudianteEncontrado({
+                    success: true,
+                    estudiante: resultado.estudiante,
+                    domicilio: resultado.domicilio,
+                    inscripcion: resultado.inscripcion,
+                    documentacion: resultado.documentacion
+                });
+            }, 2000);
+        } catch {
+            setLoading(false);
+            setError('Hubo un problema al realizar la consulta.');
+            setTimeout(() => setError(null), 5000);
         }
     };
-
     return (
         <div className="busqueda-dni-container">
             {/* Contenedor de botones superior */}
@@ -146,8 +153,8 @@ BusquedaDNI.propTypes = {
   esConsultaDirecta: PropTypes.bool, // Indica si es consulta directa (oculta botón cerrar)
   modoModificacion: PropTypes.bool, // Indica si está en modo modificación
   modoEliminacion: PropTypes.bool, // Indica si está en modo eliminación
+  modalidadId: PropTypes.number, // <-- agrega aquí
 };
-
 
 export default BusquedaDNI;
 

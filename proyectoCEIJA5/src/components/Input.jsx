@@ -2,13 +2,32 @@ import '../estilos/input.css';
 import PropTypes from 'prop-types';
 
 function Input(props) {
-    const { label, type, name, placeholder, options = [], className, registro, error, ...rest } = props;
+    const { label, type, name, placeholder, options = [], className, registro, error, forceNumber, ...rest } = props;
+
+    // Solo convierte a número si forceNumber es true
+    const handleChange = (e) => {
+        if (forceNumber) {
+            const value = e.target.value === '' ? '' : Number(e.target.value);
+            if (registro && typeof registro.onChange === 'function') {
+                registro.onChange({ ...e, target: { ...e.target, value } });
+            }
+        } else if (registro && typeof registro.onChange === 'function') {
+            registro.onChange(e);
+        }
+    };
+
     return (
         <div className="input-container">
             <label>{label}</label>
             {options.length > 0 ? (
-                // Renderiza un <select> si hay opciones
-                <select name={name} className={className}  {...registro} {...rest}>
+                <select
+                    name={name}
+                    className={className}
+                    value={registro && registro.value !== undefined && registro.value !== null ? registro.value : ''}
+                    {...registro}
+                    {...rest}
+                    onChange={handleChange}
+                >
                     {options.map((option, index) => (
                         <option key={index} value={option.value}>
                             {option.label}
@@ -16,16 +35,15 @@ function Input(props) {
                     ))}
                 </select>
             ) : (
-                // Renderiza un <input> en caso contrario
                 <input
                     type={type || 'text'}
                     name={name || ''}
                     placeholder={placeholder || ''}
+                    value={registro && registro.value !== undefined && registro.value !== null ? registro.value : ''}
                     {...registro}
                     {...rest}
                 />
             )}
-            {/* Muestra el error de forma genérica */}
             {error && <span className="error-message">{error}</span>}
         </div>
     );
@@ -41,6 +59,7 @@ Input.propTypes = {
     error: PropTypes.any,
     className: PropTypes.string,
     onChange: PropTypes.func,
+    forceNumber: PropTypes.bool, // Solo úsalo donde realmente necesites un número
 };
 
 export default Input;

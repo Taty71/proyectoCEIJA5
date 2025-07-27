@@ -1,5 +1,4 @@
-import { Form } from 'formik';
-import { useState, useMemo } from 'react';
+import { Form } from 'formik';import { useState, useMemo } from 'react';
 import ModalidadSelection from '../components/ModalidadSelection';
 import FormDocumentacion from '../components/FormDocumentacion';
 import { DatosPersonales } from '../components/DatosPersonales';
@@ -27,6 +26,8 @@ const RegistroEstd = ({
     onClose
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    // Estado requerido por ModalidadSelection (solo formData)
+    const [formData, setFormData] = useState({});
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -59,7 +60,9 @@ const RegistroEstd = ({
                         values={values}
                         showMateriasList={showMateriasList}
                         handleChange={handleChange}
-                       
+                        editMode={{}}
+                        formData={formData}
+                        setFormData={setFormData}
                     />
             </div>
             <div className="left-container">

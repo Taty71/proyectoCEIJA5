@@ -35,19 +35,18 @@ const PlanAnioSelector = ({ modalidad, handleChange, value, modalidadId, setFiel
 
     // Efecto para obtener los módulos cuando la modalidad cambia
     useEffect(() => {
-        // console.log("Modalidad actual:", modalidad);
-
         if (modalidad !== "Semipresencial" && modalidadId !== 2) return;
-        if (!value) return; 
+        // Si value es un objeto (Formik), extraer el id numérico
+        let planId = value;
+        if (value && typeof value === 'object') {
+            planId = value.planAnio || value.planAnioId || '';
+        }
+        if (!planId) return;
         const fetchModulos = async () => {
             setLoading(true);
             setError(null);
             try {
-                // Logging removed for production
-                const response = await service.getModulos(value);
-                // console.log("Respuesta de la API:", response);
-
-                // Verifica si la respuesta tiene el formato correcto
+                const response = await service.getModulos(planId);
                 if (response && Array.isArray(response)) {
                     setModulos(response);
                 } else if (response.data && Array.isArray(response.data)) {
@@ -62,7 +61,6 @@ const PlanAnioSelector = ({ modalidad, handleChange, value, modalidadId, setFiel
                 setLoading(false);
             }
         };
-
         fetchModulos();
     }, [modalidadId, modalidad, value]);
 
@@ -82,9 +80,8 @@ const PlanAnioSelector = ({ modalidad, handleChange, value, modalidadId, setFiel
                             { value: 3, label: '3er Año' },
                         ]}
                         registro={{
-                            value,
-                            onChange:  handleSelection // Esto actualiza Formik
-                           
+                            value: typeof value === 'object' ? value.planAnio || '' : value,
+                            onChange: handleSelection
                         }}
                         error={alerta && <AlertaMens text="Por favor, selecciona un año." variant="error" />}
                     />
@@ -104,8 +101,8 @@ const PlanAnioSelector = ({ modalidad, handleChange, value, modalidadId, setFiel
                             { value: 6, label: 'Plan C' },
                         ]}
                         registro={{
-                            value,
-                            onChange:  handleSelection // Esto actualiza Formik
+                            value: typeof value === 'object' ? value.planAnio || '' : value,
+                            onChange: handleSelection
                         }}
                         error={alerta && <AlertaMens text="Por favor, selecciona un plan." variant="error" />}
                     />

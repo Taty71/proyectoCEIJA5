@@ -3,38 +3,68 @@ import PropTypes from 'prop-types';
 import { useSearchParams } from 'react-router-dom';
 import '../estilos/estilosInscripcion.css';
 import '../estilos/preinscripcionHeader.css';
+
 import AccionesFormulario from '../components/AccionesFormulario';
 import OpcionesAccion from '../components/OpcionesAccion';
 import GestionCRUD from '../components/GestionCRUD';
 import GestionEstudiante from './GestionEstudiante';
 import { Logo } from '../components/Logo';
+import RegistroEstudiante from './RegistroEstd';
+import ListaEstudiantes from './ListaEstudiantes';
 
 const Preinscripcion = ({ isAdmin }) => {
     const [searchParams] = useSearchParams();
-    const estudianteParam = searchParams.get('estudiante');
+    const estudianteParam = searchParams.get('estudiante'); //No trae nada
     const modalidadFromUrl = searchParams.get('modalidad'); // Capturar modalidad desde URL
     const [accion, setAccion] = useState(null);
-    const [modalidadSeleccionada, setModalidadSeleccionada] = useState(modalidadFromUrl);
+    const [modalidadSeleccionada, setModalidadSeleccionada] = useState(modalidadFromUrl || 'Presencial'); // Valor por defecto
+
+    // DEBUG: Verifica que modalidadSeleccionada tenga valor
+    // Puedes quitar este log luego de depurar
+    console.log('-------modalidadSeleccionada----:', modalidadSeleccionada, estudianteParam, '-----');
+
+    // Si modalidadSeleccionada es null o undefined, muestra un mensaje y no renderiza nada más
+    if (!modalidadSeleccionada) {
+        return (
+            <div style={{ padding: 40, textAlign: 'center', color: 'red' }}>
+                Error: No se pudo determinar la modalidad. <br />
+                Intenta recargar la página o selecciona una modalidad.
+            </div>
+        );
+    }
+
+    const handleModalidadChange = (nuevaModalidad) => {
+        setModalidadSeleccionada(nuevaModalidad);
+        setAccion(null); // Reinicia la acción para refrescar la vista principal
+    };
 
     const renderHeader = () => (
-        <div className="header-inscripcion">
-            <Logo className="logo-inscripcion" />
-            <h1 className="titulo-principal">SISTEMA DE GESTIÓN DE ESTUDIANTES</h1>
-            <p className="subtitulo">Inscripción de Estudiantes - CEIJA 5</p>
-            {modalidadSeleccionada && (
-                <div className="modalidad-header-info">
-                    <span className="modalidad-badge">Modalidad: {modalidadSeleccionada}</span>
-                    {modalidadFromUrl && (
-                        <button 
-                            className="cambiar-modalidad-btn"
-                            onClick={() => setModalidadSeleccionada(null)}
-                            title="Cambiar modalidad"
-                        >
-                            Cambiar
-                        </button>
-                    )}
+        <div className="header-inscripcion mejorado">
+            <div className="header-inscripcion-row">
+                <div className="header-logo">
+                    <Logo className="logo-inscripcion" />
                 </div>
-            )}
+                <div className="header-titulos">
+                    <h1 className="titulo-principal">SISTEMA DE GESTIÓN DE ESTUDIANTES</h1>
+                    <p className="subtitulo">Inscripción de Estudiantes - CEIJA 5</p>
+                </div>
+            </div>
+            {/* Botones de modalidad tipo pill */}
+            <div className="header-modalidad-selector">
+                <button
+                    className={`pill-btn ${modalidadSeleccionada === 'Presencial' ? 'selected' : ''}`}
+                    onClick={() => handleModalidadChange('Presencial')}
+                >
+                    Presencial
+                </button>
+                <button
+                    className={`pill-btn ${modalidadSeleccionada === 'Semipresencial' ? 'selected' : ''}`}
+                    onClick={() => handleModalidadChange('Semipresencial')}
+                >
+                    Semipresencial
+                </button>
+            </div>
+            {/* Modalidad info y cambiar eliminados por pedido del usuario */}
         </div>
     );
 
@@ -43,6 +73,7 @@ const Preinscripcion = ({ isAdmin }) => {
             return (
                 <GestionEstudiante 
                     estudianteData={JSON.parse(decodeURIComponent(estudianteParam))}
+                    modalidad={modalidadSeleccionada}
                 />
             );
         }
@@ -52,17 +83,26 @@ const Preinscripcion = ({ isAdmin }) => {
                 <AccionesFormulario
                     setAccion={setAccion}
                     isAdmin={isAdmin}
+                    modalidad={modalidadSeleccionada}
                 />
             );
         }
 
         switch (accion) {
+            case 'Listar':
+                return (
+                    <ListaEstudiantes
+                        modalidad={modalidadSeleccionada}
+                        onClose={() => setAccion(null)}
+                    />
+                );
             case 'Consultar':
                 return (
                     <GestionCRUD
                         isAdmin={isAdmin}
                         onClose={() => setAccion(null)}
-                        vistaInicial="opciones" // Cambiar a opciones para mostrar ConsultaOpciones
+                        vistaInicial="opciones"
+                        modalidad={modalidadSeleccionada}
                     />
                 );
             case 'Modificar':
@@ -70,7 +110,8 @@ const Preinscripcion = ({ isAdmin }) => {
                     <GestionCRUD
                         isAdmin={isAdmin}
                         onClose={() => setAccion(null)}
-                        vistaInicial="opcionesModificar" // Usar las opciones de modificación
+                        vistaInicial="opcionesModificar"
+                        modalidad={modalidadSeleccionada}
                     />
                 );
             case 'ModificarPorDNI':
@@ -78,8 +119,9 @@ const Preinscripcion = ({ isAdmin }) => {
                     <GestionCRUD
                         isAdmin={isAdmin}
                         onClose={() => setAccion(null)}
-                        vistaInicial="busquedaDNI" // Ir directamente a búsqueda para modificar
-                        esModificacion={true} // Indicar que es modo modificación
+                        vistaInicial="busquedaDNI"
+                        esModificacion={true}
+                        modalidad={modalidadSeleccionada}
                     />
                 );
             case 'ModificarLista':
@@ -87,8 +129,9 @@ const Preinscripcion = ({ isAdmin }) => {
                     <GestionCRUD
                         isAdmin={isAdmin}
                         onClose={() => setAccion(null)}
-                        vistaInicial="listaModificar" // Ir directamente a lista para modificar
-                        esModificacion={true} // Indicar que es modo modificación
+                        vistaInicial="listaModificar"
+                        esModificacion={true}
+                        modalidad={modalidadSeleccionada}
                     />
                 );
             case 'Eliminar':
@@ -110,7 +153,8 @@ const Preinscripcion = ({ isAdmin }) => {
                     <GestionCRUD
                         isAdmin={isAdmin}
                         onClose={() => setAccion(null)}
-                        vistaInicial="opcionesEliminar" // Ir al menú de opciones de eliminación
+                        vistaInicial="opcionesEliminar"
+                        modalidad={modalidadSeleccionada}
                     />
                 );
             case 'EliminarLista':
@@ -118,36 +162,20 @@ const Preinscripcion = ({ isAdmin }) => {
                     <GestionCRUD
                         isAdmin={isAdmin}
                         onClose={() => setAccion(null)}
-                        vistaInicial="listaEliminar" // Ir directamente a lista para eliminar
+                        vistaInicial="listaEliminar"
+                        modalidad={modalidadSeleccionada}
                     />
                 );
             case 'Registrar':
                 if (!modalidadSeleccionada) {
-                    return (
-                        <div className="selector-modalidad-container">
-                            <h2>Seleccione la Modalidad de Inscripción</h2>
-                            <div className="modalidad-buttons">
-                                <button 
-                                    className="modalidad-button"
-                                    onClick={() => setModalidadSeleccionada('Presencial')}
-                                >
-                                    Modalidad Presencial
-                                </button>
-                                <button 
-                                    className="modalidad-button"
-                                    onClick={() => setModalidadSeleccionada('Semipresencial')}
-                                >
-                                    Modalidad Semipresencial
-                                </button>
-                            </div>
-                            <button 
-                                className="button-volver"
-                                onClick={() => setAccion(null)}
-                            >
-                                Volver
-                            </button>
-                        </div>
+                    return ( 
+                    <RegistroEstudiante
+                        modalidad={modalidadSeleccionada}
+                     onClose={() => setAccion(null)}/>
+
                     );
+                       
+                   
                 }
                 return (
                     <GestionEstudiante
@@ -156,9 +184,8 @@ const Preinscripcion = ({ isAdmin }) => {
                         isAdmin={isAdmin}
                         onClose={() => {
                             setAccion(null);
-                            // Solo resetear modalidad si no vino desde URL
                             if (!modalidadFromUrl) {
-                                setModalidadSeleccionada(null);
+                                setModalidadSeleccionada('Presencial');
                             }
                         }}
                     />

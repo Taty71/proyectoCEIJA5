@@ -14,24 +14,86 @@ const getAll = async () => {
 };
 
 // Obtener estudiantes paginados
-const getPaginatedEstudiantes = async (page, limit) => {
+const getPaginatedEstudiantes = async (page, limit, filtroActivo = 'activos') => {
     try {
-        const response = await axiosInstance.get(`/consultar-estudiantes?page=${page}&limit=${limit}`);
+        let endpoint = `/consultar-estudiantes?page=${page}&limit=${limit}`;
+        
+        // Agregar parámetro de filtro según el estado
+        if (filtroActivo === 'activos') {
+            endpoint += '&activo=1';
+        } else if (filtroActivo === 'desactivados') {
+            endpoint += '&activo=0';
+        }
+        // Si es 'todos', no agregamos parámetro de filtro
+        
+        console.log('🌐 Llamando al endpoint:', endpoint);
+        console.log('📋 Parámetros:', { page, limit, filtroActivo });
+        
+        const response = await axiosInstance.get(endpoint);
+        console.log('🔄 Respuesta del backend:', response.data);
+        
         return response.data;
     } catch (error) {
+        console.error('🚨 Error en getPaginatedEstudiantes:', error);
         const message = FormatError(error);
-        return { error: message };
+        return { error: message, success: false };
     }
 };
 
-const updateEstd = async (data, dni) => {
-  try {
-    const response = await axiosInstance.put(`/modificar-estudiante/${dni}`, data);
-    return response.data;
-  } catch (error) {
-    const message = FormatError(error);
-    throw new Error(message); 
-  }
+// Obtener documentos faltantes por DNI
+const getDocumentosFaltantes = async (dni) => {
+    try {
+        console.log('📋 Consultando documentos faltantes para DNI:', dni);
+        
+        const response = await axiosInstance.get(`/documentos-faltantes/${dni}`);
+        console.log('📄 Respuesta documentos faltantes:', response.data);
+        
+        if (response.data.success) {
+            return response.data.documentosFaltantes || [];
+        } else {
+            console.warn('⚠️ No se pudieron obtener documentos faltantes:', response.data.message);
+            return [];
+        }
+    } catch (error) {
+        console.error('🚨 Error al obtener documentos faltantes:', error);
+        // Si hay error, devolver lista genérica de documentos que podrían faltar
+        return [
+            'Documento Nacional de Identidad (DNI)',
+            'Constancia de CUIL',
+            'Certificado de Nacimiento',
+            'Ficha Médica',
+            'Analítico Parcial'
+        ];
+    }
+};
+
+// Obtener estudiante específico por DNI
+const getEstudiantePorDNI = async (dni) => {
+    try {
+        console.log('🔍 Buscando estudiante por DNI:', dni);
+        
+        const response = await axiosInstance.get(`/consultar-estudiantes/buscar/${dni}`);
+        console.log('👤 Respuesta búsqueda por DNI:', response.data);
+        
+        return response.data;
+    } catch (error) {
+        console.error('🚨 Error al buscar estudiante por DNI:', error);
+        const message = FormatError(error);
+        return { error: message, success: false };
+    }
+};
+
+const updateEstd = async (data, dni, config = {}) => {
+    try {
+        console.log('🔄 Enviando datos al backend:', { dni, data }); // Debug log
+        const response = await axiosInstance.put(`/modificar-estudiante/${dni}`, data, config);
+        console.log('✅ Respuesta del backend:', response.data); // Debug log
+        return response.data;
+    } catch (error) {
+        const message = FormatError(error);
+        console.error('🚨 Error al actualizar estudiante:', message); // Debug log
+        throw new Error(message); 
+    }
 };
 
 
@@ -63,4 +125,6 @@ export default {
     deactivateEstd,
     getAll,
     getPaginatedEstudiantes,
+    getDocumentosFaltantes,
+    getEstudiantePorDNI,
 };

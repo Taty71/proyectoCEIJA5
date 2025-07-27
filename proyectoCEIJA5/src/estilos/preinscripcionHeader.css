@@ -1,12 +1,60 @@
+/* --- Pill Modalidad Buttons --- */
+.header-modalidad-selector {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 1.5rem 0 1rem 0;
+}
+
+.pill-btn {
+  padding: 0.6em 2em;
+  border-radius: 999px;
+  border: 2px solid #1976d2;
+  background: #fff;
+  color: #1976d2;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, border 0.2s;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+  outline: none;
+}
+
+.pill-btn.selected {
+  background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+  color: #fff;
+  border: 2px solid #1565c0;
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.18);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.pill-btn:hover:not(.selected) {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 2px solid #42a5f5;
+}
+.cambiar-modalidad-btn.selected {
+  background: #2d4177 !important;
+  color: #fff !important;
+  border: 2px solid #2d4177;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(45, 65, 119, 0.08);
+}
 /* Estilos para el header de Preinscripción */
 .header-inscripcion {
-  background: linear-gradient(135deg, #e8f4f8 0%, #d1e7dd 100%);
+  background: linear-gradient(
+    to bottom,
+    #2d4177,
+    #e0e0e0
+  ); /* Degradado azul a gris */
   color: #495057;
-  padding: 15px 30px;
+  padding: 15px; /* Reducir el espacio interno */
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  border-radius: 0 0 10px 10px;
-  margin-bottom: 25px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Sombreado */
+  border-radius: 10px;
+  margin: 0.3% 1%; /* Ajustar márgenes para coincidir con nav-main */
+  width: 97%; /* Ajustar ancho para coincidir con nav-main */
+  max-width: 95%; /* Limitar el ancho máximo */
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid #dee2e6;
@@ -38,41 +86,41 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
 }
 
 .modalidad-badge {
-  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-  color: white;
-  padding: 8px 20px;
-  border-radius: 25px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  box-shadow: 0 3px 10px rgba(74, 144, 226, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  -webkit-backdrop-filter: blur(5px);
-  backdrop-filter: blur(5px);
+  background-color: #2d4177; /* Azul oscuro */
+  color: #ffffff; /* Texto blanco */
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
   position: relative;
   z-index: 1;
 }
 
 .cambiar-modalidad-btn {
-  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 15px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  background-color: #ffffff; /* Fondo blanco */
+  color: #2d4177; /* Azul oscuro */
+  border: 1px solid #666; /* Borde gris */
+  border-radius: 5px;
+  padding: 5px 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(108, 117, 125, 0.3);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-weight: bold;
+  font-size: 1.1em;
+  padding: 8px 18px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  border: 1px solid #b0bec5;
+  background: #fff;
+  color: #1976d2;
+  margin-right: 0.5em;
 }
 
 .cambiar-modalidad-btn:hover {
-  background: linear-gradient(135deg, #495057 0%, #343a40 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(108, 117, 125, 0.4);
+  background-color: #2d4177; /* Azul oscuro */
+  color: #ffffff; /* Texto blanco */
 }
 
 .modalidad-badge::before {
@@ -101,24 +149,26 @@
 }
 
 .titulo-principal {
-  font-size: 1.6rem;
-  font-weight: 500;
+  font-size: 1.8rem; /* Reducir tamaño del título */
+  font-weight: bold;
+  color: #ffffff; /* Texto blanco */
   margin: 0;
+  margin-bottom: 5px; /* Reducir espacio inferior */
   text-shadow: none;
   letter-spacing: 0.5px;
   position: relative;
   z-index: 1;
-  color: #495057;
 }
 
 .subtitulo {
-  font-size: 0.95rem;
+  font-size: 1rem; /* Reducir tamaño del subtítulo */
   margin: 5px 0 0 0;
   opacity: 0.8;
   font-weight: 400;
+  margin-bottom: 10px; /* Reducir espacio inferior */
   position: relative;
   z-index: 1;
-  color: #6c757d;
+  color: #f0f0f0; /* Gris claro */
 }
 
 .contenido-principal {
@@ -169,4 +219,37 @@
   .header-inscripcion {
     padding: 12px 15px;
   }
+}
+
+/* Botones de modalidad para Preinscripcion */
+.cambiar-modalidad-btn {
+  font-weight: bold;
+  font-size: 1.1em;
+  padding: 8px 18px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid #b0bec5;
+  background: #fff;
+  color: #1976d2;
+  margin-right: 0.5em;
+}
+
+.cambiar-modalidad-btn.presencial.selected {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.cambiar-modalidad-btn.semipresencial.selected {
+  background: #607d8b;
+  color: #fff;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.cambiar-modalidad-btn:last-child {
+  margin-right: 0;
 }

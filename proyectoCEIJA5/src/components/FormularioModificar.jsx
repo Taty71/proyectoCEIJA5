@@ -37,6 +37,11 @@ const FormularioModificar = ({
 
     return (
         <Form encType="multipart/form-data" className="formulario-inscripcion-adm">
+            {/* Título del formulario */}
+            <div className="form-header">
+                <h2 className="form-title">Modificar Estudiante</h2>
+            </div>
+            
             <div className="formd">
                 <DatosPersonales values={values} handleChange={handleChange} />
                 <Domicilio values={values} handleChange={handleChange} />

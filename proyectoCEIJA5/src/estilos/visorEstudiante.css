@@ -1,3 +1,128 @@
+/* Ocultar flechas de los inputs tipo number en navegadores modernos */
+.tarjeta-contenido input[type="number"]::-webkit-inner-spin-button,
+.tarjeta-contenido input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.tarjeta-contenido input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Aumentar la altura mínima de las tarjetas para evitar corte visual */
+.tarjeta {
+  min-height: 50%;
+}
+/* Inputs dentro de tarjetas: ancho completo y visualización elegante */
+.tarjeta-contenido input,
+.tarjeta-contenido select {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 1rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin-top: 2px;
+  margin-bottom: 6px;
+}
+.tarjeta {
+  background: #f8f8fc;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  padding: 1.2rem 1.5rem;
+  font-size: 0.95rem;
+  font-family: "Roboto Slab", serif;
+  color: #222;
+  min-width: 220px;
+  min-height: 180px;
+  transition: box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.tarjeta-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.7rem;
+}
+.tarjeta-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #3a3a5a;
+  margin: 0;
+}
+.btn-editar-seccion {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #888;
+  margin-left: auto;
+  margin-right: 0;
+  transition: color 0.2s;
+}
+.btn-editar-seccion:hover {
+  color: #3a3a5a;
+}
+.tarjeta-contenido {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.dato-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.2rem;
+}
+.dato-item label {
+  font-size: 0.92rem;
+  color: #666;
+  font-weight: 500;
+  min-width: 140px;
+  text-align: right;
+}
+.dato-item span,
+.dato-item input,
+.dato-item select {
+  font-size: 0.92rem;
+  font-family: "Roboto Slab", serif;
+  color: #222;
+  min-width: 120px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+}
+.dato-item input[type="date"] {
+  min-width: 120px;
+}
+.visor-acciones {
+  margin-top: 1rem;
+  text-align: center;
+}
+.btn-guardar-seccion,
+.btn-cancelar-seccion {
+  font-size: 0.95rem;
+  padding: 0.4rem 1.2rem;
+  border-radius: 6px;
+  border: 1px solid #bdbdbd;
+  background: #f5f5f5;
+  color: #222;
+  margin: 0 0.3rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-guardar-seccion:hover {
+  background: #d1e7dd;
+  color: #155724;
+}
+.btn-cancelar-seccion:hover {
+  background: #f8d7da;
+  color: #721c24;
+}
 /* Contenedor principal del visor */
 .visor-estudiante-container {
   display: flex;
@@ -10,7 +135,7 @@
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   color: #333;
-  font-family: Arial, sans-serif;
+  font-family: "Roboto Slab", serif;
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
@@ -413,12 +538,12 @@
 .tarjetas-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto; /* Volvemos a auto para controlar las alturas individualmente */
-  gap: 12px;
-  margin-top: 20px;
-  max-width: 800px;
-  margin: 20px auto 0;
-  align-items: start; /* Alinear al inicio */
+  grid-template-rows: auto auto;
+  gap: 2px;
+  margin-top: 2px;
+  max-width: 600px;
+  margin: 2px auto 0;
+  align-items: start;
 }
 
 .tarjeta {

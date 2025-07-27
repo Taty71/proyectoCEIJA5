@@ -1,17 +1,17 @@
 /* Estilos generales para el modal */
 .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro translúcido */
   display: flex;
   justify-content: center;
   align-items: center;
-  position: fixed; /* Fijamos la posición sobre la pantalla */
-  top: 0;
-  left: 0;
-  width: 100vw; /* Ocupa todo el ancho de la pantalla */
-  height: 100vh; /* Ocupa toda la altura de la pantalla */
-  background-color: #34292903;
-  background-color: transparent; /* Fondo oscuro y semitransparente */
-  z-index: 1000; /* Asegura que esté sobre otros elementos */
+  z-index: 1000;
 }
+
 /* Estilos para el contenido del modal */
 .modal-content {
   background-color: #313030;
@@ -24,6 +24,42 @@
   flex-direction: column;
   align-items: center;
   animation: slideDown 0.3s ease; /* Animación de aparición */
+}
+
+/* Nueva clase para el contenedor del modal */
+.modal-container {
+  background-color: #ffffff; /* Fondo blanco */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 900px;
+  padding: 20px;
+}
+
+/* Estilos para la cabecera del modal */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #666; /* Línea gris */
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+/* Estilos para el botón de cerrar del modal */
+.modal-close-btn {
+  background-color: #ffffff; /* Fondo blanco */
+  color: #2d4177; /* Azul oscuro */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.modal-close-btn:hover {
+  background-color: #2d4177; /* Azul oscuro */
+  color: #ffffff; /* Texto blanco */
 }
 
 /* Estilos para la caja de registro */
@@ -140,6 +176,3 @@
     font-size: 0.8rem;
   }
 }
-
-
-

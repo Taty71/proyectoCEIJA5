@@ -14,9 +14,10 @@ const getDomicilioById = async (idDomicilio) => {
 };
 
 // Obtener información académica por ID de estudiante
-const getInscripcionByEstudianteId = async (idEstudiante) => {
+const getInscripcionByEstudianteId = async (idEstudiante, modalidadId) => {
     try {
-        const response = await axiosInstance.get(`/datos-inscripcion/${idEstudiante}`);
+        // Agrega modalidadId como query param
+        const response = await axiosInstance.get(`/datos-inscripcion/${idEstudiante}?modalidadId=${modalidadId}`);
         return response.data.inscripcion;
     } catch (error) {
         console.error('Error al obtener la inscripción:', error);
@@ -26,17 +27,21 @@ const getInscripcionByEstudianteId = async (idEstudiante) => {
 };
 
 // Obtener datos completos del estudiante por DNI
-const getEstudianteCompletoByDni = async (dni) => {
-    if (!dni || !/^\d{7,8}$/.test(String(dni))) {
+// Permite pasar setAlert para mostrar el error en un alert si ocurre
+const getEstudianteCompletoByDni = async (dni, modalidadId, setAlert) => {
+    if (!dni || !/^[\d]{7,8}$/.test(String(dni))) {
+        if (setAlert) setAlert({ text: 'DNI no válido.', variant: 'error' });
         return { error: 'DNI no válido.' };
     }
     try {
-        const { data } = await axiosInstance.get(`/consultar-estudiantes-dni/${dni}`);
-        console.log('Respuesta completa del servicio:', data); // Verifica la respuesta aquí
-        console.log('Documentación recibida:', data.documentacion); // Verifica específicamente la documentación
+        // Agrega modalidadId como query param
+        const { data } = await axiosInstance.get(`/consultar-estudiantes-dni/${dni}?modalidadId=${modalidadId}`);
+        console.log('Respuesta completa del servicio:', data);
+        console.log('Documentación recibida:', data.documentacion);
         return data;
     } catch (error) {
         const message = FormatError(error);
+        if (setAlert) setAlert({ text: message, variant: 'error' });
         return { error: message };
     }
 };

@@ -5,7 +5,7 @@
     "fechaRegistro": "7/10/2025",
     "horaRegistro": "02:05:31",
     "tipo": "WEB_REGISTRATION",
-    "estado": "MOVIDO_A_PENDIENTES",
+    "estado": "PROCESADO_A_PENDIENTES",
     "datos": {
       "nombre": "Maria",
       "apellido": "Nieve",
@@ -48,7 +48,7 @@
     "fechaRegistro": "7/10/2025",
     "horaRegistro": "06:42:05",
     "tipo": "WEB_REGISTRATION",
-    "estado": "MOVIDO_A_PENDIENTES",
+    "estado": "PROCESADO_A_PENDIENTES",
     "datos": {
       "nombre": "Gabriela",
       "apellido": "Lopez",
@@ -91,7 +91,7 @@
     "fechaRegistro": "7/10/2025",
     "horaRegistro": "10:35:21",
     "tipo": "WEB_REGISTRATION",
-    "estado": "MOVIDO_A_PENDIENTES",
+    "estado": "PROCESADO_A_PENDIENTES",
     "datos": {
       "nombre": "Patricia ",
       "apellido": "Machado",
@@ -126,45 +126,6 @@
     "observaciones": "Movido a registros pendientes el 8/10/2025 - Faltan: archivo_analiticoParcial",
     "fechaMovimiento": "2025-10-08T04:27:32.454Z",
     "motivoPendiente": "Faltan: archivo_analiticoParcial"
-  },
-  {
-    "id": "1759896525854",
-    "timestamp": "2025-10-08T04:08:45.854Z",
-    "fechaRegistro": "8/10/2025",
-    "horaRegistro": "01:08:45",
-    "tipo": "WEB_REGISTRATION",
-    "estado": "PENDIENTE",
-    "datos": {
-      "nombre": "Stefanía",
-      "apellido": "Iriarte",
-      "dni": "45874126",
-      "cuil": "20-45874126-4",
-      "email": "crisbamaia50@gmail.com",
-      "telefono": "03517845625",
-      "fechaNacimiento": "2003-06-10",
-      "tipoDocumento": "DNI",
-      "paisEmision": "Argentina",
-      "calle": "Roca",
-      "numero": "458",
-      "barrio": "25",
-      "localidad": "108",
-      "provincia": "5",
-      "modalidad": "Presencial",
-      "modalidadId": "1",
-      "planAnio": "2",
-      "modulos": "",
-      "idModulo": null,
-      "usuario": "usuario_web",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
-    },
-    "archivos": {
-      "foto": "/archivosDocWeb/Stefanía_Iriarte_45874126_foto.png",
-      "archivo_dni": "/archivosDocWeb/Stefanía_Iriarte_45874126_archivo_dni.pdf",
-      "archivo_cuil": "/archivosDocWeb/Stefanía_Iriarte_45874126_archivo_cuil.pdf",
-      "archivo_partidaNacimiento": "/archivosDocWeb/Stefanía_Iriarte_45874126_archivo_partidaNacimiento.pdf"
-    },
-    "observaciones": "Registro web realizado el 8/10/2025 a las 01:08:45"
   },
   {
     "id": "1759922701679",
@@ -248,5 +209,94 @@
       "archivo_cuil": "/archivosDocWeb/Fernanda_Ceballos_36256456_archivo_cuil.pdf"
     },
     "observaciones": "Registro web realizado el 8/10/2025 a las 12:16:06"
+  },
+  {
+    "id": "1761941274268",
+    "timestamp": "2025-10-31T20:07:54.268Z",
+    "fechaRegistro": "31/10/2025",
+    "horaRegistro": "05:07:54",
+    "tipo": "WEB_REGISTRATION",
+    "estado": "PENDIENTE",
+    "datos": {
+      "nombre": "Leonela",
+      "apellido": "Bustamante",
+      "dni": "40258852",
+      "cuil": "20-40258852-8",
+      "email": "crisbmaia50@gmail.com",
+      "telefono": "03516689456",
+      "fechaNacimiento": "1997-02-03",
+      "tipoDocumento": "DNI",
+      "paisEmision": "Argentina",
+      "calle": "Sucre",
+      "numero": "368",
+      "barrio": "11",
+      "localidad": "108",
+      "provincia": "5",
+      "modalidad": "Semipresencial",
+      "modalidadId": "2",
+      "planAnio": "5",
+      "modulos": "",
+      "idModulo": [
+        "4",
+        ""
+      ],
+      "usuario": "usuario_web",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+    },
+    "archivos": {
+      "foto": "/archivosDocWeb/Leonela_Bustamante_40258852_foto.png",
+      "archivo_dni": "/archivosDocWeb/Leonela_Bustamante_40258852_archivo_dni.pdf",
+      "archivo_fichaMedica": "/archivosDocWeb/Leonela_Bustamante_40258852_archivo_fichaMedica.pdf"
+    },
+    "observaciones": "Registro web realizado el 31/10/2025 a las 05:07:54"
+  },
+  {
+    "id": "1761943089662",
+    "timestamp": "2025-10-31T20:38:09.662Z",
+    "fechaRegistro": "31/10/2025",
+    "horaRegistro": "05:38:09",
+    "tipo": "WEB_REGISTRATION",
+    "estado": "PROCESADO_Y_APROBADO",
+    "datos": {
+      "nombre": "David",
+      "apellido": "Cárdena",
+      "dni": "44501105",
+      "cuil": "20-44501105-4",
+      "email": "crisbmaia50@gmail.com",
+      "telefono": "03517845841",
+      "fechaNacimiento": "2001-12-02",
+      "tipoDocumento": "DNI",
+      "paisEmision": "Argentina",
+      "calle": "Balcarce",
+      "numero": "125",
+      "barrio": "10",
+      "localidad": "108",
+      "provincia": "5",
+      "modalidad": "Semipresencial",
+      "modalidadId": "2",
+      "planAnio": "5",
+      "modulos": "",
+      "idModulo": [
+        "4",
+        ""
+      ],
+      "usuario": "usuario_web",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+    },
+    "archivos": {
+      "foto": "/archivosDocWeb/David_Cárdena_44501105_foto.png",
+      "archivo_dni": "/archivosDocWeb/David_Cárdena_44501105_archivo_dni.pdf",
+      "archivo_cuil": "/archivosDocWeb/David_Cárdena_44501105_archivo_cuil.pdf",
+      "archivo_fichaMedica": "/archivosDocWeb/David_Cárdena_44501105_archivo_fichaMedica.pdf",
+      "archivo_partidaNacimiento": "/archivosPendientes/David_Cárdena_44501105_archivo_partidaNacimiento.pdf",
+      "archivo_analiticoParcial": "/archivosPendientes/David_Cárdena_44501105_archivo_analiticoParcial.pdf"
+    },
+    "observaciones": "Registro web realizado el 31/10/2025 a las 05:38:09\nMovido a pendientes por gestor.\nProcesado automáticamente: DNI ya existe en la base de datos (idEstudiante=168).",
+    "fechaMovimiento": "2025-11-01T14:35:00.400Z",
+    "fechaActualizacion": "2025-11-01T14:35:00.400Z",
+    "motivoPendiente": "Error en base de datos: Request failed with status code 400",
+    "fechaProcesado": "2025-11-01T14:35:00.406Z"
   }
 ]

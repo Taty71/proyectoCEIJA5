@@ -71,12 +71,13 @@ router.post('/:dni', upload.any(), async (req, res) => {
         const registro = registros[indiceRegistro];
         
         // Verificar si ya existe en BD
-        const [existente] = await db.query('SELECT 1 FROM estudiantes WHERE dni = ?', [dni]);
-        if (existente.length) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'El DNI ya está registrado en la base de datos.' 
-            });
+        const [existenteRows] = await db.query('SELECT id FROM estudiantes WHERE dni = ?', [dni]);
+        let idEstudianteExistente = null;
+        let usarEstudianteExistente = false;
+        if (existenteRows && existenteRows.length > 0) {
+            idEstudianteExistente = existenteRows[0].id;
+            usarEstudianteExistente = true;
+            console.log(`[INFO] El DNI ${dni} ya existe en la BD (id=${idEstudianteExistente}). Se usará el estudiante existente y se intentará adjuntar documentación/inscripción.`);
         }
         
         // Procesar archivos nuevos
@@ -167,22 +168,25 @@ router.post('/:dni', upload.any(), async (req, res) => {
         // Extraer datos del registro
         const datos = registro.datos || registro;
         
-        // 1. Crear domicilio
+        // 1. Crear domicilio (solo si vamos a crear estudiante nuevo)
         const provincia = datos.provincia || 'Córdoba';
         const localidad = datos.localidad || datos.ciudad || 'La Calera';
         const barrio = datos.barrio || 'Centro';
         const calle = datos.calle || datos.direccion || 'Sin especificar';
         const numero = parseInt(datos.numero || datos.numeroCalle || '0') || 0;
         
-        const provinciaResult = await buscarOInsertarProvincia(db, provincia);
-        const localidadResult = await buscarOInsertarLocalidad(db, localidad, provinciaResult.id);
-        const barrioResult = await buscarOInsertarBarrio(db, barrio, localidadResult.id);
-        
-        const [domicilioRes] = await db.query(
-            'INSERT INTO domicilios (calle, numero, idBarrio, idLocalidad, idProvincia) VALUES (?,?,?,?,?)',
-            [calle, numero, barrioResult.id, localidadResult.id, provinciaResult.id]
-        );
-        const idDomicilio = domicilioRes.insertId;
+        let idDomicilio = null;
+        if (!usarEstudianteExistente) {
+            const provinciaResult = await buscarOInsertarProvincia(db, provincia);
+            const localidadResult = await buscarOInsertarLocalidad(db, localidad, provinciaResult.id);
+            const barrioResult = await buscarOInsertarBarrio(db, barrio, localidadResult.id);
+            
+            const [domicilioRes] = await db.query(
+                'INSERT INTO domicilios (calle, numero, idBarrio, idLocalidad, idProvincia) VALUES (?,?,?,?,?)',
+                [calle, numero, barrioResult.id, localidadResult.id, provinciaResult.id]
+            );
+            idDomicilio = domicilioRes.insertId;
+        }
         
         // 2. Crear estudiante
         // Si la foto está en archivosPendientes, mover a archivosDocumento
@@ -195,34 +199,46 @@ router.post('/:dni', upload.any(), async (req, res) => {
             try {
                 await fsExtra.copy(origen, destino);
                 fotoUrl = `/archivosDocumento/${nombreArchivo}`;
+                    // Intentar eliminar el archivo original en archivosPendientes si existe
+                    try {
+                        const origenPend = path.join(__dirname, '../archivosPendientes', nombreArchivo);
+                        await fsExtra.remove(origenPend);
+                        console.log(`🧹 Eliminado archivo pendiente original: ${nombreArchivo}`);
+                    } catch (rmErr) {
+                        console.warn(`⚠️ No se pudo eliminar archivo pendiente original ${nombreArchivo}:`, rmErr.message);
+                    }
             } catch (err) {
                 console.warn(`⚠️ Error moviendo foto a archivosDocumento: ${nombreArchivo}`, err.message);
             }
         }
         const fechaNacimiento = datos.fechaNacimiento || null;
         
-        const [estRes] = await db.query(
-            `INSERT INTO estudiantes
-             (nombre, apellido, tipoDocumento, paisEmision, dni, cuil, email, telefono, fechaNacimiento, foto, idDomicilio, idUsuarios)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
-            [
-                datos.nombre,
-                datos.apellido, 
-                datos.tipoDocumento || 'DNI',
-                datos.paisEmision || 'Argentina',
-                dni,
-                datos.cuil || null,
-                datos.email || null,
-                datos.telefono || null,
-                fechaNacimiento,
-                fotoUrl,
-                idDomicilio,
-                null
-            ]
-        );
-        const idEstudiante = estRes.insertId;
+        // 2. Crear estudiante si no existe; si existe, usar su id
+        let idEstudiante = idEstudianteExistente;
+        if (!usarEstudianteExistente) {
+            const [estRes] = await db.query(
+                `INSERT INTO estudiantes
+                 (nombre, apellido, tipoDocumento, paisEmision, dni, cuil, email, telefono, fechaNacimiento, foto, idDomicilio, idUsuarios)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
+                [
+                    datos.nombre,
+                    datos.apellido, 
+                    datos.tipoDocumento || 'DNI',
+                    datos.paisEmision || 'Argentina',
+                    dni,
+                    datos.cuil || null,
+                    datos.email || null,
+                    datos.telefono || null,
+                    fechaNacimiento,
+                    fotoUrl,
+                    idDomicilio,
+                    null
+                ]
+            );
+            idEstudiante = estRes.insertId;
+        }
         
-        // 3. Crear inscripcion (APROBADO)
+        // 3. Crear o reutilizar inscripción (APROBADO)
         const modalidadId = parseInt(datos.modalidadId) || 1;
         const planAnioId = parseInt(datos.planAnio) || 1;
         const modulosId = parseInt(datos.idModulo) || 1;
@@ -251,14 +267,46 @@ router.post('/:dni', upload.any(), async (req, res) => {
             });
         }
 
-        const [inscRes] = await db.query(
-            'INSERT INTO inscripciones (idEstudiante, idModalidad, idAnioPlan, idModulos, idEstadoInscripcion, fechaInscripcion) VALUES (?, ?, ?, ?, ?, CURDATE())',
-            [idEstudiante, modalidadId, planAnioId, modulosId, idEstadoInscripcion]
-        );
-        const idInscripcion = inscRes.insertId;
+        // Verificar si ya existe una inscripción para este estudiante con la misma modalidad/plan/modulo
+        let idInscripcion = null;
+        try {
+            const [inscripcionesExistentes] = await db.query(
+                'SELECT id AS idInscripcion FROM inscripciones WHERE idEstudiante = ? AND idModalidad = ? AND idAnioPlan = ? AND idModulos = ? LIMIT 1',
+                [idEstudiante, modalidadId, planAnioId, modulosId]
+            );
+            if (inscripcionesExistentes && inscripcionesExistentes.length > 0) {
+                idInscripcion = inscripcionesExistentes[0].idInscripcion;
+                console.log(`[INFO] Ya existe inscripción para estudiante ${idEstudiante}: idInscripcion=${idInscripcion}`);
+            } else {
+                const [inscRes] = await db.query(
+                    'INSERT INTO inscripciones (idEstudiante, idModalidad, idAnioPlan, idModulos, idEstadoInscripcion, fechaInscripcion) VALUES (?, ?, ?, ?, ?, CURDATE())',
+                    [idEstudiante, modalidadId, planAnioId, modulosId, idEstadoInscripcion]
+                );
+                idInscripcion = inscRes.insertId;
+            }
+        } catch (insErr) {
+            console.error('Error verificando/creando inscripción:', insErr.message);
+            return res.status(500).json({ success: false, userMessage: 'Error al crear o verificar la inscripción en la base de datos.', technical: insErr.message });
+        }
         
         // 4. Guardar archivos en BD
         const fsExtra = require('fs-extra');
+        // Asegurarnos de que la tabla `archivos_estudiantes` exista (evita errores si el esquema no fue aplicado)
+        try {
+            await db.query(`
+                CREATE TABLE IF NOT EXISTS archivos_estudiantes (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    idEstudiante INT NOT NULL,
+                    tipoArchivo VARCHAR(100),
+                    rutaArchivo VARCHAR(255),
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    INDEX (idEstudiante)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            `);
+        } catch (createErr) {
+            console.error('Error creando/verificando tabla archivos_estudiantes:', createErr.message);
+            // No abortamos inmediatamente: permitimos que se inserten los demás datos, pero avisamos en logs
+        }
         for (const [campo, rutaArchivo] of Object.entries(todosLosArchivos)) {
             if (rutaArchivo && campo.startsWith('archivo_') || campo === 'foto') {
                 try {
@@ -274,6 +322,14 @@ router.post('/:dni', upload.any(), async (req, res) => {
                         try {
                             await fsExtra.copy(origen, destino);
                             console.log(`📁 Copiado ${nombreArchivo} a archivosDocumento`);
+                            // Intentar eliminar el archivo pendiente original
+                            try {
+                                const origenPend = path.join(__dirname, '../archivosPendientes', nombreArchivo);
+                                await fsExtra.remove(origenPend);
+                                console.log(`🧹 Eliminado archivo pendiente original: ${nombreArchivo}`);
+                            } catch (rmErr) {
+                                console.warn(`⚠️ No se pudo eliminar archivo pendiente original ${nombreArchivo}:`, rmErr.message);
+                            }
                         } catch (copyError) {
                             console.warn(`⚠️ Error copiando archivo ${nombreArchivo}:`, copyError.message);
                         }
@@ -308,34 +364,74 @@ router.post('/:dni', upload.any(), async (req, res) => {
             }
         }
         
-        // 5. Marcar como PROCESADO pero NO eliminar del archivo de pendientes
-        registros[indiceRegistro].estado = 'PROCESADO';
-        registros[indiceRegistro].fechaProcesado = new Date().toISOString();
-        registros[indiceRegistro].observaciones = `Procesado y guardado en BD el ${new Date().toLocaleDateString('es-AR')}`;
+        // 5. Eliminar el registro pendiente del JSON
+        const registroEliminado = registros.splice(indiceRegistro, 1)[0];
         await fs.writeFile(REGISTROS_PENDIENTES_PATH, JSON.stringify(registros, null, 2));
 
-        console.log(`✅ [COMPLETAR] Estudiante ${datos.nombre} ${datos.apellido} (DNI: ${dni}) registrado y marcado como PROCESADO en pendientes`);
+        // 6. Intentar actualizar un posible registro web que correspondiera a este DNI
+        // Hacemos esto antes de responder para que el cliente (GestorRegistrosWeb) vea el cambio inmediatamente
+        let registroWebActualizado = null;
+        try {
+            const REGISTROS_WEB_PATH = path.join(__dirname, '..', 'data', 'Registro_Web.json');
+            const rawWeb = await fs.readFile(REGISTROS_WEB_PATH, 'utf8');
+            let registrosWeb = JSON.parse(rawWeb || '[]');
+            let changed = false;
+            registrosWeb = registrosWeb.map(rw => {
+                try {
+                    const rwDni = rw?.datos?.dni || rw?.dni;
+                    if (rwDni && String(rwDni) === String(dni)) {
+                        changed = true;
+                        const updated = {
+                            ...rw,
+                            estado: 'PROCESADO_Y_APROBADO',
+                            fechaProcesado: new Date().toISOString(),
+                            archivos: todosLosArchivos || rw.archivos || {},
+                            datos: { ...rw.datos, ...datos }
+                        };
+                        registroWebActualizado = updated;
+                        return updated;
+                    }
+                } catch (e) {
+                    // ignore per-record errors
+                }
+                return rw;
+            });
+            if (changed) {
+                await fs.writeFile(REGISTROS_WEB_PATH, JSON.stringify(registrosWeb, null, 2));
+                console.log(`🔄 Registro Web actualizado para DNI ${dni} (marcado PROCESADO_Y_APROBADO)`);
+            }
+        } catch (webErr) {
+            console.warn('⚠️ No se pudo actualizar Registro_Web.json:', webErr.message);
+        }
 
+        console.log(`✅ [COMPLETAR] Estudiante ${datos.nombre} ${datos.apellido} (DNI: ${dni}) registrado y eliminado de pendientes`);
+
+        // 7. Responder al cliente indicando éxito. Mantener el estado claro de la operación
         res.json({
             success: true,
             migradoABaseDatos: true,
             migradoAPendientes: false,
-            message: 'Registrado correctamente en el sistema (marcado como PROCESADO, no eliminado)',
-            estado: 'APROBADO_Y_PROCESADO',
+            message: 'Registrado correctamente en el sistema y eliminado de registros pendientes',
+            // Normalizado: devolvemos el nuevo estado estándar
+            estado: 'PROCESADO_Y_APROBADO',
             estudiante: {
                 id: idEstudiante,
                 nombre: datos.nombre,
                 apellido: datos.apellido,
                 dni: dni,
                 inscripcionId: idInscripcion
-            }
+            },
+            registroPendiente: registroEliminado,
+            registroWebActualizado
         });
         
     } catch (error) {
         console.error('Error completando documentación:', error);
         res.status(500).json({
             success: false,
-            message: 'Error interno del servidor: ' + error.message
+            error: 'Error interno del servidor',
+            userMessage: 'Ocurrió un error al completar la documentación. Revise los datos e intente nuevamente, o contacte al equipo técnico.',
+            technical: error.message
         });
     }
 });

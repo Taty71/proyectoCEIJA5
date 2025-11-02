@@ -1,21 +1,6 @@
-/**
- * REGISTROS PENDIENTES - VERSIÓN REFACTORIZADA
- * 
- * Este archivo ha sido refactorizado en componentes modulares ubicados en:
- * - services/registrosPendientes/config.js - Configuración y constantes
- * - services/registrosPendientes/fileManager.js - Gestión de archivos
- * - services/registrosPendientes/documentValidator.js - Validación de documentos
- * - services/registrosPendientes/databaseManager.js - Operaciones de BD
- * - services/registrosPendientes/controllers.js - Controladores de endpoints
- * 
- * Fecha de refactorización: 1 de noviembre de 2025
- */
-
 const express = require('express');
 const router = express.Router();
-
-// Importar todos los servicios refactorizados
-const { upload } = require('../services/registrosPendientes/config');
+const { upload } = require('./config');
 const {
     obtenerTodosLosRegistros,
     obtenerRegistroPorDni,
@@ -24,7 +9,7 @@ const {
     eliminarRegistroPendiente,
     obtenerEstadisticas,
     procesarRegistroPendiente
-} = require('../services/registrosPendientes/controllers');
+} = require('./controllers');
 
 // ================================
 // RUTAS DE REGISTROS PENDIENTES

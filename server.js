@@ -76,6 +76,8 @@ app.use('/api/estado-documental', estadoDocumentalRoutes);
 app.use('/api/registros-web', require('./routes/registrosWeb')); // Nueva ruta para registros web
 app.use('/api/registros-pendientes', require('./routes/registrosPendientes')); // Nueva ruta para registros pendientes
 app.use('/api/completar-documentacion', require('./routes/completarDocumentacion')); // Ruta separada para completar documentación
+app.use('/api/verificar-estudiante', require('./routes/verificarEstudiante')); // Verificar si estudiante existe y obtener documentación
+app.use('/api/actualizar-documentacion-existente', require('./routes/actualizarDocumentacionExistente')); // Actualizar documentación de estudiante existente
 app.use('/api/ubicaciones', ubicacionesRoutes); // Nueva ruta para ubicaciones
 app.use('/api/actualizar-estado-inscripcion', actualizarEstadoInscripcionRoutes); // Nueva ruta para actualizar solo el estado
 app.use('/api/notificaciones', require('./routes/notificaciones')); // Ruta para notificaciones por email

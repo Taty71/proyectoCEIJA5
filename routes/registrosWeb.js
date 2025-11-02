@@ -59,7 +59,8 @@ router.get('/', async (req, res) => {
         console.error('Error al obtener registros web:', error);
         res.status(500).json({ 
             error: 'Error al obtener los registros web',
-            message: error.message 
+            userMessage: 'No se pudieron cargar los registros web. Intente nuevamente o contacte al equipo técnico.',
+            technical: error.message
         });
     }
 });
@@ -149,7 +150,8 @@ router.post('/', upload.any(), async (req, res) => {
         console.error('Error al crear registro web:', error);
         res.status(500).json({ 
             error: 'Error al guardar el registro web',
-            message: error.message 
+            userMessage: 'No se pudo guardar el registro web. Verifique los datos e intente nuevamente, o contacte al equipo técnico.',
+            technical: error.message
         });
     }
 });
@@ -188,7 +190,8 @@ router.put('/:id', async (req, res) => {
         console.error('Error al actualizar registro web:', error);
         res.status(500).json({ 
             error: 'Error al actualizar el registro web',
-            message: error.message 
+            userMessage: 'No se pudo actualizar el registro web. Intente nuevamente o contacte al equipo técnico.',
+            technical: error.message
         });
     }
 });
@@ -224,14 +227,15 @@ router.delete('/:id', async (req, res) => {
         console.error('Error al eliminar registro web:', error);
         res.status(500).json({ 
             error: 'Error al eliminar el registro web',
-            message: error.message 
+            userMessage: 'No se pudo eliminar el registro web. Intente nuevamente o contacte al equipo técnico.',
+            technical: error.message
         });
     }
 });
 
 // POST: Procesar un registro web (solo ADMIN)
 // Si la documentación está completa: guarda en la base de datos y migra archivos a archivosDocumento.
-// Si está incompleta: mueve a Registros_Pendientes.json y marca el registro web como MOVIDO_A_PENDIENTES.
+    // Si está incompleta: mueve a Registros_Pendientes.json y marca el registro web como PROCESADO_A_PENDIENTES.
 router.post('/:id/procesar', upload.any(), async (req, res) => {
     try {
         await ensureFileExists();
@@ -250,7 +254,9 @@ router.post('/:id/procesar', upload.any(), async (req, res) => {
         const archivosNuevos = {};
         if (req.files) {
             req.files.forEach(file => {
-                archivosNuevos[file.fieldname] = `/archivosDocumento/${file.filename}`;
+                // Multer en este router guarda en archivosDocWeb, por eso referenciamos esa carpeta.
+                // Posteriormente se decidirá si se copian a archivosDocumento o archivosPendientes.
+                archivosNuevos[file.fieldname] = `/archivosDocWeb/${file.filename}`;
             });
         }
         // Combinar archivos existentes y nuevos
@@ -290,6 +296,90 @@ router.post('/:id/procesar', upload.any(), async (req, res) => {
         const cantidadSubidos = documentosSubidos.length;
         const totalDocumentos = documentosRequeridos.length;
         const esCompleto = (cantidadSubidos === totalDocumentos) && validacionAlternativaOK;
+
+        // Antes de cualquier acción, comprobar si el DNI ya existe en la BD para evitar duplicados
+        try {
+            const pool = require('../db');
+            const [existing] = await pool.query('SELECT id FROM estudiantes WHERE dni = ?', [datosCompletos.dni]);
+            if (existing && existing.length > 0) {
+                // En lugar de abortar, consultar toda la información del estudiante
+                console.log(`⚠️ DNI ${datosCompletos.dni} ya existe en BD (id=${existing[0].id})`);
+                
+                // Obtener información completa del estudiante con inscripciones y documentación
+                const [estudianteRows] = await pool.query('SELECT * FROM estudiantes WHERE id = ?', [existing[0].id]);
+                const estudiante = estudianteRows[0];
+                
+                // Obtener inscripciones
+                const [inscripcionesRows] = await pool.query(`
+                    SELECT 
+                        i.idInscripcion,
+                        i.fechaInscripcion,
+                        i.idEstadoInscripcion,
+                        m.nombre as modalidad,
+                        p.anio as plan,
+                        mo.nombre as modulo,
+                        e.descripcionEstado as estado
+                    FROM inscripciones i
+                    LEFT JOIN modalidades m ON i.idModalidad = m.id
+                    LEFT JOIN anio_plan p ON i.idPlan = p.id
+                    LEFT JOIN modulos mo ON i.idModulo = mo.id
+                    LEFT JOIN estado_inscripciones e ON i.idEstadoInscripcion = e.id
+                    WHERE i.idEstudiante = ?
+                    ORDER BY i.fechaInscripcion DESC
+                `, [existing[0].id]);
+                
+                // Para cada inscripción, obtener documentación
+                const inscripcionesConDocs = [];
+                for (const insc of inscripcionesRows) {
+                    const [docs] = await pool.query(`
+                        SELECT 
+                            dd.idDetalleDocumentacion,
+                            dd.idDocumentaciones,
+                            d.descripcionDocumentacion,
+                            dd.estadoDocumentacion,
+                            dd.fechaEntrega,
+                            dd.archivoDocumentacion
+                        FROM detalle_inscripcion dd
+                        LEFT JOIN documentaciones d ON dd.idDocumentaciones = d.id
+                        WHERE dd.idInscripcion = ?
+                    `, [insc.idInscripcion]);
+                    inscripcionesConDocs.push({ ...insc, documentacion: docs });
+                }
+                
+                // Marcar el registro web como procesado
+                registros[indiceRegistro] = {
+                    ...registro,
+                    estado: 'PROCESADO_Y_APROBADO',
+                    fechaProcesado: new Date().toISOString(),
+                    fechaActualizacion: new Date().toISOString(),
+                    archivos: archivosCombinados,
+                    datos: datosCompletos,
+                    observaciones: (registro.observaciones || '') + `\nProcesado automáticamente: DNI ya existe en la base de datos (idEstudiante=${existing[0].id}).`
+                };
+                await fs.writeFile(REGISTROS_WEB_PATH, JSON.stringify(registros, null, 2));
+                
+                return res.status(200).json({
+                    yaExiste: true,
+                    message: 'El DNI ya está registrado en el sistema',
+                    estudianteExistente: {
+                        id: estudiante.id,
+                        nombre: estudiante.nombre,
+                        apellido: estudiante.apellido,
+                        dni: estudiante.dni,
+                        cuil: estudiante.cuil,
+                        email: estudiante.email,
+                        telefono: estudiante.telefono,
+                        fechaNacimiento: estudiante.fechaNacimiento
+                    },
+                    inscripciones: inscripcionesConDocs,
+                    archivosNuevosRegistroWeb: archivosCombinados,
+                    registroWebActualizado: registros[indiceRegistro]
+                });
+            }
+        } catch (dbErr) {
+            console.warn('⚠️ No se pudo comprobar duplicado en BD (registro web), se continuará y la inserción manejará posibles errores:', dbErr.message);
+        }
+
         // Si la documentación está incompleta, mover a pendientes
         const REGISTROS_PENDIENTES_PATH = path.join(__dirname, '..', 'data', 'Registros_Pendientes.json');
         let registrosPendientes = [];
@@ -303,8 +393,9 @@ router.post('/:id/procesar', upload.any(), async (req, res) => {
             // Solo cambiar estado y devolver mensaje, no eliminar ni crear duplicado
             registros[indiceRegistro] = {
                 ...registro,
-                estado: 'MOVIDO_A_PENDIENTES',
+                estado: 'PROCESADO_A_PENDIENTES',
                 fechaMovimiento: new Date().toISOString(),
+                fechaActualizacion: new Date().toISOString(),
                 motivoPendiente: `Ya existe en pendientes`,
                 observaciones: `Registro ya estaba en pendientes, contabilizado como procesado a pendientes el ${new Date().toLocaleDateString('es-AR')}`
             };
@@ -314,59 +405,91 @@ router.post('/:id/procesar', upload.any(), async (req, res) => {
                 registroWebActualizado: registros[indiceRegistro]
             });
         }
-        // Copiar todos los archivos de archivosDocWeb a archivosPendientes antes de crear el registro pendiente
-        const archivosPendientesDir = path.join(__dirname, '../archivosPendientes');
-        await fs.mkdir(archivosPendientesDir, { recursive: true });
+        // Si está incompleto: copiar archivos desde archivosDocWeb a archivosPendientes y crear registro pendiente
+        if (!esCompleto) {
+            // Copiar todos los archivos de archivosDocWeb a archivosPendientes antes de crear el registro pendiente
+            const archivosPendientesDir = path.join(__dirname, '../archivosPendientes');
+            await fs.mkdir(archivosPendientesDir, { recursive: true });
+            for (const [campo, ruta] of Object.entries(archivosCombinados)) {
+                if (ruta && ruta.startsWith('/archivosDocWeb/')) {
+                    const nombreArchivo = path.basename(ruta);
+                    const origen = path.join(__dirname, '../archivosDocWeb', nombreArchivo);
+                    const destino = path.join(archivosPendientesDir, nombreArchivo);
+                    try {
+                        await fs.copyFile(origen, destino);
+                        // Actualiza la ruta para el registro pendiente
+                        archivosCombinados[campo] = `/archivosPendientes/${nombreArchivo}`;
+                    } catch (err) {
+                        console.error(`Error copiando archivo ${nombreArchivo}:`, err);
+                    }
+                }
+            }
+            // Crear registro pendiente
+            const registroPendiente = {
+                dni: datosCompletos.dni,
+                timestamp: new Date().toISOString(),
+                fechaRegistro: new Date().toLocaleDateString('es-AR'),
+                horaRegistro: new Date().toLocaleTimeString('es-AR'),
+                tipo: 'REGISTRO_WEB_PENDIENTE',
+                estado: 'PENDIENTE',
+                origenWeb: true,
+                idRegistroWebOriginal: registro.id,
+                datos: {
+                    ...datosCompletos,
+                    motivoPendiente: `Faltan: ${documentosFaltantes.join(', ')}`,
+                    administrador: 'admin_web'
+                },
+                archivos: archivosCombinados,
+                observaciones: `Movido desde registro web a pendientes el ${new Date().toLocaleDateString('es-AR')} - Faltan: ${documentosFaltantes.join(', ')}`
+            };
+            registrosPendientes.push(registroPendiente);
+            await fs.writeFile(REGISTROS_PENDIENTES_PATH, JSON.stringify(registrosPendientes, null, 2));
+            // Actualizar estado del registro web original
+            registros[indiceRegistro] = {
+                ...registro,
+                estado: 'PROCESADO_A_PENDIENTES',
+                fechaMovimiento: new Date().toISOString(),
+                fechaActualizacion: new Date().toISOString(),
+                motivoPendiente: `Faltan: ${documentosFaltantes.join(', ')}`,
+                observaciones: `Procesado por admin y movido a registros pendientes el ${new Date().toLocaleDateString('es-AR')} - Faltan: ${documentosFaltantes.join(', ')}`
+            };
+            await fs.writeFile(REGISTROS_WEB_PATH, JSON.stringify(registros, null, 2));
+            return res.status(200).json({
+                message: 'Registro web procesado y movido a pendientes por documentación incompleta',
+                registroWebActualizado: registros[indiceRegistro],
+                registroPendienteCreado: registroPendiente
+            });
+        }
+        // Si la documentación está completa, guardar en la base de datos
+        const pool = require('../db');
+        // Preparar migración atómica de archivos: copiar desde archivosDocWeb a archivosDocumento y registrar copias para rollback
+        const archivosDocumentoDir = path.join(__dirname, '../archivosDocumento');
+        await fs.mkdir(archivosDocumentoDir, { recursive: true });
+        const copiedFiles = [];
         for (const [campo, ruta] of Object.entries(archivosCombinados)) {
             if (ruta && ruta.startsWith('/archivosDocWeb/')) {
                 const nombreArchivo = path.basename(ruta);
-                const origen = path.join(__dirname, '../archivosDocWeb', nombreArchivo);
-                const destino = path.join(archivosPendientesDir, nombreArchivo);
+                const origenWeb = path.join(__dirname, '..', 'archivosDocWeb', nombreArchivo);
+                const destino = path.join(archivosDocumentoDir, nombreArchivo);
                 try {
-                    await fs.copyFile(origen, destino);
-                    // Actualiza la ruta para el registro pendiente
-                    archivosCombinados[campo] = `/archivosPendientes/${nombreArchivo}`;
-                } catch (err) {
-                    console.error(`Error copiando archivo ${nombreArchivo}:`, err);
+                    // Si no existe en destino, copiar
+                    try {
+                        await fs.access(destino);
+                        // ya existe, no copiar
+                        archivosCombinados[campo] = `/archivosDocumento/${nombreArchivo}`;
+                    } catch (_) {
+                        await fs.copyFile(origenWeb, destino);
+                        archivosCombinados[campo] = `/archivosDocumento/${nombreArchivo}`;
+                        copiedFiles.push(destino);
+                    }
+                } catch (copyErr) {
+                    console.warn(`⚠️ No se pudo copiar ${nombreArchivo} a archivosDocumento:`, copyErr.message);
+                    // mantener la referencia original si falla
+                    archivosCombinados[campo] = ruta;
                 }
             }
         }
-        // Crear registro pendiente
-        const registroPendiente = {
-            dni: datosCompletos.dni,
-            timestamp: new Date().toISOString(),
-            fechaRegistro: new Date().toLocaleDateString('es-AR'),
-            horaRegistro: new Date().toLocaleTimeString('es-AR'),
-            tipo: 'REGISTRO_WEB_PENDIENTE',
-            estado: 'PENDIENTE',
-            origenWeb: true,
-            idRegistroWebOriginal: registro.id,
-            datos: {
-                ...datosCompletos,
-                motivoPendiente: `Faltan: ${documentosFaltantes.join(', ')}`,
-                administrador: 'admin_web'
-            },
-            archivos: archivosCombinados,
-            observaciones: `Movido desde registro web a pendientes el ${new Date().toLocaleDateString('es-AR')} - Faltan: ${documentosFaltantes.join(', ')}`
-        };
-        registrosPendientes.push(registroPendiente);
-        await fs.writeFile(REGISTROS_PENDIENTES_PATH, JSON.stringify(registrosPendientes, null, 2));
-        // Actualizar estado del registro web original
-        registros[indiceRegistro] = {
-            ...registro,
-            estado: 'MOVIDO_A_PENDIENTES',
-            fechaMovimiento: new Date().toISOString(),
-            motivoPendiente: `Faltan: ${documentosFaltantes.join(', ')}`,
-            observaciones: `Movido a registros pendientes el ${new Date().toLocaleDateString('es-AR')} - Faltan: ${documentosFaltantes.join(', ')}`
-        };
-        await fs.writeFile(REGISTROS_WEB_PATH, JSON.stringify(registros, null, 2));
-        return res.status(200).json({
-            message: 'Registro web movido a pendientes por documentación incompleta',
-            registroWebActualizado: registros[indiceRegistro],
-            registroPendienteCreado: registroPendiente
-        });
-        // Si la documentación está completa, guardar en la base de datos
-        const pool = require('../db');
+
         try {
             // Insertar estudiante en la tabla 'estudiantes'
             const [result] = await pool.query(
@@ -403,30 +526,52 @@ router.post('/:id/procesar', upload.any(), async (req, res) => {
             );
             registros[indiceRegistro] = {
                 ...registro,
-                estado: 'PROCESADO',
+                estado: 'PROCESADO_Y_APROBADO',
                 fechaProcesado: new Date().toISOString(),
+                fechaActualizacion: new Date().toISOString(),
                 archivos: archivosCombinados,
                 datos: datosCompletos,
                 observaciones: `Procesado y guardado en BD el ${new Date().toLocaleDateString('es-AR')}`
             };
             await fs.writeFile(REGISTROS_WEB_PATH, JSON.stringify(registros, null, 2));
+            // Opcional: eliminar archivos originales en archivosDocWeb si se copiaron
+            try {
+                for (const destino of copiedFiles) {
+                    // determinar nombre
+                    const nombre = path.basename(destino);
+                    const origenWeb = path.join(__dirname, '..', 'archivosDocWeb', nombre);
+                    await fs.unlink(origenWeb).catch(() => {});
+                }
+            } catch (rmErr) {
+                console.warn('⚠️ No se pudieron eliminar archivos originales de archivosDocWeb tras procesar:', rmErr.message);
+            }
             return res.status(200).json({
                 message: 'Registro web procesado y guardado en la base de datos',
                 registroProcesado: registros[indiceRegistro],
                 insertId: result.insertId
             });
         } catch (err) {
+            // En caso de error al insertar, intentar rollback de archivos copiados
+            try {
+                for (const f of copiedFiles) {
+                    await fs.unlink(f).catch(() => {});
+                }
+            } catch (cleanupErr) {
+                console.warn('⚠️ Error limpiando archivos tras fallo de inserción (registro web):', cleanupErr.message);
+            }
             console.error('Error al guardar en la base de datos:', err);
             return res.status(500).json({
                 error: 'Error al guardar en la base de datos',
-                message: err.message
+                userMessage: 'No se pudo guardar el estudiante en la base de datos. Verifique los datos o contacte al equipo técnico.',
+                technical: err.message
             });
         }
         // Por ahora, solo marcamos como PROCESADO y respondemos
         registros[indiceRegistro] = {
             ...registro,
-            estado: 'PROCESADO',
+            estado: 'PROCESADO_Y_APROBADO',
             fechaProcesado: new Date().toISOString(),
+            fechaActualizacion: new Date().toISOString(),
             archivos: archivosCombinados,
             datos: datosCompletos,
             observaciones: `Procesado correctamente el ${new Date().toLocaleDateString('es-AR')}`
@@ -446,7 +591,7 @@ router.post('/:id/procesar', upload.any(), async (req, res) => {
 });
 
 // POST: Mover un registro web a pendientes (solo ADMIN, acción manual)
-// Permite mover un registro web a Registros_Pendientes.json y marcarlo como MOVIDO_A_PENDIENTES.
+    // Permite mover un registro web a Registros_Pendientes.json y marcarlo como PROCESADO_A_PENDIENTES.
 router.post('/:id/mover-pendiente', async (req, res) => {
     try {
         await ensureFileExists();
@@ -467,7 +612,7 @@ router.post('/:id/mover-pendiente', async (req, res) => {
         const registroWeb = registrosWeb[indiceRegistro];
         
         // Crear registro pendiente
-        const registroPendiente = {
+    const registroPendiente = {
             dni: registroWeb.datos.dni,
             timestamp: new Date().toISOString(),
             fechaRegistro: new Date().toLocaleDateString('es-AR'),
@@ -503,8 +648,9 @@ router.post('/:id/mover-pendiente', async (req, res) => {
         // Actualizar estado del registro web original
         registrosWeb[indiceRegistro] = {
             ...registroWeb,
-            estado: 'MOVIDO_A_PENDIENTES',
+            estado: 'PROCESADO_A_PENDIENTES',
             fechaMovimiento: new Date().toISOString(),
+            fechaActualizacion: new Date().toISOString(),
             motivoPendiente: motivoPendiente,
             observaciones: `Movido a registros pendientes el ${new Date().toLocaleDateString('es-AR')} - ${motivoPendiente}`
         };
@@ -523,7 +669,8 @@ router.post('/:id/mover-pendiente', async (req, res) => {
         console.error('Error al mover registro web a pendientes:', error);
         res.status(500).json({ 
             error: 'Error al mover el registro web a pendientes',
-            message: error.message 
+            userMessage: 'No se pudo mover el registro web a pendientes. Intente nuevamente o contacte al equipo técnico.',
+            technical: error.message
         });
     }
 });
@@ -538,9 +685,10 @@ router.get('/stats', async (req, res) => {
         const stats = {
             total: registros.length,
             pendientes: registros.filter(r => r.estado === 'PENDIENTE').length,
-            procesados: registros.filter(r => r.estado === 'PROCESADO' || r.estado === 'MOVIDO_A_PENDIENTES').length,
+            // Contamos como procesados tanto los registros aprobados como los que fueron procesados pero quedaron en pendientes
+            procesados: registros.filter(r => r.estado === 'PROCESADO_Y_APROBADO' || r.estado === 'PROCESADO' || r.estado === 'PROCESADO_A_PENDIENTES').length,
             anulados: registros.filter(r => r.estado === 'ANULADO').length,
-            movidosAPendientes: registros.filter(r => r.estado === 'MOVIDO_A_PENDIENTES').length,
+            movidosAPendientes: registros.filter(r => r.estado === 'PROCESADO_A_PENDIENTES').length,
             ultimoRegistro: registros.length > 0 ? registros[registros.length - 1].timestamp : null
         };
         
@@ -549,7 +697,8 @@ router.get('/stats', async (req, res) => {
         console.error('Error al obtener estadísticas:', error);
         res.status(500).json({ 
             error: 'Error al obtener estadísticas',
-            message: error.message 
+            userMessage: 'No se pudieron calcular las estadísticas. Intente nuevamente o contacte al equipo técnico.',
+            technical: error.message
         });
     }
 });

@@ -179,84 +179,60 @@ const ModalEditarRegistro = ({ registro, onClose, onGuardado, onEliminado }) => 
                 return preview && (preview.url || preview.file);
             });
 
-            const documentacionCompleta = documentosRequeridos.documentos.every(doc => 
-                archivosPresentes.includes(doc)
-            );
-
+            // El frontend ya no decide si está completa o no - eso lo decide el backend
             console.log('📋 Documentos requeridos:', documentosRequeridos.documentos);
             console.log('📎 Archivos presentes:', archivosPresentes);
-            console.log('✅ Documentación completa:', documentacionCompleta);
+            console.log('🔍 [DEBUG SUBMIT] previews:', Object.keys(previews));
+            console.log('🔍 [DEBUG SUBMIT] formValues.modalidad:', formValues.modalidad);
+            console.log('🔍 [DEBUG SUBMIT] formValues.planAnio:', formValues.planAnio);
+            console.log('🔍 [DEBUG SUBMIT] formValues.modulos:', formValues.modulos);
 
             formData.append('registroPendienteId', registro.dni);
-            formData.append('documentacionCompleta', documentacionCompleta);
             
             let resultado;
             
-            if (documentacionCompleta) {
-                // 1. Subir archivos nuevos (si hay) usando PUT
-                if (Object.keys(previews).length > 0) {
-                    // Subir archivos nuevos y mantener los existentes
-                    await registrosPendientesService.actualizarRegistroPendiente(registro.dni, formValues, previews);
-                }
-                // 2. Procesar registro (migrar y guardar en BD)
-                resultado = await registrosPendientesService.completarRegistro(formData);
+            console.log('🎯 FLUJO: Llamando SIEMPRE a completarRegistro (el backend decide si está completa)');
+            
+            // SIEMPRE llamar al endpoint /procesar - el backend decide el estado final
+            // 1. Subir archivos nuevos (si hay) usando PUT
+            if (Object.keys(previews).length > 0) {
+                console.log('📎 Subiendo archivos nuevos antes del procesamiento...');
+                await registrosPendientesService.actualizarRegistroPendiente(registro.dni, formValues, previews);
+            }
+            
+            // 2. Procesar registro (migrar y guardar en BD)
+            resultado = await registrosPendientesService.completarRegistro(formData);
 
                 console.log('✅ Respuesta de completar registro:', resultado);
 
-                // Verificar si la respuesta indica éxito
-                if (resultado && (resultado.success === true || resultado.message?.includes('exitoso') || resultado.id)) {
-                    showSuccess('✅ Registro enviado, procesando...');
-                    console.log('✅ Registro completado exitosamente');
-                    // Eliminar del archivo de pendientes SOLO si fue exitoso
-                    await registrosPendientesService.eliminarRegistroPendiente(registro.dni);
-                    onGuardado && onGuardado(registro, 'completado');
-                } else if (resultado && resultado.success === false) {
-                    showError(resultado.message || 'Error al completar el registro');
-                    throw new Error(resultado.message || 'Error al completar el registro');
+            // Verificar la respuesta del backend (puede ser PROCESADO o PENDIENTE)
+            if (resultado && (resultado.insertId || resultado.insertId === 0 || resultado.insertId === '0')) {
+                // El backend procesó el registro exitosamente
+                const mensaje = resultado.message || (resultado.documentacionCompleta 
+                    ? '✅ Registro procesado y aprobado - Documentación completa'
+                    : '⚠️ Registro procesado - Documentación básica completa, pero queda PENDIENTE');
+                    
+                if (resultado.documentacionCompleta) {
+                    showSuccess(mensaje);
+                    onGuardado && onGuardado(registro, 'completado', resultado);
                 } else {
-                    // No eliminar si la respuesta no es clara
-                    showError('❌ Error: No se pudo completar el registro. Verifique la respuesta del servidor.');
+                    showSuccess(mensaje);
+                    onGuardado && onGuardado(registro, 'pendiente', resultado);
                 }
+                
+                console.log('✅ Registro procesado exitosamente:', {
+                    insertId: resultado.insertId,
+                    estado: resultado.estado,
+                    documentacionCompleta: resultado.documentacionCompleta,
+                    motivoPendiente: resultado.motivoPendiente
+                });
+            } else if (resultado && resultado.success === false) {
+                showError(resultado.message || 'Error al completar el registro');
+                throw new Error(resultado.message || 'Error al completar el registro');
             } else {
-                // Actualizar en pendientes
-                console.log('📝 Documentación incompleta - Actualizando pendientes');
-                
-                // Preparar archivos para actualización (incluir tanto existentes como nuevos)
-                const archivosActualizados = {};
-                Object.keys(previews).forEach(tipoDoc => {
-                    const preview = previews[tipoDoc];
-                    if (preview) {
-                        if (preview.existente) {
-                            // Mantener ruta original para archivos existentes
-                            archivosActualizados[tipoDoc] = preview.rutaOriginal;
-                        } else if (preview.file) {
-                            // Para archivos nuevos, se procesarán en el backend
-                            archivosActualizados[tipoDoc] = `nuevo_${tipoDoc}`;
-                        }
-                    }
-                });
-                
-                resultado = await registrosPendientesService.actualizarRegistroPendiente(registro.dni, {
-                    datos: formValues,
-                    archivos: archivosActualizados,
-                    timestamp: new Date().toISOString(),
-                    tipo: 'DOCUMENTACION_INCOMPLETA'
-                });
-                
-                console.log('📝 Respuesta de actualización:', resultado);
-                
-                // Verificar si la respuesta indica éxito
-                if (resultado && (resultado.success === true || resultado.message?.includes('actualizado') || resultado.message?.includes('exitosamente'))) {
-                    showSuccess('📝 Cambios guardados - Faltan documentos por completar');
-                    onGuardado && onGuardado(registro, 'actualizado');
-                } else if (resultado && resultado.success === false) {
-                    throw new Error(resultado.message || 'Error al actualizar el registro');
-                } else {
-                    // Si no hay estructura de respuesta clara, considerar como éxito si no hay error
-                    console.log('⚠️ Respuesta sin estructura clara, considerando como éxito');
-                    showSuccess('📝 Cambios guardados - Faltan documentos por completar');
-                    onGuardado && onGuardado(registro, 'actualizado');
-                }
+                // Si no hay insertId ni success=false, tratar como error
+                showError('❌ Error: No se pudo completar el registro. Verifique la respuesta del servidor.');
+                console.warn('Respuesta inesperada de completarRegistro:', resultado);
             }
 
             onClose();

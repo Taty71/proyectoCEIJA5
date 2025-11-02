@@ -8,6 +8,7 @@ import { useAlerts } from '../hooks/useAlerts';
 import AlertaMens from './AlertaMens';
 import BotonCargando from './BotonCargando';
 import CloseButton from './CloseButton';
+import ModalDocumentacionExistente from './ModalDocumentacionExistente';
 
 import '../estilos/RegistrosPendientes.css';
 
@@ -24,7 +25,12 @@ const GestorRegistrosWeb = ({ onClose, onRegistroSeleccionado, isAdmin = false }
         closeModal
     } = useAlerts();
     const [registros, setRegistros] = useState([]);
+    // Mantener contadores en cliente calculados a partir del array `registros`
     const [stats, setStats] = useState({ total: 0, pendientes: 0, procesados: 0, anulados: 0 });
+
+    // Estado para modal de actualización de documentación
+    const [mostrarModalActualizacion, setMostrarModalActualizacion] = useState(false);
+    const [datosEstudianteExistente, setDatosEstudianteExistente] = useState(null);
 
     // Usar stats del backend para los contadores
     const contadoresVisuales = stats;
@@ -35,22 +41,92 @@ const GestorRegistrosWeb = ({ onClose, onRegistroSeleccionado, isAdmin = false }
     const [registroAEliminar, setRegistroAEliminar] = useState(null);
     const [eliminando, setEliminando] = useState(false);
 
+
+
     // Cargar registros web al montar el componente
     // Cargar registros web y estadísticas al montar y al volver del formulario
     useEffect(() => {
         const inicializar = async () => {
             await cargarRegistrosWeb();
-            await cargarEstadisticas();
+            
+            // Verificar si hay datos de estudiante existente en sessionStorage
+            const params = new URLSearchParams(location.search);
+            if (params.get('mostrarActualizacion') === 'true') {
+                const datosGuardados = sessionStorage.getItem('estudianteExistente');
+                if (datosGuardados) {
+                    try {
+                        const datos = JSON.parse(datosGuardados);
+                        setDatosEstudianteExistente(datos);
+                        setMostrarModalActualizacion(true);
+                        sessionStorage.removeItem('estudianteExistente');
+                        console.log('📋 Mostrando modal de actualización para estudiante existente');
+                    } catch (error) {
+                        console.error('Error al parsear datos de estudiante existente:', error);
+                    }
+                }
+            }
         };
         inicializar();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.key]);
 
+        // Escuchar actualizaciones provenientes del backend (cuando un registro web fue marcado PROCESADO)
+    useEffect(() => {
+        const handler = (e) => {
+            try {
+                const updated = e.detail;
+                if (!updated) return;
+                
+                console.log('🔔 Evento registroWeb:actualizado recibido:', updated);
+                
+                setRegistros(prev => {
+                    const idx = prev.findIndex(r => r.id === updated.id);
+                    let newList;
+                    
+                    if (idx !== -1) {
+                        // Actualizar el registro existente
+                        const procesado = ['PROCESADO_Y_APROBADO', 'PROCESADO_A_PENDIENTES', 'PROCESADO', 'APROBADO'].includes(updated.estado);
+                        newList = [...prev];
+                        newList[idx] = { ...updated, procesado };
+                        console.log('✅ Registro actualizado en memoria:', updated.datos?.dni, '→', updated.estado);
+                    } else {
+                        // Si no existe, agregarlo (caso raro)
+                        const procesado = ['PROCESADO_Y_APROBADO', 'PROCESADO_A_PENDIENTES', 'PROCESADO', 'APROBADO'].includes(updated.estado);
+                        newList = [...prev, { ...updated, procesado }];
+                        console.log('➕ Nuevo registro agregado:', updated.datos?.dni);
+                    }
+                    
+                    // Recalcular contadores inmediatamente
+                    const nuevosStats = calcularContadoresFromRegistros(newList);
+                    console.log('📊 Contadores actualizados:', nuevosStats);
+                    setStats(nuevosStats);
+                    
+                    return newList;
+                });
+            } catch (err) {
+                console.warn('⚠️ Error procesando evento registroWeb:actualizado', err.message);
+            }
+        };
+
+        window.addEventListener('registroWeb:actualizado', handler);
+        return () => window.removeEventListener('registroWeb:actualizado', handler);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const cargarRegistrosWeb = async () => {
         try {
             setLoading(true);
             const data = await serviceRegistrosWeb.obtenerRegistrosWeb();
-            setRegistros(data);
+            console.log('📥 Registros web cargados desde backend:', data?.length || 0);
+            // Añadir flag procesado derivado del estado para uso local
+            const enriched = (data || []).map(r => {
+                const procesado = ['PROCESADO_Y_APROBADO', 'PROCESADO_A_PENDIENTES', 'PROCESADO', 'APROBADO', 'aprobado'].includes(r.estado);
+                return { ...r, procesado };
+            });
+            setRegistros(enriched);
+            const nuevosStats = calcularContadoresFromRegistros(enriched);
+            console.log('📊 Contadores calculados:', nuevosStats);
+            setStats(nuevosStats);
         } catch (error) {
             console.error('Error al cargar registros web:', error);
             showError('Error al cargar los registros web: ' + error.message);
@@ -59,29 +135,45 @@ const GestorRegistrosWeb = ({ onClose, onRegistroSeleccionado, isAdmin = false }
         }
     };
 
-    const cargarEstadisticas = async () => {
-        try {
-            const estadisticas = await serviceRegistrosWeb.obtenerEstadisticas();
-            setStats(estadisticas);
-        } catch (error) {
-            console.error('Error al cargar estadísticas:', error);
-        }
+    
+
+    // Calcula los contadores a partir del array de registros en memoria
+    const calcularContadoresFromRegistros = (list = registros) => {
+        const total = (list || []).length;
+        // PENDIENTE: solo los que están en estado PENDIENTE (nunca procesados)
+        const pendientes = (list || []).filter(r => 
+            r.estado === 'PENDIENTE' || r.estado === 'pendiente'
+        ).length;
+        // PROCESADOS: incluye PROCESADO_Y_APROBADO y PROCESADO_A_PENDIENTES
+        const procesados = (list || []).filter(r => 
+            r.estado === 'PROCESADO_Y_APROBADO' || 
+            r.estado === 'PROCESADO_A_PENDIENTES' ||
+            r.estado === 'PROCESADO' ||
+            r.estado === 'APROBADO' ||
+            r.estado === 'aprobado' ||
+            r.estado === 'procesado_y_aprobado' ||
+            r.estado === 'procesado_a_pendientes'
+        ).length;
+        const anulados = (list || []).filter(r => 
+            r.estado === 'ANULADO' || r.estado === 'anulado'
+        ).length;
+        return { total, pendientes, procesados, anulados };
     };
+    
     // Estado visual amigable para mostrar en la interfaz
-function getEstadoVisual(registro) {
-    // Mapear los valores válidos de estado a los visuales
-    if (registro.estado === 'APROBADO') return 'PROCESADO';
-    if (registro.estado === 'ANULADO') return 'ANULADO';
-    if (registro.estado === 'PENDIENTE') return 'PENDIENTE';
-    if (registro.estado === 'MOVIDO_A_PENDIENTES') return 'PROCESADO A PENDIENTES'; // <--- AÑADIDO
-    // Si por alguna razón el backend envía minúsculas
-    if (registro.estado === 'aprobado') return 'PROCESADO';
-    if (registro.estado === 'anulado') return 'ANULADO';
-    if (registro.estado === 'pendiente') return 'PENDIENTE';
-    if (registro.estado === 'movido_a_pendientes') return 'PROCESADO A PENDIENTES'; // <--- AÑADIDO
-    // Cualquier otro valor, mostrar en mayúsculas
-    return (registro.estado || '').toUpperCase();
-}
+    function getEstadoVisual(registro) {
+        // Mapear los valores válidos de estado a los visuales
+        const estado = (registro.estado || '').toUpperCase();
+        
+        if (estado === 'PROCESADO_Y_APROBADO') return 'PROCESADO Y APROBADO';
+        if (estado === 'PROCESADO_A_PENDIENTES') return 'PROCESADO A PENDIENTES';
+        if (estado === 'APROBADO' || estado === 'PROCESADO') return 'PROCESADO';
+        if (estado === 'ANULADO') return 'ANULADO';
+        if (estado === 'PENDIENTE') return 'PENDIENTE';
+        
+        // Cualquier otro valor, mostrar en mayúsculas
+        return estado || 'DESCONOCIDO';
+    }
     const manejarProcesarRegistro = async (registro) => {
         // Solo navegar al formulario de edición, NO procesar automáticamente
         if (onRegistroSeleccionado) {
@@ -114,8 +206,7 @@ function getEstadoVisual(registro) {
         try {
             await serviceRegistrosWeb.eliminarRegistroWeb(registroAEliminar.id);
             showSuccess(`🗑️ Registro de ${registroAEliminar.datos.apellido}, ${registroAEliminar.datos.nombre} eliminado`);
-            cargarRegistrosWeb();
-            await cargarEstadisticas();
+            await cargarRegistrosWeb();
         } catch (error) {
             console.error('Error al eliminar registro:', error);
             showError('❌ Error al eliminar registro: ' + error.message);
@@ -246,7 +337,6 @@ function getEstadoVisual(registro) {
                             className="refresh-button"
                             onClick={() => {
                                 cargarRegistrosWeb();
-                                // cargarEstadisticas();
                             }}
                         >
                             🔄 Actualizar
@@ -357,31 +447,40 @@ function getEstadoVisual(registro) {
                                                 <button
                                                     className="btn-procesar"
                                                     onClick={() => {
-                                                        if (registro.estado === 'MOVIDO_A_PENDIENTES') {
-                                                            showWarning('⚠️ REGISTRO PROCESADO A PENDIENTES');
+                                                        if (registro.estado === 'PROCESADO_A_PENDIENTES') {
+                                                            showWarning('⚠️ Este registro ya fue procesado y movido a Registros Pendientes por falta de documentación.');
+                                                            return;
+                                                        }
+                                                        if (registro.estado === 'PROCESADO_Y_APROBADO') {
+                                                            showSuccess(`✅ Este estudiante ya está registrado en la base de datos.\n\nNombre: ${registro.datos.nombre} ${registro.datos.apellido}\nDNI: ${registro.datos.dni}`);
                                                             return;
                                                         }
                                                         manejarProcesarRegistro(registro);
                                                     }}
-                                                    disabled={registro.estado === 'MOVIDO_A_PENDIENTES'}
+                                                    disabled={registro.estado === 'PROCESADO_A_PENDIENTES' || registro.estado === 'PROCESADO_Y_APROBADO'}
                                                     title={
                                                         registro.estado === 'PENDIENTE' 
                                                         ? 'Completar inscripción del registro web'
-                                                        : registro.estado === 'PROCESADO'
-                                                        ? 'Revisar y completar inscripción presencial'
-                                                        : registro.estado === 'MOVIDO_A_PENDIENTES'
-                                                        ? 'REGISTRO PROCESADO A PENDIENTES'
+                                                        : registro.estado === 'PROCESADO_Y_APROBADO'
+                                                        ? 'Este estudiante ya está registrado en la base de datos'
+                                                        : registro.estado === 'PROCESADO_A_PENDIENTES'
+                                                        ? 'Registro verificado pero faltan documentos (movido a pendientes)'
                                                         : 'Gestionar registro web'
                                                     }
+                                                    style={{
+                                                        opacity: (registro.estado === 'PROCESADO_A_PENDIENTES' || registro.estado === 'PROCESADO_Y_APROBADO') ? 0.6 : 1,
+                                                        cursor: (registro.estado === 'PROCESADO_A_PENDIENTES' || registro.estado === 'PROCESADO_Y_APROBADO') ? 'not-allowed' : 'pointer'
+                                                    }}
                                                 >
                                                     {registro.estado === 'PENDIENTE' ? (
                                                         '✅ Completar Inscripción'
-                                                    ) : registro.estado === 'PROCESADO' ? (
-                                                        '🔍 Revisar & Completar'
+                                                    ) : registro.estado === 'PROCESADO_Y_APROBADO' ? (
+                                                        '✅ Procesado y Aprobado'
+                                                    ) : registro.estado === 'PROCESADO_A_PENDIENTES' ? (
+                                                        // Mostrar texto claro cuando el admin verificó pero faltan documentos
+                                                        '⏳ Pendiente (faltan documentos)'
                                                     ) : registro.estado === 'ANULADO' ? (
-                                                        '🔄 Reactivar Registro'
-                                                    ) : registro.estado === 'MOVIDO_A_PENDIENTES' ? (
-                                                        '🛑 Procesado a Pendientes'
+                                                        '� Reactivar Registro'
                                                     ) : (
                                                         '📝 Gestionar Registro'
                                                     )}
@@ -448,6 +547,25 @@ function getEstadoVisual(registro) {
                                 </div>
                             </div>
                         </div>
+                    )}
+
+                    {/* Modal de actualización de documentación */}
+                    {mostrarModalActualizacion && datosEstudianteExistente && (
+                        <ModalDocumentacionExistente
+                            estudiante={datosEstudianteExistente.estudiante}
+                            inscripciones={datosEstudianteExistente.inscripciones}
+                            archivosNuevos={datosEstudianteExistente.archivosNuevos}
+                            onClose={() => {
+                                setMostrarModalActualizacion(false);
+                                setDatosEstudianteExistente(null);
+                                // Recargar registros para reflejar cambios
+                                cargarRegistrosWeb();
+                            }}
+                            onActualizar={(resultado) => {
+                                console.log('✅ Documentación actualizada:', resultado);
+                                showSuccess(`Documentación actualizada: ${resultado.cantidadArchivos} archivo(s)`);
+                            }}
+                        />
                     )}
                 </div>
             </div>

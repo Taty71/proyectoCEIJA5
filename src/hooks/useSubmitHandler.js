@@ -424,6 +424,22 @@ export const useSubmitHandler = (files, previews, resetArchivos, buildDetalleDoc
                 // Documentación completa: procesar en BD
                 console.log('✅ Documentación completa - Procesando registro web en BD');
                 const resultado = await serviceRegistrosWeb.procesarRegistroWeb(idRegistroWeb, datosCompletos, documentos);
+                
+                // Verificar si el estudiante ya existe
+                if (resultado.yaExiste) {
+                    console.log('ℹ️ Estudiante ya registrado - Mostrando modal de actualización');
+                    // Guardar datos para el modal
+                    sessionStorage.setItem('estudianteExistente', JSON.stringify({
+                        estudiante: resultado.estudianteExistente,
+                        inscripciones: resultado.inscripciones,
+                        archivosNuevos: resultado.archivosNuevosRegistroWeb
+                    }));
+                    
+                    // Redirigir al dashboard con flag para mostrar modal
+                    window.location.href = '/dashboard?tab=registros-web&mostrarActualizacion=true';
+                    return;
+                }
+                
                 showSuccess('Registro web procesado y guardado en la base de datos exitosamente');
                 console.log('✅ Registro procesado en BD:', resultado);
             } else {

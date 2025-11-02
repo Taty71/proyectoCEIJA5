@@ -111,6 +111,15 @@ const registrosPendientesService = {
             console.log('✅ Procesando registro pendiente y migrando a BD...');
             const response = await axiosInstance.post(`/registros-pendientes/${dni}/procesar`);
             const resultado = response.data;
+            // Si el backend devolvió la versión actualizada del Registro Web, emitir un evento global
+            try {
+                if (resultado && resultado.registroWebActualizado) {
+                    window.dispatchEvent(new CustomEvent('registroWeb:actualizado', { detail: resultado.registroWebActualizado }));
+                    console.log('🔔 Evento emitido: registroWeb:actualizado', resultado.registroWebActualizado.id || resultado.registroWebActualizado.datos?.dni);
+                }
+            } catch (evErr) {
+                console.warn('⚠️ No se pudo emitir evento registroWeb:actualizado', evErr.message);
+            }
             console.log('✅ Registro pendiente procesado y guardado en BD:', resultado);
             return resultado;
         } catch (error) {

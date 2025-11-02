@@ -21,10 +21,32 @@ const VerificadorRegistroPendiente = ({ dni, onRegistroCompleto, onSinRegistro }
         setLoading(false);
         return;
       }
+      // Only attempt lookup for full 8-digit DNI (avoid calling backend on each keystroke)
+      const dniStr = String(dni).trim();
+      if (dniStr.length !== 8 || !/^[0-9]{8}$/.test(dniStr)) {
+        setLoading(false);
+        return;
+      }
+      // Avoid fetching repeatedly for the same DNI
+      if (verificarEstadoRegistro.lastFetchedDni && verificarEstadoRegistro.lastFetchedDni === dniStr) {
+        setLoading(false);
+        return;
+      }
       // Buscar en el backend si existe el registro pendiente
       const resp = await fetch(`/api/registros-pendientes/${dni}`);
       if (resp.ok) {
         const registro = await resp.json();
+        // Cache last fetched dni to avoid repeated calls
+        verificarEstadoRegistro.lastFetchedDni = dniStr;
+        // If backend reports that the DNI is already registered in DB, do not present it as pending
+        if (registro.alreadyInDb) {
+          setRegistroPendiente(null);
+          setInfoVencimiento(null);
+          setAlert({ text: `El DNI ${dniStr} ya está registrado en el sistema (idEstudiante=${registro.idEstudiante}). No se puede procesar como pendiente.`, variant: 'warning' });
+          onSinRegistro && onSinRegistro();
+          setLoading(false);
+          return;
+        }
         if (registro && registro.dni) {
           setRegistroPendiente(registro);
           const info = obtenerInfoVencimiento(registro);
@@ -60,19 +82,22 @@ const VerificadorRegistroPendiente = ({ dni, onRegistroCompleto, onSinRegistro }
   const handleCompletarRegistro = async () => {
     try {
       setCompletandoRegistro(true);
-      
-      // Eliminar el registro pendiente en el backend
-      const resp = await fetch(`/api/registros-pendientes/${dni}`, { method: 'DELETE' });
+      // Llamar al endpoint de procesar que migra archivos y guarda en BD
+      const resp = await fetch(`/api/registros-pendientes/${dni}/procesar`, { method: 'POST' });
       if (resp.ok) {
+        const resultado = await resp.json();
         setAlert({ 
-          text: '✅ Continuando con el registro completo...', 
+          text: '✅ Registro procesado y guardado en la base de datos', 
           variant: 'success' 
         });
+        // Pasar al padre la respuesta del servidor para que refresque listas y muestre el alumno creado
         setTimeout(() => {
-          onRegistroCompleto && onRegistroCompleto(registroPendiente);
-        }, 1500);
+          // Firma: onRegistroCompleto(registroPendiente, resultado)
+          onRegistroCompleto && onRegistroCompleto(registroPendiente, resultado);
+        }, 800);
       } else {
-        throw new Error('No se pudo eliminar el registro pendiente');
+        const text = await resp.text();
+        throw new Error(`Error al procesar registro: ${resp.status} ${resp.statusText} - ${text}`);
       }
       
     } catch (error) {

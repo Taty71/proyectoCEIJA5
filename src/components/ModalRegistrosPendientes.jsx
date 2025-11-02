@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { obtenerRegistrosSinDocumentacion, obtenerDocumentosRequeridos } from '../utils/registroSinDocumentacion';
 import registrosPendientesService from '../services/serviceRegistrosPendientes';
+import { enriquecerRegistroProcesado } from '../services/serviceVerificarEstudiante';
 import { useAlerts } from '../hooks/useAlerts';
 import jsPDF from 'jspdf';
 import AlertaMens from './AlertaMens';
@@ -28,7 +29,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
     const [limpiandoDuplicados, setLimpiandoDuplicados] = useState(false);
     const [registroEditando, setRegistroEditando] = useState(null);
     const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);
-    const [estudiantesRegistrados, setEstudiantesRegistrados] = useState(new Set());
+    // Estado eliminado: estudiantesRegistrados (no es necesario, usamos estudianteEnBD del registro enriquecido)
 
     // Funciones para gestión de duplicados adaptadas para datos actuales
     const verificarEstadoDuplicados = useCallback(async () => {
@@ -107,13 +108,16 @@ const ModalRegistrosPendientes = ({ onClose }) => {
             const registrosActualizados = await registrosPendientesService.obtenerRegistrosPendientes();
             console.log('📋 Registros actualizados:', registrosActualizados);
 
-            const registrosAnteriores = registros.length;
-            const registrosNuevos = registrosActualizados.length;
+            // Enriquecer registros procesados con documentación de BD
+            console.log('🔍 Enriqueciendo registros procesados con documentación de BD...');
+            const registrosEnriquecidos = await Promise.all(
+                registrosActualizados.map(registro => enriquecerRegistroProcesado(registro))
+            );
 
-            setRegistros(registrosActualizados);
-            
-            // Verificar estado de registro de estudiantes después de actualizar la lista
-            await verificarTodosLosEstudiantes(registrosActualizados);
+            const registrosAnteriores = registros.length;
+            const registrosNuevos = registrosEnriquecidos.length;
+
+            setRegistros(registrosEnriquecidos);
 
             if (registrosNuevos < registrosAnteriores) {
                 const diferencia = registrosAnteriores - registrosNuevos;
@@ -161,52 +165,8 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         }
     };
 
-    // Función para verificar si un estudiante ya está registrado en la base de datos o en pendientes
-    // Ahora recibe la lista de registros como argumento para evitar dependencias cíclicas
-    const verificarEstudianteRegistrado = useCallback(async (dni, registrosList) => {
-        // Verificar en la base de datos principal
-        let registradoEnBD = false;
-        try {
-            const response = await fetch(`/api/estudiantes/verificar/${dni}`);
-            if (response.ok) {
-                const data = await response.json();
-                registradoEnBD = data.registrado;
-            }
-        } catch {
-            registradoEnBD = false;
-        }
-
-        // Verificar en registros pendientes (en la lista recibida)
-        const registradoEnPendientes = registrosList.some(r => (r.datos?.dni || r.dni) === dni);
-
-        return { registradoEnBD, registradoEnPendientes };
-    }, []);
-
-    // Función para verificar todos los estudiantes
-    const verificarTodosLosEstudiantes = useCallback(async (registrosList) => {
-        console.log('🔄 Verificando', registrosList.length, 'estudiantes');
-        const estudiantesSet = new Set();
-        const pendientesSet = new Set();
-        for (const registro of registrosList) {
-            if (registro.datos?.dni) {
-                const { registradoEnBD, registradoEnPendientes } = await verificarEstudianteRegistrado(registro.datos.dni, registrosList);
-                if (registradoEnBD) {
-                    estudiantesSet.add(registro.datos.dni);
-                }
-                if (registradoEnPendientes) {
-                    pendientesSet.add(registro.datos.dni);
-                }
-            }
-        }
-        if (estudiantesSet.size > 0) {
-            console.log('✅ Estudiantes ya registrados en BD:', Array.from(estudiantesSet));
-        }
-        if (pendientesSet.size > 0) {
-            console.log('🕒 Estudiantes en Registros_Pendientes:', Array.from(pendientesSet));
-        }
-        setEstudiantesRegistrados(estudiantesSet);
-        // Puedes guardar pendientesSet en otro estado si lo necesitas en la UI
-    }, [verificarEstudianteRegistrado]);
+    // Funciones eliminadas: verificarEstudianteRegistrado y verificarTodosLosEstudiantes
+    // Ya no son necesarias porque usamos el enriquecimiento con estudianteEnBD directamente
 
     // Cargar registros desde el archivo JSON del backend
     useEffect(() => {
@@ -218,14 +178,19 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                 const registrosBackend = await registrosPendientesService.obtenerRegistrosPendientes();
                 console.log('📋 Registros desde backend:', registrosBackend);
 
-                setRegistros(registrosBackend);
-                // Verificar cuáles estudiantes ya están registrados
-                await verificarTodosLosEstudiantes(registrosBackend);
+                // Enriquecer registros procesados con documentación de BD
+                console.log('🔍 Enriqueciendo registros procesados con documentación de BD...');
+                const registrosEnriquecidos = await Promise.all(
+                    registrosBackend.map(registro => enriquecerRegistroProcesado(registro))
+                );
+                console.log('✅ Registros enriquecidos:', registrosEnriquecidos.filter(r => r.estudianteEnBD).length, 'con datos de BD');
 
-                if (registrosBackend.length === 0) {
+                setRegistros(registrosEnriquecidos);
+
+                if (registrosEnriquecidos.length === 0) {
                     setMensajeEmail('ℹ️ No hay registros pendientes en este momento. ¡Excelente trabajo!');
                 } else {
-                    setMensajeEmail(`📋 Cargados ${registrosBackend.length} registro(s) pendiente(s) de documentación`);
+                    setMensajeEmail(`📋 Cargados ${registrosEnriquecidos.length} registro(s) pendiente(s) de documentación`);
                 }
                 setTimeout(() => setMensajeEmail(''), 3000);
 
@@ -247,7 +212,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         }, 30000);
 
         return () => clearInterval(intervalo);
-    }, [verificarTodosLosEstudiantes]); // useEffect depende de verificarTodosLosEstudiantes para cumplir con eslint
+    }, []); // useEffect solo se ejecuta al montar el componente
 
     // Función para obtener información del vencimiento
     const obtenerInfoVencimiento = (registro) => {
@@ -319,23 +284,50 @@ const ModalRegistrosPendientes = ({ onClose }) => {
     };
 
     // Función para manejar guardado desde el modal
-    const handleRegistroGuardado = async (registro, tipoOperacion) => {
-        console.log(`✅ Registro ${tipoOperacion}:`, registro.dni);
-        
+    // Ahora acepta un tercer parámetro 'resultado' que viene del backend
+    // El backend puede devolver yaExistia=true si el DNI ya estaba registrado
+    const handleRegistroGuardado = async (registro, tipoOperacion, resultado = null) => {
+        console.log(`✅ Registro ${tipoOperacion}:`, registro?.dni, 'resultado:', resultado);
 
-        if (tipoOperacion === 'completado') {
-            const nombreCompleto = `${registro.datos?.nombre || registro.nombre} ${registro.datos?.apellido || registro.apellido}`;
-            showSuccess(`🎉 ${nombreCompleto} - Estudiante registrado y aprobado.`);
-            // Eliminar automáticamente de la lista local
-            setRegistros(prevRegistros => prevRegistros.filter(r => r.dni !== registro.dni));
-        } else {
-            await recargarRegistros(false);
+        try {
+            if (tipoOperacion === 'completado') {
+                const nombreCompleto = `${registro.datos?.nombre || registro.nombre} ${registro.datos?.apellido || registro.apellido}`.trim();
+                
+                // Mensaje diferente si fue actualización vs inserción
+                if (resultado?.yaExistia) {
+                    showSuccess(`📝 ${nombreCompleto} - Documentación actualizada en registro existente.`);
+                } else {
+                    showSuccess(`🎉 ${nombreCompleto} - Estudiante registrado y aprobado.`);
+                }
+
+                // Eliminar automáticamente de la lista local
+                setRegistros(prevRegistros => prevRegistros.filter(r => r.dni !== registro.dni));
+
+                // Refrescar listas desde el servidor para sincronizar Registros Pendientes y Registros Web
+                await recargarRegistros(false);
+
+                // Si el backend devolvió información del alumno creado/actualizado, mostrar información adicional
+                if (resultado && (resultado.insertId || resultado.insertId === 0)) {
+                    // Mostrar información adicional sin ser intrusivo
+                    if (resultado.archivos) {
+                        showInfo(`ID creado: ${resultado.insertId} — Archivos adjuntos migrados: ${Object.keys(resultado.archivos).length}`);
+                    } else {
+                        showInfo(`ID creado: ${resultado.insertId}`);
+                    }
+                }
+            } else {
+                // Para actualizaciones u otros casos, recargar la lista
+                await recargarRegistros(false);
+            }
+        } catch (error) {
+            console.error('Error en handleRegistroGuardado al refrescar listas:', error);
+            showError(`Error al actualizar listas: ${error.message}`);
+        } finally {
+            // Cerrar modal después de un pequeño delay para que se vea el mensaje
+            setTimeout(() => {
+                cerrarModalEdicion();
+            }, 500);
         }
-        
-        // Cerrar modal después de un pequeño delay para que se vea el mensaje
-        setTimeout(() => {
-            cerrarModalEdicion();
-        }, 500);
     };
 
     // Función para manejar eliminación desde el modal
@@ -563,6 +555,33 @@ const ModalRegistrosPendientes = ({ onClose }) => {
 
     // Función utilitaria para obtener estado de documentación
     const obtenerEstadoDocumentacion = (registro) => {
+        // Si el registro tiene documentación de BD (fue procesado), usar esa
+        if (registro.estudianteEnBD && registro.documentacionBD && registro.documentacionBD.length > 0) {
+            console.log('📊 Usando documentación de BD para registro procesado:', registro.dni);
+            
+            const documentosEntregados = registro.documentacionBD.filter(
+                doc => doc.estadoDocumentacion === 'Entregado'
+            );
+            
+            const documentosFaltantes = registro.documentacionBD.filter(
+                doc => doc.estadoDocumentacion === 'Faltante'
+            );
+
+            return {
+                subidos: documentosEntregados.map(doc => 
+                    mapeoDocumentos[doc.descripcionDocumentacion] || doc.descripcionDocumentacion
+                ),
+                faltantes: documentosFaltantes.map(doc => 
+                    mapeoDocumentos[doc.descripcionDocumentacion] || doc.descripcionDocumentacion
+                ),
+                totalSubidos: documentosEntregados.length,
+                totalRequeridos: registro.documentacionBD.length,
+                porcentajeCompletado: Math.round((documentosEntregados.length / registro.documentacionBD.length) * 100),
+                desdeBD: true
+            };
+        }
+
+        // Lógica original para registros pendientes normales
         const modalidad = registro.datos?.modalidad || registro.modalidad || '';
         const planAnio = registro.datos?.planAnio || registro.planAnio || '';
         const modulos = registro.datos?.modulos || registro.modulos || '';
@@ -627,7 +646,8 @@ const ModalRegistrosPendientes = ({ onClose }) => {
             totalSubidos: documentosValidosSubidos.length,
             totalRequeridos: totalRequeridos,
             documentoUsado: documentoUsado,
-            porcentajeCompletado: Math.round((documentosValidosSubidos.length / totalRequeridos) * 100)
+            porcentajeCompletado: Math.round((documentosValidosSubidos.length / totalRequeridos) * 100),
+            desdeBD: false
         };
     };
 
@@ -879,7 +899,6 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                         <ListaRegistrosPendientes
                             registros={registros}
                             cargandoRegistros={cargandoRegistros}
-                            estudiantesRegistrados={estudiantesRegistrados}
                             mapeoDocumentos={{
                                 'cuil': 'CUIL',
                                 'dni': 'DNI',

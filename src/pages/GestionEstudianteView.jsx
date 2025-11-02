@@ -10,6 +10,9 @@ const GestionEstudianteView = ({
     handleChange,
     accion,
     handleSubmit,
+    submitForm,
+    validateForm,
+    submitHandler,
     setFieldValue,
     values,
     isAdmin,
@@ -31,6 +34,9 @@ const GestionEstudianteView = ({
                 handleChange={handleChange}
                 accion={accion}
                 handleSubmit={handleSubmit}
+                submitForm={submitForm}
+                validateForm={validateForm}
+                submitHandler={submitHandler}
                 setFieldValue={setFieldValue}
                 values={values}
                 isAdmin={isAdmin}
@@ -56,6 +62,9 @@ GestionEstudianteView.propTypes = {
     handleChange: PropTypes.func.isRequired,
     accion: PropTypes.string.isRequired,
     handleSubmit: PropTypes.func.isRequired,
+    submitForm: PropTypes.func,
+    validateForm: PropTypes.func,
+    submitHandler: PropTypes.func,
     setFieldValue: PropTypes.func.isRequired,
     values: PropTypes.object.isRequired,
     isAdmin: PropTypes.bool.isRequired,

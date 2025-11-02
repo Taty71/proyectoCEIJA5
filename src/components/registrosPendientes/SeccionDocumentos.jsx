@@ -3,6 +3,21 @@ import PropTypes from 'prop-types';
 const SeccionDocumentos = ({ estadoDoc, mapeoDocumentos }) => {
     return (
         <div className="documentos-container">
+            {/* Indicador de que los datos vienen de la BD */}
+            {estadoDoc.desdeBD && (
+                <div className="info-desde-bd" style={{
+                    backgroundColor: '#e3f2fd',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    marginBottom: '10px',
+                    fontSize: '0.9em',
+                    color: '#1976d2',
+                    border: '1px solid #90caf9'
+                }}>
+                    ℹ️ Documentación guardada en base de datos (archivosDocumento)
+                </div>
+            )}
+
             {/* Documentos subidos */}
             {estadoDoc.subidos.length > 0 && (
                 <div className="seccion-documentos documentos-subidos">

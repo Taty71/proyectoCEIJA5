@@ -10,31 +10,42 @@ import { verificarRegistroPendiente } from '../utils/registroSinDocumentacion';
  * @param {string} completarRegistroWeb - ID del registro web a completar
  */
 export const useInitialValues = (modalidad, completarRegistro, datosRegistroWeb, datosRegistroPendiente, completarRegistroWeb) => {
-    // Buscar datos en sessionStorage primero (desde modal "Completar")
+    // Buscar datos en sessionStorage SOLO si estamos completando un registro
     let datosSessionStorage = null;
-    try {
-        // Priorizar datos de registro web si están disponibles
-        const datosWebString = sessionStorage.getItem('datosRegistroWeb');
-        const datosPendienteString = sessionStorage.getItem('datosRegistroPendiente');
-        
-        if (datosWebString) {
-            datosSessionStorage = JSON.parse(datosWebString);
-            console.log('📋 Datos de registro web encontrados en sessionStorage:', datosSessionStorage);
-        } else if (datosPendienteString) {
-            datosSessionStorage = JSON.parse(datosPendienteString);
-            console.log('📋 Datos de registro pendiente encontrados en sessionStorage:', datosSessionStorage);
+    const esCompletarRegistro = !!(completarRegistro || completarRegistroWeb || datosRegistroPendiente || datosRegistroWeb);
+    
+    if (esCompletarRegistro) {
+        try {
+            // Priorizar datos de registro web si están disponibles
+            const datosWebString = sessionStorage.getItem('datosRegistroWeb');
+            const datosPendienteString = sessionStorage.getItem('datosRegistroPendiente');
+            
+            if (datosWebString) {
+                datosSessionStorage = JSON.parse(datosWebString);
+                console.log('📋 Datos de registro web encontrados en sessionStorage:', datosSessionStorage);
+            } else if (datosPendienteString) {
+                datosSessionStorage = JSON.parse(datosPendienteString);
+                console.log('📋 Datos de registro pendiente encontrados en sessionStorage:', datosSessionStorage);
+            }
+            
+            // NO eliminar sessionStorage aquí para permitir múltiples renderizaciones
+            // Los datos se eliminarán cuando se complete el registro o se cierre la página
+        } catch (error) {
+            console.error('Error al parsear datos de sessionStorage:', error);
         }
-        
-        // NO eliminar sessionStorage aquí para permitir múltiples renderizaciones
-        // Los datos se eliminarán cuando se complete el registro o se cierre la página
-    } catch (error) {
-        console.error('Error al parsear datos de sessionStorage:', error);
+    } else {
+        // Si NO estamos completando registro, LIMPIAR sessionStorage
+        console.log('🧹 Limpiando sessionStorage para nuevo registro');
+        sessionStorage.removeItem('datosRegistroWeb');
+        sessionStorage.removeItem('datosRegistroPendiente');
     }
     
     // Determinar qué datos usar - priorizar URL > sessionStorage > localStorage
-    const registroPendiente = datosRegistroPendiente?.datos || datosRegistroWeb?.datos || datosSessionStorage || 
+    const registroPendiente = esCompletarRegistro ? (
+        datosRegistroPendiente?.datos || datosRegistroWeb?.datos || datosSessionStorage || 
         (completarRegistro ? verificarRegistroPendiente(completarRegistro) : null) ||
-        (completarRegistroWeb ? null : null); // Para registro web, los datos vienen de sessionStorage
+        (completarRegistroWeb ? null : null) // Para registro web, los datos vienen de sessionStorage
+    ) : null;
 
     return useMemo(() => {
         const baseValues = {

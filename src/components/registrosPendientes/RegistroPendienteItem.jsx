@@ -7,7 +7,6 @@ import { obtenerDocumentosRequeridos } from '../../utils/registroSinDocumentacio
 const RegistroPendienteItem = ({ 
     registro, 
     index,
-    estaRegistrado,
     mapeoDocumentos,
     enviandoEmail,
     onCompletar,
@@ -24,6 +23,29 @@ const RegistroPendienteItem = ({
     
     // Memoizar el estado de documentación para evitar cálculos innecesarios
     const estadoDoc = useMemo(() => {
+        // Si el registro tiene documentación de BD (fue procesado), usar esa
+        if (registro.estudianteEnBD && registro.documentacionBD && registro.documentacionBD.length > 0) {
+            console.log('📊 [RegistroPendienteItem] Usando documentación de BD para registro procesado:', registro.dni);
+            
+            const documentosEntregados = registro.documentacionBD.filter(
+                doc => doc.estadoDocumentacion === 'Entregado'
+            );
+            
+            const documentosFaltantes = registro.documentacionBD.filter(
+                doc => doc.estadoDocumentacion === 'Faltante'
+            );
+
+            return {
+                subidos: documentosEntregados.map(doc => doc.descripcionDocumentacion),
+                faltantes: documentosFaltantes.map(doc => doc.descripcionDocumentacion),
+                totalSubidos: documentosEntregados.length,
+                totalRequeridos: registro.documentacionBD.length,
+                porcentajeCompletado: Math.round((documentosEntregados.length / registro.documentacionBD.length) * 100),
+                desdeBD: true
+            };
+        }
+
+        // Lógica original para registros pendientes normales
         const modalidad = registro.datos?.modalidad || registro.modalidad || '';
         const planAnio = registro.datos?.planAnio || registro.planAnio || '';
         const modulos = registro.datos?.modulos || registro.modulos || '';
@@ -81,14 +103,22 @@ const RegistroPendienteItem = ({
             totalRequeridos: totalRequeridos,
             modalidad: modalidad,
             plan: planAnio || modulos,
-            documentosAlternativos: documentosAlternativos
+            documentosAlternativos: documentosAlternativos,
+            porcentajeCompletado: Math.round((documentosValidosSubidos.length / totalRequeridos) * 100),
+            desdeBD: false
         };
-    }, [registro.datos, registro.modalidad, registro.planAnio, registro.modulos, registro.documentosSubidos, registro.archivos]);
+    }, [registro.datos, registro.modalidad, registro.planAnio, registro.modulos, registro.documentosSubidos, registro.archivos, registro.estudianteEnBD, registro.documentacionBD, registro.dni]);
     
 
-    // Mostrar cartel de procesado si el estado es PROCESADO
-    const esProcesado = registro.estado === 'PROCESADO' || registro.estado === 'APROBADO_Y_PROCESADO';
-    const mostrarBadgeAprobado = !!estaRegistrado || esProcesado;
+    // Detectar si es un registro procesado y aprobado basándose SOLO en el estado del JSON
+    const estadosProcesados = [
+        'PROCESADO',
+        'PROCESADO_Y_APROBADO',
+        'REGISTRO PROCESADO Y APROBADO',
+        'APROBADO_Y_PROCESADO'
+    ];
+    const esProcesado = estadosProcesados.includes(registro.estado);
+    const mostrarBadgeAprobado = esProcesado;
 
     return (
         <div 
@@ -210,7 +240,6 @@ const RegistroPendienteItem = ({
 RegistroPendienteItem.propTypes = {
     registro: PropTypes.object.isRequired,
     index: PropTypes.number.isRequired,
-    estaRegistrado: PropTypes.bool,
     mapeoDocumentos: PropTypes.object.isRequired,
     enviandoEmail: PropTypes.bool.isRequired,
     onCompletar: PropTypes.func.isRequired,

@@ -10,7 +10,7 @@ const AccionesRegistro = ({
 }) => {
     // Log eliminado para evitar spam en console
 
-    // Si el registro está procesado, solo mostrar el botón de eliminar
+    // Si el registro está procesado, mostrar mensaje y solo botón de eliminar desactivado
     if (info.esProcesado) {
         return (
             <div className="registro-acciones" style={{
@@ -28,12 +28,12 @@ const AccionesRegistro = ({
                 position: 'relative'
             }}>
                 <span style={{ fontSize: '1rem', color: '#28a745', fontWeight: 'bold', marginRight: '10px' }}>
-                    ✅ Registro Procesado y Aprobado
+                    ✅ Registro Procesado y Aprobado - Documentación guardada en BD
                 </span>
                 <button
                     onClick={() => onEliminar(registro)}
                     className="btn-eliminar"
-                    title="Eliminar este registro del listado de pendientes (usar después de que el estudiante esté registrado y aprobado)"
+                    title="Eliminar este registro del listado de pendientes (ya está registrado y aprobado en la base de datos)"
                     disabled={enviandoEmail}
                     style={{
                         display: 'inline-flex',

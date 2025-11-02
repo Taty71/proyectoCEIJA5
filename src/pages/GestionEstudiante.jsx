@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Formik } from 'formik';
+import { formularioInscripcionSchema } from '../validaciones/ValidacionSchemaYup.jsx';
 import PropTypes from 'prop-types';
 import useGestionDocumentacion from '../hooks/useGestionDocumentacion';
 import { useInitialValues } from '../hooks/useInitialValues';
@@ -55,6 +56,9 @@ const GestionEstudiante = ({ modalidad, accion, isAdmin, completarRegistro, isWe
 
             <Formik
                 initialValues={initialValues}
+                validationSchema={formularioInscripcionSchema}
+                validateOnChange={true}
+                validateOnBlur={true}
                 onSubmit={handleSubmit}
             >
                 {(formikProps) => (
@@ -67,6 +71,7 @@ const GestionEstudiante = ({ modalidad, accion, isAdmin, completarRegistro, isWe
                         isAdmin={isAdmin}
                         isWebUser={isWebUser}
                         handleFileChange={handleFileChangeWithValidation}
+                        submitHandler={handleSubmitForm}
                         completarRegistro={completarRegistro}
                         completarRegistroWeb={completarWebParam}
                         datosRegistroWeb={datosRegistroWeb}

@@ -84,6 +84,33 @@
   }
 }
 
+/* Recalcular CUIL button: matches domicilio button style but slightly smaller */
+.recalcular-cuil {
+  margin-top: 6px;
+  display: flex;
+  justify-content: flex-start;
+}
+.recalcular-cuil .btn-recalcular {
+  border-radius: 8px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%);
+  color: #fff;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(24, 40, 72, 0.12);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+  height: fit-content;
+}
+.recalcular-cuil .btn-recalcular:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(24, 40, 72, 0.18);
+}
+.recalcular-cuil .btn-recalcular:active {
+  transform: translateY(0);
+  opacity: 0.95;
+}
 /* Grupo para Nombre y Apellido en línea */
 .form-datos .nombre-apellido-group {
   display: grid;

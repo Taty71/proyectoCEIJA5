@@ -23,6 +23,9 @@ const RegistroEstd = ({
     handleFileChange,
     handleChange,
     handleSubmit,
+    submitForm,
+    validateForm,
+    submitHandler,
     isSubmitting,
     accion,
     values,
@@ -83,6 +86,8 @@ const RegistroEstd = ({
             setFieldValue('telefono', registroData.telefono || '');
             setFieldValue('fechaNacimiento', registroData.fechaNacimiento || '');
             setFieldValue('paisEmision', registroData.paisEmision || '');
+            // Sexo / género (varios posibles nombres en datos externos)
+            setFieldValue('sexo', registroData.sexo || registroData.genero || registroData.gender || '');
             // Domicilio
             setFieldValue('calle', registroData.calle || '');
             setFieldValue('numero', registroData.numero || '');
@@ -115,37 +120,51 @@ const RegistroEstd = ({
             return;
         }
 
-        // Usar el handleSubmit del hook que maneja todo el flujo correctamente
-        const result = await handleSubmit(values, { 
-            setSubmitting: () => {}, 
-            resetForm: () => {} 
-        }, accion, isAdmin, isWebUser, completarRegistro, values.modalidad, null);
-
-        // Mostrar feedback según resultado
-        if (result && result.success) {
-            if (result.migradoABaseDatos) {
-                // Registro completo y guardado en BD
-                if (window?.showSuccess) window.showSuccess('✅ Registro completado y guardado en la base de datos');
-                else alert('✅ Registro completado y guardado en la base de datos');
-            } else if (result.migradoAPendientes) {
-                // Documentación incompleta, movido a pendientes
-                if (window?.showWarning) window.showWarning('⚠️ Documentación incompleta. El registro se movió a pendientes');
-                else alert('⚠️ Documentación incompleta. El registro se movió a pendientes');
-            } else {
-                // Registro exitoso pero sin detalle
-                if (window?.showSuccess) window.showSuccess('✅ Registro procesado correctamente');
-                else alert('✅ Registro procesado correctamente');
+        // Antes de enviar, pedimos a Formik que valide el formulario
+        // `handleSubmit` que tenemos en props viene de Formik (función que dispara submit)
+        // Validar primero y sólo permitir submit cuando no haya errores
+        if (typeof validateForm === 'function') {
+            const formErrors = await validateForm();
+            const hasErrors = formErrors && Object.keys(formErrors).length > 0;
+            if (hasErrors) {
+                // Mostrar errores en UI para corrección inmediata
+                // Mostrar el primer mensaje de error específico si existe (por ejemplo CUIL inválido)
+                const firstKey = Object.keys(formErrors)[0];
+                const firstMsg = formErrors[firstKey];
+                if (firstMsg) {
+                    showError(firstMsg);
+                } else {
+                    showError('Corrige los errores del formulario antes de continuar.');
+                }
+                return;
             }
-        } else {
-            // Error
-            if (window?.showError) window.showError(result?.message || '❌ Error al procesar el registro');
-            else alert(result?.message || '❌ Error al procesar el registro');
         }
 
-        // Si es usuario web y el registro fue exitoso, redirigir al home
-        if (isWebUser && result && result.success) {
-            window.location.href = '/';
+        // Si no hay errores, delegar en Formik para que invoque el onSubmit definido en el padre
+        if (typeof submitForm === 'function') {
+            await submitForm();
+            return;
         }
+
+        // Fallback: si no tenemos submitForm (por compatibilidad), intentar llamar handleSubmit
+        if (typeof handleSubmit === 'function') {
+            const result = await handleSubmit(values, { 
+                setSubmitting: () => {}, 
+                resetForm: () => {} 
+            }, accion, isAdmin, isWebUser, completarRegistro, values.modalidad, null);
+
+            // Mostrar feedback según resultado si el padre devuelve algo
+            if (result && result.success) {
+                if (result.migradoABaseDatos) {
+                    if (window?.showSuccess) window.showSuccess('✅ Registro completado y guardado en la base de datos');
+                    else alert('✅ Registro completado y guardado en la base de datos');
+                }
+            }
+            return;
+        }
+
+        // Nota: el feedback y las redirecciones las maneja la función onSubmit definida
+        // en el padre (GestionEstudiante). Aquí solo nos aseguramos de validar y disparar submit.
     };
 
     return (
@@ -214,9 +233,17 @@ const RegistroEstd = ({
                             <button
                                 type="button"
                                 className="boton-principal"
-                                onClick={() => {
-                                    handleSubmit(values, { setSubmitting: () => {} }); // Llama a la función de eliminación
-                                }}
+                                            onClick={async () => {
+                                                // Para eliminación usamos el submitHandler si está disponible
+                                                if (typeof submitHandler === 'function') {
+                                                    await submitHandler(values, { setSubmitting: () => {} }, accion, isAdmin, isWebUser, null, values.modalidad);
+                                                } else if (typeof handleSubmit === 'function') {
+                                                    // Fallback (antiguo) - puede no funcionar si handleSubmit es Formik's handleSubmit
+                                                    await handleSubmit(values, { setSubmitting: () => {} }); // Llama a la función de eliminación
+                                                } else {
+                                                    showError('No se encontró el manejador de eliminación');
+                                                }
+                                            }}
                             >
                                 Confirmar eliminación
                             </button>
@@ -252,6 +279,9 @@ RegistroEstd.propTypes = {
     handleFileChange: PropTypes.func.isRequired,
     handleChange: PropTypes.func.isRequired,
     handleSubmit: PropTypes.func.isRequired,
+    submitForm: PropTypes.func,
+    validateForm: PropTypes.func,
+    submitHandler: PropTypes.func,
     values: PropTypes.object.isRequired,
     setFieldValue: PropTypes.func.isRequired,
     accion: PropTypes.string,

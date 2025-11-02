@@ -31,11 +31,11 @@ export const obtenerDocumentosRequeridos = (modalidad, planAnio, modulos) => {
         return { documentos: [], alternativos: null, criterio: '' };
     }
 
-    // Documentos base SIEMPRE requeridos (según ModalidadModal.jsx)
+    // Documentos base SIEMPRE requeridos
     const documentosBase = [
         "foto", // 📷 Foto 4x4  
         "archivo_dni", // 📄 DNI
-        "archivo_cuil", // 📄 CUIL (requerido administrativamente)
+        "archivo_cuil", // 📄 CUIL
         "archivo_fichaMedica", // 🏥 Ficha Médica CUS
         "archivo_partidaNacimiento" // 📜 Partida de Nacimiento
     ];
@@ -45,103 +45,33 @@ export const obtenerDocumentosRequeridos = (modalidad, planAnio, modulos) => {
 
     // Documentos adicionales según modalidad y plan
     if (modalidad === 'Presencial') {
-        // Para modalidad presencial según año (desde ModalidadModal.jsx)
         if (planAnio === '1') {
-            // 1er Año: Título nivel primario + Pase escuela Secundaria hasta 3er año incompleto
+            // 1er Año: Certificado Primario + Solicitud Pase (ambos requeridos)
             documentosAdicionales = ["archivo_certificadoNivelPrimario", "archivo_solicitudPase"];
-        } else if (planAnio === '2') {
-            // 2do Año: ANALÍTICO PARCIAL (preferido) o SOLICITUD DE PASE (alternativa)
-            // NO requiere certificado de nivel primario
+        } else if (planAnio === '2' || planAnio === '3') {
+            // 2do/3er Año: ANALÍTICO PARCIAL (definitivo) o SOLICITUD DE PASE (temporal)
             documentosAdicionales = [];
             documentosAlternativos = {
                 grupo: "analitico_o_pase",
                 preferido: "archivo_analiticoParcial",
                 alternativa: "archivo_solicitudPase",
-                descripcion: "Analítico Parcial (preferido) O Solicitud de Pase (si no presenta analítico)"
-            };
-        } else if (planAnio === '3') {
-            // 3er Año: ANALÍTICO PARCIAL (preferido) o SOLICITUD DE PASE (alternativa)
-            // NO requiere certificado de nivel primario
-            documentosAdicionales = [];
-            documentosAlternativos = {
-                grupo: "analitico_o_pase",
-                preferido: "archivo_analiticoParcial",
-                alternativa: "archivo_solicitudPase",
-                descripcion: "Analítico Parcial (preferido) O Solicitud de Pase (si no presenta analítico)"
-            };
-        } else if (planAnio && planAnio !== '1') {
-            // Cualquier otro año presencial (4°, 5°, etc.) - usar lógica de analítico/pase
-            console.log(`ℹ️ [VALIDACIÓN] Plan presencial ${planAnio}° año. Aplicando lógica de documentos alternativos.`);
-            documentosAdicionales = [];
-            documentosAlternativos = {
-                grupo: "analitico_o_pase",
-                preferido: "archivo_analiticoParcial",
-                alternativa: "archivo_solicitudPase",
-                descripcion: "Analítico Parcial (preferido) O Solicitud de Pase (si no presenta analítico)"
+                descripcion: "Analítico Parcial (definitivo) O Solicitud de Pase (temporal - luego deberá presentar analítico)"
             };
         }
     } else if (modalidad === 'Semipresencial') {
-        // Para modalidad semipresencial según planAnio (desde BD real)
-        // ID 4 = Plan A (Módulos 1,2,3), ID 5 = Plan B (Módulos 4,5), ID 6 = Plan C (Módulos 6,7,8,9)
         if (planAnio === '4') {
-            // Plan A (ID 4): Certificado Primario (definitivo) O Solicitud de Pase (temporal - necesita analítico después)
-            documentosAdicionales = [];
-            documentosAlternativos = {
-                grupo: "certificado_o_pase_planA",
-                preferido: "archivo_certificadoNivelPrimario",
-                alternativa: "archivo_solicitudPase",
-                descripcion: "Certificado de Nivel Primario (definitivo) O Solicitud de Pase (temporal - luego deberá presentar Analítico Parcial)"
-            };
-        } else if (planAnio === '5') {
-            // Plan B (ID 5): Analítico Parcial (obligatorio/preferido) O Solicitud de Pase (alternativa temporal)
-            // Si presenta solicitud, luego deberá presentar analítico parcial
-            documentosAdicionales = [];
-            documentosAlternativos = {
-                grupo: "analitico_o_pase_planB",
-                preferido: "archivo_analiticoParcial",
-                alternativa: "archivo_solicitudPase",
-                descripcion: "Analítico Parcial (obligatorio) O Solicitud de Pase (si no presenta analítico, luego deberá completar con analítico)"
-            };
-        } else if (planAnio === '6') {
-            // Plan C (ID 6): Analítico Parcial (obligatorio/preferido) O Solicitud de Pase (alternativa temporal)
-            // Si presenta solicitud, luego deberá presentar analítico parcial
-            documentosAdicionales = [];
-            documentosAlternativos = {
-                grupo: "analitico_o_pase_planC",
-                preferido: "archivo_analiticoParcial",
-                alternativa: "archivo_solicitudPase",
-                descripcion: "Analítico Parcial (obligatorio) O Solicitud de Pase (si no presenta analítico, luego deberá completar con analítico)"
-            };
-        } else {
-            // Fallback para casos no identificados
-            console.log(`ℹ️ [VALIDACIÓN] Plan semipresencial no identificado: ${planAnio}. Aplicando lógica por defecto.`);
+            // Plan A: Certificado Primario + Solicitud Pase (ambos requeridos)
+            documentosAdicionales = ["archivo_certificadoNivelPrimario", "archivo_solicitudPase"];
+        } else if (planAnio === '5' || planAnio === '6') {
+            // Plan B/C: ANALÍTICO PARCIAL (definitivo) o SOLICITUD DE PASE (temporal)
             documentosAdicionales = [];
             documentosAlternativos = {
                 grupo: "analitico_o_pase",
                 preferido: "archivo_analiticoParcial",
                 alternativa: "archivo_solicitudPase",
-                descripcion: "Analítico Parcial (preferido) O Solicitud de Pase (si no presenta analítico)"
+                descripcion: "Analítico Parcial (definitivo) O Solicitud de Pase (temporal - luego deberá presentar analítico)"
             };
         }
-    }
-
-    // Si no se puede determinar o es un caso especial, usar documentos alternativos como fallback
-    if (documentosAdicionales.length === 0 && !documentosAlternativos) {
-        // Solo mostrar warning para casos realmente no identificados
-        if (modalidad && (planAnio || modulos)) {
-            console.log(`ℹ️ [VALIDACIÓN] Aplicando configuración por defecto para ${modalidad} - Plan/Año: ${planAnio || modulos}`);
-        } else {
-            console.warn(`⚠️ [VALIDACIÓN] Modalidad o plan no especificado correctamente. Modalidad: "${modalidad}", Plan/Año: "${planAnio || modulos}". Usando documentos por defecto.`);
-        }
-
-        // Para cualquier caso no cubierto, usar la lógica de documentos alternativos
-        documentosAdicionales = [];
-        documentosAlternativos = {
-            grupo: "analitico_o_pase",
-            preferido: "archivo_analiticoParcial",
-            alternativa: "archivo_solicitudPase",
-            descripcion: "Analítico Parcial (preferido) O Solicitud de Pase (alternativa)"
-        };
     }
     
     // Construir lista de documentos requeridos

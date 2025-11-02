@@ -33,7 +33,8 @@ const ModalidadSelection = memo(({ modalidad, modalidadId, handleChange, setFiel
     }, [modalidad, values.planAnio, modalidadId, showMateriasList]);
 
     // Para nuevos registros, asegurar value controlado (string vacío si no hay valor)
-    const planAnioValue = values.planAnio !== undefined && values.planAnio !== null ? values.planAnio : '';
+    // Normalizar planAnio como string para evitar inconsistencias entre number/string
+    const planAnioValue = values.planAnio !== undefined && values.planAnio !== null ? String(values.planAnio) : '';
     return (
         <div className="form-eleccion" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
             <h3 style={{ margin: 0, flex: 1 }}>Información Académica</h3>

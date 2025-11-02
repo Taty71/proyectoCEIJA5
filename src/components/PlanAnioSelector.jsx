@@ -219,7 +219,8 @@ PlanAnioSelector.propTypes = {
     handleChange: PropTypes.func,
     value: PropTypes.oneOfType([
         PropTypes.string,
-        PropTypes.object
+        PropTypes.object,
+        PropTypes.number
     ]).isRequired,
     modalidadId: PropTypes.number.isRequired,
     setFieldValue: PropTypes.func.isRequired,

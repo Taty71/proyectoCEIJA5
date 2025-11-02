@@ -26,7 +26,27 @@ export const formularioInscripcionSchema = yup.object().shape({
             is: 'DNI',
             then: (schema) => schema
                 .required('CUIL es requerido para DNI argentino')
-                .matches(/^\d{2}-\d{8}-\d$/, 'CUIL debe tener el formato 00-00000000-0 (11 dígitos con guiones)'),
+                .matches(/^\d{2}-\d{8}-\d$/, 'CUIL debe tener el formato 00-00000000-0 (11 dígitos con guiones)')
+                .test('cuil-digito-valido', 'CUIL inválido: dígito verificador incorrecto', function(value) {
+                    if (!value) return false;
+                    const m = String(value).match(/^(\d{2})-(\d{8})-(\d)$/);
+                    if (!m) return false;
+                    const prefijo = m[1];
+                    const dniStr = m[2];
+                    const digStr = m[3];
+                    const multiplicadores = [5,4,3,2,7,6,5,4,3,2];
+                    const cuilSinDigito = `${prefijo}${dniStr}`;
+                    if (!/^[0-9]{10}$/.test(cuilSinDigito)) return false;
+                    let suma = 0;
+                    for (let i = 0; i < 10; i++) {
+                        suma += parseInt(cuilSinDigito[i], 10) * multiplicadores[i];
+                    }
+                    const resto = suma % 11;
+                    let digito = 11 - resto;
+                    if (digito === 11) digito = 0;
+                    else if (digito === 10) digito = 9;
+                    return String(digito) === String(digStr);
+                }),
             otherwise: (schema) => schema.notRequired()
         }),
     email: yup
@@ -45,7 +65,19 @@ export const formularioInscripcionSchema = yup.object().shape({
    fechaNacimiento: yup
         .date()
         .required('Fecha de nacimiento es requerida')
-        .typeError('Fecha inválida'),
+        .typeError('Fecha inválida')
+        .test('edad-valida', 'Debe tener entre 16 y 100 años', function(value) {
+            if (!value) return false;
+            const fecha = new Date(value);
+            if (isNaN(fecha)) return false;
+            const hoy = new Date();
+            let edad = hoy.getFullYear() - fecha.getFullYear();
+            const m = hoy.getMonth() - fecha.getMonth();
+            if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
+                edad--;
+            }
+            return edad >= 16 && edad <= 100;
+        }),
     calle: yup.string().required('Calle es requerida'),
             numero: yup
             .number()
@@ -59,14 +91,29 @@ export const formularioInscripcionSchema = yup.object().shape({
         .number()
         .typeError('Plan/Año es requerido')
         .required('Plan/Año es requerido'),
-    modulos: yup
-        .number()
-        .typeError('Módulo es requerido')
-        .required('Módulo es requerido'),
+    // El campo 'modulos' sólo es obligatorio cuando la modalidad requiere módulo
+    modulos: yup.mixed().when(['modalidad', 'modalidadId'], {
+        is: (modalidad, modalidadId) => {
+            try {
+                if (modalidadId !== undefined && modalidadId !== null) {
+                    return Number(modalidadId) === 2; // modalidadId 2 => Semipresencial (convención usada en app)
+                }
+                return String(modalidad || '').toLowerCase().includes('semi');
+            } catch {
+                return false;
+            }
+        },
+        then: () => yup.number().typeError('Módulo es requerido').required('Módulo es requerido'),
+        otherwise: (schema) => schema.notRequired()
+    }),
     idEstadoInscripcion: yup
         .number()
         .typeError('Estado de inscripción es requerido')
         .required('Estado de inscripción es requerido'),
+    // Sexo/Género: opcional en el formulario; utilizado sólo para ayudar a calcular CUIL si está presente
+    sexo: yup
+        .string()
+        .notRequired(),
 });
 export const loginValidationSchema = yup.object().shape({
     email: yup

@@ -41,6 +41,13 @@
   outline: none;
   box-shadow: 0 0 0 2px #1976d233;
 }
+/* Estilo para inputs con error */
+.input-container input.is-invalid,
+.input-container select.is-invalid {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.08);
+  background-color: #fff5f5;
+}
 .form-group input::placeholder,
 .form-group select::placeholder {
   color: #999;

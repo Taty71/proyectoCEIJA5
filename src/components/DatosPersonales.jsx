@@ -4,7 +4,7 @@ import { useEffect, memo } from 'react';
 import ValidadorDni from '../validaciones/ValidadorDNI.jsx';
 
 export const DatosPersonales = memo(() => {
-    const { values, setFieldValue } = useFormikContext();
+    const { values, setFieldValue, errors } = useFormikContext();
     // Si no existe modalidadId, establecer un valor por defecto (ejemplo: 1)
     if (!values.modalidadId && values.modalidad) {
         // Si modalidad es string, puedes mapearlo a un id si es necesario
@@ -17,43 +17,99 @@ export const DatosPersonales = memo(() => {
     }
 
     // Función para calcular el dígito verificador del CUIL
+    /**
+     * Calcula el dígito verificador del CUIL/CUIT según el algoritmo oficial.
+     * - prefijo: string o número de 2 dígitos (ej. '20', '27', '23')
+     * - dni: string o número de 8 dígitos
+     * Retorna el dígito verificador (0-9).
+     *
+     * Regla:
+     * 1) Construir la cadena de 10 dígitos = prefijo (2) + dni (8)
+     * 2) Multiplicar cada dígito por los pesos [5,4,3,2,7,6,5,4,3,2]
+     * 3) Sumar los productos, obtener resto = suma % 11
+     * 4) dígito = 11 - resto
+     *    - si dígito === 11 => dígito = 0
+     *    - si dígito === 10 => dígito = 9 (caso especial manejado así por la práctica común)
+     */
     const calcularDigitoVerificador = (prefijo, dni) => {
         const multiplicadores = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
-        const cuilSinDigito = prefijo + dni;
-        
+        const pref = String(prefijo).padStart(2, '0');
+        const d = String(dni).padStart(8, '0');
+        const cuilSinDigito = pref + d; // 10 caracteres
+
+        if (cuilSinDigito.length !== 10 || !/^[0-9]{10}$/.test(cuilSinDigito)) {
+            // Valor inválido, devolver null para que el llamador lo gestione
+            return null;
+        }
+
         let suma = 0;
         for (let i = 0; i < 10; i++) {
-            suma += parseInt(cuilSinDigito[i]) * multiplicadores[i];
+            suma += parseInt(cuilSinDigito[i], 10) * multiplicadores[i];
         }
-        
+
         const resto = suma % 11;
-        if (resto < 2) {
-            return resto;
-        } else {
-            return 11 - resto;
-        }
+        let digito = 11 - resto;
+        if (digito === 11) digito = 0;
+        else if (digito === 10) digito = 9; // manejo práctico del caso especial
+
+        return digito;
     };
+
+    // Referencia para saber si el CUIL fue autogenerado por este componente
+    const autoCuilRef = useRef(false);
 
     // Función para auto-completar CUIL basado en DNI (solo para documentos argentinos)
     useEffect(() => {
+        // Solo aplicamos lógica para documentos DNI argentinos de 8 dígitos
         if (values.tipoDocumento === 'DNI' && values.dni && values.dni.toString().length === 8) {
             const dni = values.dni.toString();
-            
-            // Si el CUIL está vacío o solo tiene formato parcial, lo completamos
-            if (!values.cuil || values.cuil.length < 11) {
-                const prefijo = "20";
-                const digitoVerificador = calcularDigitoVerificador(prefijo, dni);
+
+            // Determinar prefijo según sexo/género si está disponible
+            let prefijo = '20'; // default masculino
+            const sexoVal = (values.sexo || '').toString().toLowerCase();
+            if (sexoVal === 'femenino' || sexoVal === 'female' || sexoVal === 'mujer') {
+                prefijo = '27';
+            } else if (sexoVal === 'empresa' || sexoVal === 'juridica' || sexoVal === 'empresa_o_cuit') {
+                prefijo = '23';
+            } else if (sexoVal === 'otro' || sexoVal === 'desconocido' || sexoVal === '') {
+                // mantener default 20 si no está claro
+                prefijo = '20';
+            }
+
+            // Si ya existe un CUIL con prefijo válido, respetarlo (solo si el cuil no fue manualmente editado)
+            if (values.cuil && typeof values.cuil === 'string') {
+                const match = values.cuil.match(/^(\d{2})-/);
+                if (match && match[1]) {
+                    // Solo respetar el prefijo existente si el CUIL no fue autogenerado previamente
+                    if (!autoCuilRef.current) {
+                        prefijo = match[1];
+                    }
+                }
+            }
+
+            const digitoVerificador = calcularDigitoVerificador(prefijo, dni);
+            if (digitoVerificador !== null && typeof digitoVerificador !== 'undefined') {
                 const cuilCompleto = `${prefijo}-${dni}-${digitoVerificador}`;
-                
-                setFieldValue('cuil', cuilCompleto);
+
+                // Si el CUIL está vacío, tenía formato parcial, o fue generado automáticamente antes,
+                // entonces lo actualizamos. Si el usuario editó manualmente el CUIL, no sobreescribimos.
+                if (!values.cuil || values.cuil.length < 11 || autoCuilRef.current) {
+                    setFieldValue('cuil', cuilCompleto);
+                    autoCuilRef.current = true;
+                }
+            } else {
+                // No podemos calcular el dígito verificador por datos inválidos
+                // No sobreescribimos el campo cuil en este caso
+                console.warn('No se pudo calcular dígito verificador del CUIL con prefijo:', prefijo, 'dni:', dni);
             }
         } else if (values.tipoDocumento !== 'DNI') {
-            // Si no es DNI argentino, limpiar el CUIL
+            // Si no es DNI argentino, limpiar el CUIL y resetear la bandera
             if (values.cuil) {
                 setFieldValue('cuil', '');
             }
+            autoCuilRef.current = false;
         }
-    }, [values.dni, values.tipoDocumento, setFieldValue, values.cuil]);
+    }, [values.dni, values.tipoDocumento, setFieldValue, values.cuil, values.sexo]);
 
     
     // Referencia para evitar doble validación en el mismo blur
@@ -103,6 +159,20 @@ export const DatosPersonales = memo(() => {
                         <ErrorMessage name="tipoDocumento" component="div" className="error" />
                     </div>
 
+                    {/* Selector de sexo/género para calcular prefijo del CUIL (moved before DNI) */}
+                    <div className="form-group">
+                        <label>Sexo / Género:</label>
+                        <Field as="select" name="sexo" className="form-control">
+                            <option value="">Seleccione sexo</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Empresa">Empresa</option>
+                            <option value="Otro">Otro</option>
+                        </Field>
+                        <ErrorMessage name="sexo" component="div" className="error" />
+                        <small className="form-text text-muted">El prefijo del CUIL se calcula según el sexo/género seleccionado si corresponde.</small>
+                    </div>
+
                     <div className="form-group">
                         <label>
                             {values.tipoDocumento === 'DNI' ? 'DNI:' : 
@@ -119,18 +189,76 @@ export const DatosPersonales = memo(() => {
                                 values.tipoDocumento === 'CEDULA' ? 'Número de cédula' :
                                 'Número de documento'
                             }
-                            className="form-control" 
-                            maxLength={values.tipoDocumento === 'DNI' ? "8" : "20"}
+                            className={`form-control ${errors && errors.dni ? 'is-invalid' : ''}`} 
+                            maxLength={values.tipoDocumento === 'DNI' ? 8 : 20}
+                            inputMode={values.tipoDocumento === 'DNI' ? 'numeric' : 'text'}
+                            pattern={values.tipoDocumento === 'DNI' ? '\\d{8}' : undefined}
                             onBlur={handleDniBlur}
                         />
                         <ErrorMessage name="dni" component="div" className="error" />
                     </div>
 
-                    {values.tipoDocumento === 'DNI' && (
+                        {values.tipoDocumento === 'DNI' && (
                         <div className="form-group">
                             <label>CUIL:</label>
-                            <Field type="text" name="cuil" placeholder="CUIL" className="form-control" />
-                            <ErrorMessage name="cuil" component="div" className="error" />
+                            <Field name="cuil">
+                                {({ field, form }) => (
+                                    <>
+                                        <input
+                                            {...field}
+                                            type="text"
+                                            placeholder="CUIL"
+                                            className={`form-control ${errors && errors.cuil ? 'is-invalid' : ''}`}
+                                            onChange={(e) => {
+                                                // Si el usuario edita manualmente el CUIL, desactivamos la bandera de autogenerado
+                                                form.setFieldValue('cuil', e.target.value);
+                                                try {
+                                                    // access the ref in closure
+                                                    if (autoCuilRef) autoCuilRef.current = false;
+                                                } catch {
+                                                    // ignore
+                                                }
+                                            }}
+                                        />
+                                        <ErrorMessage name="cuil" component="div" className="error" />
+                                        {/* Botón para recalcular el CUIL usando sexo + dni */}
+                                        <div className="recalcular-cuil">
+                                            <button
+                                                type="button"
+                                                className="btn-recalcular"
+                                                onClick={() => {
+                                                    // Intentar recalcular el CUIL
+                                                    const dniVal = values.dni ? String(values.dni).padStart(8, '0') : null;
+                                                    if (!dniVal || dniVal.length !== 8) {
+                                                        // no hay DNI válido
+                                                        // marcar el campo para que muestre el error
+                                                        if (typeof form.setFieldTouched === 'function') form.setFieldTouched('dni', true);
+                                                        return;
+                                                    }
+                                                    // Determinar prefijo igual que en el efecto
+                                                    let prefijo = '20';
+                                                    const sexoVal = (values.sexo || '').toString().toLowerCase();
+                                                    if (sexoVal === 'femenino' || sexoVal === 'female' || sexoVal === 'mujer') {
+                                                        prefijo = '27';
+                                                    } else if (sexoVal === 'empresa' || sexoVal === 'juridica' || sexoVal === 'empresa_o_cuit') {
+                                                        prefijo = '23';
+                                                    }
+                                                    const dig = calcularDigitoVerificador(prefijo, dniVal);
+                                                    if (dig === null) {
+                                                        console.warn('No se pudo recalcular CUIL: datos inválidos', prefijo, dniVal);
+                                                        return;
+                                                    }
+                                                    const nuevo = `${prefijo}-${dniVal}-${dig}`;
+                                                    form.setFieldValue('cuil', nuevo);
+                                                    autoCuilRef.current = true;
+                                                }}
+                                            >
+                                                Recalcular CUIL
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </Field>
                             <small className="form-text text-muted">
                                 Se completa automáticamente con el DNI. Prefijo: 20 (masculino), 27 (femenino), 23 (empresa)
                             </small>
@@ -146,25 +274,25 @@ export const DatosPersonales = memo(() => {
                     </div>
                 )}
 
-                <div className="form-group">
-                    <label>Email:</label>
-                    <Field type="email" name="email" placeholder="Correo electrónico" className="form-control" />
-                    <ErrorMessage name="email" component="div" className="error" />
+                    <div className="form-group">
+                        <label>Email:</label>
+                        <Field type="email" name="email" placeholder="Correo electrónico" className={`form-control ${errors && errors.email ? 'is-invalid' : ''}`} />
+                        <ErrorMessage name="email" component="div" className="error" />
                     <small className="form-text text-muted">
                         Email para notificaciones y envío de comprobantes
                     </small>
                 </div>
                 
-                <div className="form-group">
-                    <label>Teléfono/Celular:</label>
-                    <Field 
-                        type="tel" 
-                        name="telefono" 
-                        placeholder="Ej: 11-1234-5678 o 0351-4567890" 
-                        className="form-control"
-                        maxLength="15"
-                    />
-                    <ErrorMessage name="telefono" component="div" className="error" />
+                    <div className="form-group">
+                        <label>Teléfono/Celular:</label>
+                        <Field 
+                            type="tel" 
+                            name="telefono" 
+                            placeholder="Ej: 11-1234-5678 o 0351-4567890" 
+                            className={`form-control ${errors && errors.telefono ? 'is-invalid' : ''}`}
+                            maxLength="15"
+                        />
+                        <ErrorMessage name="telefono" component="div" className="error" />
                     <small className="form-text text-muted">
                         Incluir código de área sin el 15. Ej: 11-1234-5678
                     </small>
@@ -172,7 +300,7 @@ export const DatosPersonales = memo(() => {
                 
                 <div className="form-group">
                     <label>Fecha Nacimiento:</label>
-                    <Field type="date" name="fechaNacimiento" className="form-control"placeholder="Fecha de Nacimiento"/>
+                    <Field type="date" name="fechaNacimiento" className={`form-control ${errors && errors.fechaNacimiento ? 'is-invalid' : ''}`} placeholder="Fecha de Nacimiento"/>
                     <ErrorMessage name="fechaNacimiento" component="div" className="error" />
                     {/*<small>Debug: <Field name="fechaNacimiento">{({ field }) => field.value}</Field></small>*/}
                 </div>

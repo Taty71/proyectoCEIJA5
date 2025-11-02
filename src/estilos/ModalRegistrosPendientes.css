@@ -488,8 +488,11 @@
 .modal-registros-pendientes .seccion-emails h4 {
   margin: 0 0 6px 0;
   color: #2d4177;
-  font-size: 0.85rem;
+  font-size: 0.9rem; /* Aumentado de 0.85rem a 0.9rem */
   font-weight: 600;
+  white-space: normal; /* Permitir saltos de línea si es necesario */
+  overflow: visible; /* Asegurar que no se corte */
+  text-overflow: clip; /* No cortar con elipsis */
 }
 
 .modal-registros-pendientes .seccion-emails {
@@ -583,7 +586,7 @@
   margin: 0;
   flex-shrink: 0;
   text-align: left;
-  max-height: 200px;
+  max-height: 300px; /* Aumentado de 200px a 300px para más espacio */
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -676,13 +679,14 @@
 
 /* Separadores visuales en el footer */
 .modal-registros-pendientes .botones-descarga::before {
-  content: "Reportes y Descargas";
+  content: "📊 Reportes y Descargas";
   display: block;
-  font-size: 0.75rem;
-  color: #6c757d;
+  font-size: 0.85rem; /* Aumentado de 0.75rem a 0.85rem */
+  color: #2d4177; /* Color más visible, igual al de títulos */
   text-align: center;
-  margin-bottom: 5px;
+  margin-bottom: 8px; /* Aumentado de 5px a 8px */
   font-weight: 600;
+  width: 100%; /* Asegurar ancho completo */
 }
 
 /* Colores específicos para botones */

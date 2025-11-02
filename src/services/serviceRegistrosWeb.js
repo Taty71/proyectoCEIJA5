@@ -192,6 +192,26 @@ const registrosWebService = {
 
             const resultado = await response.json();
             console.log(`✅ Registro web procesado y guardado:`, resultado);
+            
+            // Emitir evento para que GestorRegistrosWeb actualice la UI
+            try {
+                if (resultado.registroWebActualizado) {
+                    window.dispatchEvent(new CustomEvent('registroWeb:actualizado', { detail: resultado.registroWebActualizado }));
+                    console.log('🔔 Evento emitido: registroWeb:actualizado', resultado.registroWebActualizado.id);
+                } else if (resultado.registroProcesado) {
+                    window.dispatchEvent(new CustomEvent('registroWeb:actualizado', { detail: resultado.registroProcesado }));
+                    console.log('🔔 Evento emitido: registroWeb:actualizado', resultado.registroProcesado.id);
+                }
+                
+                // Si el estudiante ya existe, también emitir evento
+                if (resultado.yaExiste && resultado.registroWebActualizado) {
+                    window.dispatchEvent(new CustomEvent('registroWeb:actualizado', { detail: resultado.registroWebActualizado }));
+                    console.log('🔔 Evento emitido: registroWeb:actualizado (estudiante ya existe)', resultado.estudianteExistente.dni);
+                }
+            } catch (evErr) {
+                console.warn('⚠️ No se pudo emitir evento registroWeb:actualizado', evErr.message);
+            }
+            
             return resultado;
         } catch (error) {
             console.error('❌ Error al procesar registro web:', error);
@@ -221,6 +241,17 @@ const registrosWebService = {
 
             const resultado = await response.json();
             console.log(`✅ Registro web movido a pendientes:`, resultado);
+            
+            // Emitir evento para que GestorRegistrosWeb actualice la UI
+            try {
+                if (resultado.registroWebActualizado) {
+                    window.dispatchEvent(new CustomEvent('registroWeb:actualizado', { detail: resultado.registroWebActualizado }));
+                    console.log('🔔 Evento emitido: registroWeb:actualizado (movido a pendientes)', resultado.registroWebActualizado.id);
+                }
+            } catch (evErr) {
+                console.warn('⚠️ No se pudo emitir evento registroWeb:actualizado', evErr.message);
+            }
+            
             return resultado;
         } catch (error) {
             console.error('❌ Error al mover registro web a pendientes:', error);

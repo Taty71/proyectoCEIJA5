@@ -21,10 +21,7 @@ const obtenerModalidadId = (modalidadNombre) => {
     // Mapeo basado en los valores comunes en la base de datos
     const mapeoModalidades = {
         'PRESENCIAL': 1,
-        'SEMIPRESENCIAL': 2,
-        'A DISTANCIA': 3,
-        'DISTANCIA': 3, // Alias
-        'VIRTUAL': 3 // Alias
+        'SEMIPRESENCIAL': 2
     };
     
     return mapeoModalidades[modalidadUpper] || null;

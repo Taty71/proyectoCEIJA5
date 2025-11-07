@@ -10,6 +10,7 @@ const ListaRegistrosPendientes = ({
     onEliminar,
     onEnviarEmail,
     obtenerInfoVencimiento,
+    onReiniciarAlarma,
     getTipoIcon,
     formatearTipo
 }) => {
@@ -44,6 +45,7 @@ const ListaRegistrosPendientes = ({
                     onEliminar={onEliminar}
                     onEnviarEmail={onEnviarEmail}
                     obtenerInfoVencimiento={obtenerInfoVencimiento}
+                    onReiniciarAlarma={onReiniciarAlarma}
                     getTipoIcon={getTipoIcon}
                     formatearTipo={formatearTipo}
                 />
@@ -61,6 +63,7 @@ ListaRegistrosPendientes.propTypes = {
     onEliminar: PropTypes.func.isRequired,
     onEnviarEmail: PropTypes.func.isRequired,
     obtenerInfoVencimiento: PropTypes.func.isRequired,
+    onReiniciarAlarma: PropTypes.func.isRequired,
     getTipoIcon: PropTypes.func.isRequired,
     formatearTipo: PropTypes.func.isRequired
 };

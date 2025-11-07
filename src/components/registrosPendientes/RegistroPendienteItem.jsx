@@ -12,7 +12,8 @@ const RegistroPendienteItem = ({
     onCompletar,
     onEliminar,
     onEnviarEmail,
-    obtenerInfoVencimiento
+    obtenerInfoVencimiento,
+    onReiniciarAlarma
 }) => {
     const info = obtenerInfoVencimiento(registro);
     
@@ -48,13 +49,45 @@ const RegistroPendienteItem = ({
         // Lógica original para registros pendientes normales
         const modalidad = registro.datos?.modalidad || registro.modalidad || '';
         const planAnio = registro.datos?.planAnio || registro.planAnio || '';
-        const modulos = registro.datos?.modulos || registro.modulos || '';
-        console.log('[DEBUG] Llamando a obtenerDocumentosRequeridos desde RegistroPendienteItem.jsx con:', {
-            modalidad, planAnio, modulos
+        
+        // Extraer modulos del campo directo o del array idModulo
+        let modulos = registro.datos?.modulos || registro.modulos || '';
+        
+        // Siempre intentar extraer módulos del array idModulo primero
+        if (registro.datos?.idModulo && Array.isArray(registro.datos.idModulo)) {
+            const modulosValidos = registro.datos.idModulo.filter(id => id && id !== '' && id !== null);
+            if (modulosValidos.length > 0) {
+                modulos = modulosValidos.join(',');
+                console.log('📋 [ITEM] Módulos del registro:', {
+                    modulos,
+                    idModulo: modulosValidos,
+                    dni: registro.dni
+                });
+            } else {
+                console.warn('⚠️ [ITEM] No se encontraron módulos válidos en idModulo para DNI:', registro.dni);
+            }
+        } else if (!modulos || modulos === '') {
+            console.warn('⚠️ [ITEM] Registro sin módulos especificados para DNI:', registro.dni);
+        }
+        
+        // Log de contexto (datos académicos usados para calcular qué documentos se requieren)
+        console.log('[DEBUG] Datos académicos para cálculo de documentos:', {
+            modalidad,
+            planAnio,
+            modulos: modulos || '❌ SIN MÓDULOS',
+            idModulo: registro.datos?.idModulo || [],
+            dni: registro.dni
         });
         const requerimientos = obtenerDocumentosRequeridos(modalidad, planAnio, modulos);
         const documentosRequeridosDinamicos = requerimientos.documentos || [];
         const documentosAlternativos = requerimientos.alternativos;
+
+        // Log que muestra los documentos requeridos efectivamente calculados y los archivos existentes
+        console.log('📋 [DEBUG] Documentos requeridos calculados:', {
+            documentos: documentosRequeridosDinamicos,
+            alternativos: documentosAlternativos,
+            archivosExistentes: registro.archivos ? Object.keys(registro.archivos) : []
+        });
         
         let documentosSubidos = [];
         
@@ -71,7 +104,7 @@ const RegistroPendienteItem = ({
         let documentosFaltantes = [];
         let documentosValidosSubidos = [];
         
-        if (documentosAlternativos) {
+    if (documentosAlternativos) {
             const tienePreferido = documentosSubidos.includes(documentosAlternativos.preferido);
             const tieneAlternativa = documentosSubidos.includes(documentosAlternativos.alternativa);
             
@@ -95,6 +128,13 @@ const RegistroPendienteItem = ({
         }
         
         const totalRequeridos = documentosRequeridosDinamicos.length - (documentosAlternativos ? 1 : 0);
+
+        // Log final del estado documental calculado para este registro
+        console.log('📎 [DEBUG] Documentación detectada/subida y faltantes para registro:', {
+            documentosValidosSubidos,
+            documentosFaltantes,
+            totalRequeridos
+        });
         
         return {
             subidos: documentosValidosSubidos,
@@ -110,14 +150,11 @@ const RegistroPendienteItem = ({
     }, [registro.datos, registro.modalidad, registro.planAnio, registro.modulos, registro.documentosSubidos, registro.archivos, registro.estudianteEnBD, registro.documentacionBD, registro.dni]);
     
 
-    // Detectar si es un registro procesado y aprobado basándose SOLO en el estado del JSON
-    const estadosProcesados = [
-        'PROCESADO',
-        'PROCESADO_Y_APROBADO',
-        'REGISTRO PROCESADO Y APROBADO',
-        'APROBADO_Y_PROCESADO'
-    ];
-    const esProcesado = estadosProcesados.includes(registro.estado);
+    // Detectar si es un registro procesado basándose en si existe en BD
+    // Independientemente del estado seleccionado por el administrador:
+    // - Si estudianteEnBD = true → mostrar "PROCESADO Y APROBADO"
+    // - Si estudianteEnBD = false/undefined → mostrar "PENDIENTE"
+    const esProcesado = registro.estudianteEnBD === true;
     const mostrarBadgeAprobado = esProcesado;
 
     return (
@@ -193,7 +230,7 @@ const RegistroPendienteItem = ({
                         {!mostrarBadgeAprobado && !esProcesado && (
                             <>
                                 <div className="registro-vencimiento" style={{ color: info.color }}>
-                                    {info.vencido ? '🔴 VENCIDO' : `🕒 ${info.mensaje}`}
+                                    {info.vencido ? `🔴 ${info.mensaje}` : `🕒 ${info.mensaje}`}
                                 </div>
                                 {!info.vencido && (
                                     <div className="registro-fecha-limite">
@@ -217,8 +254,10 @@ const RegistroPendienteItem = ({
                 {estadoDoc.documentosAlternativos && estadoDoc.faltantes.length === 0 && (
                     <div className="info-documento-usado">
                         {estadoDoc.subidos.includes(estadoDoc.documentosAlternativos.preferido) ? 
-                            `✨ Presenta documento preferido: ${mapeoDocumentos[estadoDoc.documentosAlternativos.preferido]}` :
-                            `📝 Presenta alternativa: ${mapeoDocumentos[estadoDoc.documentosAlternativos.alternativa]}`
+                            `✨ Presenta documento preferido: ${mapeoDocumentos[estadoDoc.documentosAlternativos.preferido] || estadoDoc.documentosAlternativos.preferido}` :
+                            estadoDoc.documentosAlternativos.alternativa && mapeoDocumentos[estadoDoc.documentosAlternativos.alternativa] ?
+                                `📝 Presenta alternativa: ${mapeoDocumentos[estadoDoc.documentosAlternativos.alternativa]}` :
+                                null
                         }
                     </div>
                 )}
@@ -231,6 +270,7 @@ const RegistroPendienteItem = ({
                     onCompletar={onCompletar}
                     onEliminar={onEliminar}
                     onEnviarEmail={onEnviarEmail}
+                    onReiniciarAlarma={onReiniciarAlarma}
                 />
             </div>
         </div>
@@ -245,7 +285,8 @@ RegistroPendienteItem.propTypes = {
     onCompletar: PropTypes.func.isRequired,
     onEliminar: PropTypes.func.isRequired,
     onEnviarEmail: PropTypes.func.isRequired,
-    obtenerInfoVencimiento: PropTypes.func.isRequired
+    obtenerInfoVencimiento: PropTypes.func.isRequired,
+    onReiniciarAlarma: PropTypes.func.isRequired
 };
 
 export default RegistroPendienteItem;

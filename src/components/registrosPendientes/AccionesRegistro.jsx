@@ -6,7 +6,8 @@ const AccionesRegistro = ({
     enviandoEmail, 
     onCompletar, 
     onEliminar, 
-    onEnviarEmail 
+    onEnviarEmail,
+    onReiniciarAlarma 
 }) => {
     // Log eliminado para evitar spam en console
 
@@ -127,6 +128,33 @@ const AccionesRegistro = ({
                     {enviandoEmail ? '📧 Enviando...' : `📧 ${info.vencido ? 'Vencido' : 'Notificar'}`}
                 </button>
             )}
+            {/* Botón para reiniciar alarma - solo si está vencido o próximo a vencer Y puede reiniciar */}
+            {(info.vencido || info.diasRestantes <= 3) && info.puedeReiniciarAlarma && (
+                <button
+                    onClick={() => onReiniciarAlarma(registro)}
+                    className="btn-reiniciar-alarma"
+                    disabled={enviandoEmail}
+                    title="Extender plazo de entrega por 7 días adicionales"
+                    style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        backgroundColor: '#ffc107',
+                        color: '#212529',
+                        border: 'none',
+                        padding: '8px 12px',
+                        borderRadius: '4px',
+                        cursor: enviandoEmail ? 'not-allowed' : 'pointer',
+                        fontSize: '12px',
+                        margin: '2px',
+                        visibility: 'visible',
+                        opacity: enviandoEmail ? 0.6 : 1,
+                        whiteSpace: 'nowrap',
+                        fontWeight: 'bold'
+                    }}
+                >
+                    ⏰ Reiniciar Alarma
+                </button>
+            )}
             {/* Botón para eliminar registro */}
             <button
                 onClick={() => onEliminar(registro)}
@@ -161,7 +189,8 @@ AccionesRegistro.propTypes = {
     enviandoEmail: PropTypes.bool.isRequired,
     onCompletar: PropTypes.func.isRequired,
     onEliminar: PropTypes.func.isRequired,
-    onEnviarEmail: PropTypes.func.isRequired
+    onEnviarEmail: PropTypes.func.isRequired,
+    onReiniciarAlarma: PropTypes.func.isRequired
 };
 
 export default AccionesRegistro;

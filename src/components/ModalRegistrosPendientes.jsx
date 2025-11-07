@@ -18,7 +18,7 @@ import '../estilos/botones.css';
 import '../estilos/ModalRegistrosPendientes.css';
 
 const ModalRegistrosPendientes = ({ onClose }) => {
-    const { showSuccess, showError, showWarning, showInfo, alerts, removeAlert, modal, closeModal } = useAlerts();
+    const { showSuccess, showError, showWarning, showInfo, alerts, removeAlert, modal, closeModal, clearAlerts } = useAlerts();
     // Eliminar estado local de alerta, usar solo sistema global
     const [registros, setRegistros] = useState([]);
     const [mensajeEmail, setMensajeEmail] = useState('');
@@ -216,13 +216,36 @@ const ModalRegistrosPendientes = ({ onClose }) => {
 
     // Función para obtener información del vencimiento
     const obtenerInfoVencimiento = (registro) => {
+        // Si el registro tiene información de vencimiento del backend, usarla
+        if (registro.vencimiento) {
+            const info = registro.vencimiento;
+            return {
+                vencido: info.tipoNotificacion === 'vencido',
+                diasRestantes: info.diasRestantes || 0,
+                mensaje: info.mensaje || 'Sin información',
+                color: info.tipoNotificacion === 'vencido' ? '#dc3545' : 
+                       info.diasRestantes <= 1 ? '#dc3545' : 
+                       info.diasRestantes <= 3 ? '#ffc107' : '#28a745',
+                fechaVencimiento: info.fechaVencimiento || 'No disponible',
+                puedeReiniciarAlarma: info.puedeReiniciarAlarma || false
+            };
+        }
+
+        // Fallback: lógica original para registros sin información de vencimiento del backend
         const ahora = new Date();
         const fechaRegistro = new Date(registro.timestamp);
         const vencimiento = new Date(fechaRegistro.getTime() + (7 * 24 * 60 * 60 * 1000));
         const msRestantes = vencimiento.getTime() - ahora.getTime();
 
         if (msRestantes <= 0) {
-            return { vencido: true, diasRestantes: 0, mensaje: 'VENCIDO', color: '#dc3545' };
+            return { 
+                vencido: true, 
+                diasRestantes: 0, 
+                mensaje: 'VENCIDO', 
+                color: '#dc3545',
+                fechaVencimiento: vencimiento.toLocaleString(),
+                puedeReiniciarAlarma: true
+            };
         }
 
         const diasRestantes = Math.ceil(msRestantes / (1000 * 60 * 60 * 24));
@@ -248,7 +271,8 @@ const ModalRegistrosPendientes = ({ onClose }) => {
             diasRestantes,
             mensaje,
             color,
-            fechaVencimiento: vencimiento.toLocaleString()
+            fechaVencimiento: vencimiento.toLocaleString(),
+            puedeReiniciarAlarma: diasRestantes <= 3
         };
     };
 
@@ -279,13 +303,14 @@ const ModalRegistrosPendientes = ({ onClose }) => {
 
     // Función para cerrar modal de edición
     const cerrarModalEdicion = () => {
+        // Limpiar alertas al cerrar el modal
+        clearAlerts();
         setMostrarModalEdicion(false);
         setRegistroEditando(null);
     };
 
     // Función para manejar guardado desde el modal
-    // Ahora acepta un tercer parámetro 'resultado' que viene del backend
-    // El backend puede devolver yaExistia=true si el DNI ya estaba registrado
+    // resultado incluye información detallada del backend sobre la operación
     const handleRegistroGuardado = async (registro, tipoOperacion, resultado = null) => {
         console.log(`✅ Registro ${tipoOperacion}:`, registro?.dni, 'resultado:', resultado);
 
@@ -293,37 +318,75 @@ const ModalRegistrosPendientes = ({ onClose }) => {
             if (tipoOperacion === 'completado') {
                 const nombreCompleto = `${registro.datos?.nombre || registro.nombre} ${registro.datos?.apellido || registro.apellido}`.trim();
                 
-                // Mensaje diferente si fue actualización vs inserción
+                // Si fue actualización de un registro existente
                 if (resultado?.yaExistia) {
-                    showSuccess(`📝 ${nombreCompleto} - Documentación actualizada en registro existente.`);
+                    // Mostrar más detalles del resultado de la actualización
+                    if (resultado.mensaje) {
+                        showSuccess(resultado.mensaje);
+                    } else {
+                        showSuccess(`📝 ${nombreCompleto} - Documentación actualizada exitosamente.`);
+                    }
                 } else {
-                    showSuccess(`🎉 ${nombreCompleto} - Estudiante registrado y aprobado.`);
+                    // Si fue inserción de nuevo registro
+                    showSuccess(`🎉 ${nombreCompleto} - Estudiante registrado exitosamente.`);
                 }
 
                 // Eliminar automáticamente de la lista local
                 setRegistros(prevRegistros => prevRegistros.filter(r => r.dni !== registro.dni));
 
-                // Refrescar listas desde el servidor para sincronizar Registros Pendientes y Registros Web
+                // Refrescar listas desde el servidor
                 await recargarRegistros(false);
 
-                // Si el backend devolvió información del alumno creado/actualizado, mostrar información adicional
+                // Mostrar información adicional sobre el resultado si está disponible
                 if (resultado && (resultado.insertId || resultado.insertId === 0)) {
-                    // Mostrar información adicional sin ser intrusivo
+                    let infoAdicional = [];
+                    infoAdicional.push(`ID: ${resultado.insertId}`);
+                    
                     if (resultado.archivos) {
-                        showInfo(`ID creado: ${resultado.insertId} — Archivos adjuntos migrados: ${Object.keys(resultado.archivos).length}`);
-                    } else {
-                        showInfo(`ID creado: ${resultado.insertId}`);
+                        infoAdicional.push(`Archivos migrados: ${Object.keys(resultado.archivos).length}`);
                     }
+                    
+                    if (resultado.modulosAsignados) {
+                        infoAdicional.push(`Módulos: ${resultado.modulosAsignados.join(', ')}`);
+                    }
+                    
+                    showInfo(`ℹ️ Detalles: ${infoAdicional.join(' | ')}`);
                 }
-            } else {
-                // Para actualizaciones u otros casos, recargar la lista
+
+            } else if (tipoOperacion === 'ya_procesado') {
+                const nombreCompleto = `${registro.datos?.nombre || registro.nombre} ${registro.datos?.apellido || registro.apellido}`.trim();
+                
+                // Mostrar mensaje detallado sobre el registro existente
+                if (resultado?.mensaje) {
+                    showWarning(resultado.mensaje);
+                } else {
+                    showWarning(`⚠️ ${nombreCompleto} ya está registrado en el sistema.`);
+                }
+                
+                // Información adicional sobre el registro existente
+                if (resultado?.detalles) {
+                    showInfo(resultado.detalles);
+                }
+                
+                // Eliminar de la lista local y sincronizar
+                setRegistros(prevRegistros => prevRegistros.filter(r => r.dni !== registro.dni));
                 await recargarRegistros(false);
+                
+            } else if (tipoOperacion === 'actualizado') {
+                // Recargar lista después de una actualización
+                await recargarRegistros(false);
+                
+                if (resultado?.mensaje) {
+                    showSuccess(resultado.mensaje);
+                } else {
+                    showSuccess('✅ Registro actualizado exitosamente');
+                }
             }
         } catch (error) {
-            console.error('Error en handleRegistroGuardado al refrescar listas:', error);
-            showError(`Error al actualizar listas: ${error.message}`);
+            console.error('Error en handleRegistroGuardado:', error);
+            showError(`❌ Error al procesar el registro: ${error.message}`);
         } finally {
-            // Cerrar modal después de un pequeño delay para que se vea el mensaje
+            // Cerrar modal con delay para mostrar mensajes
             setTimeout(() => {
                 cerrarModalEdicion();
             }, 500);
@@ -355,6 +418,32 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         } catch (error) {
             console.error('Error al eliminar registro:', error);
             showError(`❌ Error al eliminar: ${error.message}`);
+        }
+    };
+
+    // Función para reiniciar alarma de vencimiento
+    const reiniciarAlarma = async (registro, diasExtension = 7, motivo = 'Extensión solicitada') => {
+        const nombreCompleto = `${registro.datos?.nombre || registro.nombre || ''} ${registro.datos?.apellido || registro.apellido || ''}`.trim();
+        try {
+            showInfo(`⏰ Reiniciando alarma para ${nombreCompleto || 'registro'}...`);
+            const resultado = await registrosPendientesService.reiniciarAlarma(registro.dni, diasExtension, motivo);
+            
+            // El backend devuelve un objeto con 'mensaje' si es exitoso
+            if (resultado && resultado.mensaje === 'Alarma reiniciada exitosamente') {
+                // Recargar registros para mostrar la nueva fecha de vencimiento
+                await recargarRegistros(false);
+                showSuccess(`✅ Alarma reiniciada: ${nombreCompleto} tiene ${diasExtension} días adicionales`);
+            } else {
+                showError(`❌ Error al reiniciar alarma: ${resultado?.mensaje || 'Error desconocido'}`);
+            }
+        } catch (error) {
+            console.error('Error al reiniciar alarma:', error);
+            // Si es un error de HTTP (4xx, 5xx), extraer el mensaje del response
+            if (error.response && error.response.data && error.response.data.mensaje) {
+                showError(`❌ Error al reiniciar alarma: ${error.response.data.mensaje}`);
+            } else {
+                showError(`❌ Error al reiniciar alarma: ${error.message || 'Error desconocido'}`);
+            }
         }
     };
 
@@ -584,9 +673,23 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         // Lógica original para registros pendientes normales
         const modalidad = registro.datos?.modalidad || registro.modalidad || '';
         const planAnio = registro.datos?.planAnio || registro.planAnio || '';
-        const modulos = registro.datos?.modulos || registro.modulos || '';
+        
+        // Extraer modulos del campo directo o del array idModulo
+        let modulos = registro.datos?.modulos || registro.modulos || '';
+        
+        // Si modulos está vacío, intentar extraerlo del array idModulo
+        if ((!modulos || modulos === '') && registro.datos?.idModulo && Array.isArray(registro.datos.idModulo)) {
+            const moduloValido = registro.datos.idModulo.find(id => id && id !== '' && id !== null);
+            if (moduloValido) {
+                modulos = moduloValido;
+                console.log('🔄 [MODAL] Módulo extraído del array idModulo:', moduloValido, 'de array:', registro.datos.idModulo);
+            }
+        }
+        
         console.log('[DEBUG] Llamando a obtenerDocumentosRequeridos desde ModalRegistrosPendientes.jsx con:', {
-            modalidad, planAnio, modulos
+            modalidad, planAnio, modulos,
+            idModulo: registro.datos?.idModulo,
+            dni: registro.dni
         });
         const requerimientos = obtenerDocumentosRequeridos(modalidad, planAnio, modulos);
         const documentosRequeridosDinamicos = requerimientos.documentos || [];
@@ -914,6 +1017,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                             onEliminar={procesarEliminacion}
                             onEnviarEmail={enviarEmailIndividual}
                             obtenerInfoVencimiento={obtenerInfoVencimiento}
+                            onReiniciarAlarma={reiniciarAlarma}
                             getTipoIcon={getTipoIcon}
                             formatearTipo={formatearTipo}
                         />

@@ -22,8 +22,16 @@ const PlanAnioSelector = ({ modalidad, handleChange, value, modalidadId, setFiel
             handleChange(event);
         }
         setAlerta(newValue === "");
-        setIdModulo('');
-        setFieldValue('modulos', '');
+        
+        // Solo resetear módulo si NO estamos en modo de registro pendiente
+        const datosRegistroPendiente = sessionStorage.getItem('datosRegistroPendiente');
+        if (!datosRegistroPendiente) {
+            console.log('🔄 [PLAN CHANGE] Reseteando módulo (no es registro pendiente)');
+            setIdModulo('');
+            setFieldValue('modulos', '');
+        } else {
+            console.log('🔒 [PLAN CHANGE] Manteniendo módulo (es registro pendiente)');
+        }
     };
 
    const handleModuloChange = (event) => {
@@ -95,6 +103,7 @@ const PlanAnioSelector = ({ modalidad, handleChange, value, modalidadId, setFiel
                             setFieldValue('modulos', moduloId);
                             setFieldValue('idModulo', datos.idModulo); // Mantener array original también
                             setModuloInicialEstablecido(true); // Marcar como establecido
+                            console.log('✅ [INIT MÓDULO] Estado actualizado - idModulo local:', moduloId, 'formik modulos:', moduloId);
                         } else {
                             console.warn('⚠️ Módulo no encontrado en lista disponible:', moduloId);
                             console.log('📋 Módulos disponibles:', modulos);

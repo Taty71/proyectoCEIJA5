@@ -109,7 +109,13 @@ const registrosPendientesService = {
             const dni = formData.get('dni') || formData.get('registroPendienteId');
             if (!dni) throw new Error('No se encontró el DNI en el FormData');
             console.log('✅ Procesando registro pendiente y migrando a BD...');
-            const response = await axiosInstance.post(`/registros-pendientes/${dni}/procesar`);
+            
+            // POST con multipart/form-data para enviar archivos
+            const response = await axiosInstance.post(`/registros-pendientes/${dni}/procesar`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
             const resultado = response.data;
             // Si el backend devolvió la versión actualizada del Registro Web, emitir un evento global
             try {
@@ -137,6 +143,22 @@ const registrosPendientesService = {
             return resultado;
         } catch (error) {
             console.error('Error al enviar notificación:', error);
+            throw error;
+        }
+    },
+
+    // Reiniciar alarma de vencimiento
+    reiniciarAlarma: async (dni, diasExtension = 7, motivo = 'Extensión solicitada') => {
+        try {
+            console.log(`⏰ Reiniciando alarma para DNI: ${dni}, extensión: ${diasExtension} días`);
+            const { data: resultado } = await axiosInstance.post(`/registros-pendientes/${dni}/reiniciar-alarma`, {
+                diasExtension,
+                motivo
+            });
+            console.log('✅ Alarma reiniciada exitosamente');
+            return resultado;
+        } catch (error) {
+            console.error('Error al reiniciar alarma:', error);
             throw error;
         }
     }

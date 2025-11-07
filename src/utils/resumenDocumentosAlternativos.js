@@ -26,15 +26,15 @@
  * - Ficha Médica CUS
  * - Partida de Nacimiento
  * 
- * 🎓 PRESENCIAL 1er AÑO: 7 documentos
- * - Base (5) + Certificado Primario + Solicitud de Pase
+ * 🎓 PRESENCIAL 1er AÑO: 6 documentos
+ * - Base (5) + Certificado Primario 
  * 
  * 🎓 PRESENCIAL 2do/3er AÑO: 6 documentos
  * - Base (5) + (Analítico Parcial O Solicitud de Pase)
  * - SIN certificado de nivel primario
  * 
- * 📚 SEMIPRESENCIAL PLAN A: 7 documentos
- * - Base (5) + Certificado Primario + Solicitud de Pase
+ * 📚 SEMIPRESENCIAL PLAN A: 6 documentos
+ * - Base (5) + Certificado Primario 
  * 
  * 📚 SEMIPRESENCIAL PLAN B/C: 6 documentos
  * - Base (5) + (Analítico Parcial O Solicitud de Pase)
@@ -67,7 +67,7 @@
  * CASOS DE USO VALIDADOS:
  * =======================
  * 
- * ✅ Plan A / 1er Año: 7 docs (base + certificado + solicitud)
+ * ✅ Plan A / 1er Año: 6 docs (base + certificado primario)
  * ✅ Plan B / 2do Año: 6 docs (base + analítico O solicitud)
  * ✅ Plan C / 3er Año: 6 docs (base + analítico O solicitud)
  * 
@@ -77,7 +77,7 @@
  * ✅ 2do/3er año con analítico → PROCESADO (6/6 documentos)
  * ✅ 2do/3er año con solicitud → PROCESADO (6/6 documentos)
  * ✅ 2do/3er año sin alternativo → PENDIENTE (5/6 documentos)
- * ✅ 1er año/Plan A completo → PROCESADO (7/7 documentos)
+ * ✅ 1er año/Plan A completo → PROCESADO (6/6 documentos)
  * 
  * EJEMPLO CORREGIDO:
  * ==================

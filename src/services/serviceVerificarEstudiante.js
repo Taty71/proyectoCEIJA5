@@ -12,6 +12,11 @@ export const verificarEstudiante = async (dni) => {
         const response = await fetch(`${API_URL}/api/verificar-estudiante/${dni}`);
 
         if (!response.ok) {
+            if (response.status === 404) {
+                // Estudiante no encontrado - esto es normal para nuevos registros
+                console.log(`ℹ️ Estudiante con DNI ${dni} no encontrado en BD (normal para nuevos registros)`);
+                return { existe: false, message: 'DNI no encontrado en la base de datos' };
+            }
             throw new Error(`Error HTTP: ${response.status}`);
         }
 
@@ -69,6 +74,13 @@ export const enriquecerRegistroProcesado = async (registro) => {
         return registroEnriquecido;
 
     } catch (error) {
+        if (error.message === 'Error HTTP: 404') {
+            // No es realmente un error, solo significa que el estudiante no está en BD
+            return {
+                ...registro,
+                estudianteEnBD: false
+            };
+        }
         console.error(`❌ Error al enriquecer registro ${registro.dni}:`, error);
         return {
             ...registro,

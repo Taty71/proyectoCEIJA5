@@ -23,7 +23,8 @@ const {
     actualizarRegistroPendiente,
     eliminarRegistroPendiente,
     obtenerEstadisticas,
-    procesarRegistroPendiente
+    procesarRegistroPendiente,
+    reiniciarAlarma
 } = require('../services/registrosPendientes/controllers');
 
 // ================================
@@ -52,9 +53,12 @@ router.get('/stats', obtenerEstadisticas);
 router.put('/:dni/archivos', upload.any(), actualizarRegistroPendiente);
 
 // POST /api/registros-pendientes/procesar - Procesar registro pendiente
-router.post('/procesar', procesarRegistroPendiente);
+router.post('/procesar', upload.any(), procesarRegistroPendiente);
 
 // POST /api/registros-pendientes/:dni/procesar - Procesar registro pendiente (alternativo)
-router.post('/:dni/procesar', procesarRegistroPendiente);
+router.post('/:dni/procesar', upload.any(), procesarRegistroPendiente);
+
+// POST /api/registros-pendientes/:dni/reiniciar-alarma - Reiniciar alarma de vencimiento
+router.post('/:dni/reiniciar-alarma', reiniciarAlarma);
 
 module.exports = router;

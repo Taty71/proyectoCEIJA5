@@ -48,8 +48,8 @@ const validarDocumentacion = (modalidadId, planAnioId, archivosDisponibles) => {
             nombreDocumentoRequerido = 'Certificado de Nivel Primario';
             documentacionCompleta = documentacionBasicaCompleta && tieneCertificadoPrimario;
         } else if (planAnioId === 5 || planAnioId === 6) { // Plan B/C
-            nombreDocumentoRequerido = 'Analítico Parcial';
-            documentacionCompleta = documentacionBasicaCompleta && tieneAnaliticoParcial;
+            nombreDocumentoRequerido = 'Analítico Parcial o Solicitud de Pase';
+            documentacionCompleta = documentacionBasicaCompleta && (tieneAnaliticoParcial || tieneSolicitudPase);
         } else {
             // Default case for unspecified Semipresencial plans
             console.log(`   ⚠️  Plan ${planAnioId} no especificado para Semipresencial, usando documentación básica`);
@@ -116,8 +116,8 @@ const generarMensajePendiente = (resultado, registro) => {
         } else if (modalidadId === 2) { // SEMIPRESENCIAL
             if (planAnioId === 4 && !tieneCertificadoPrimario) {
                 documentosFaltantes.push('📊 Certificado de Nivel Primario');
-            } else if ((planAnioId === 5 || planAnioId === 6) && !tieneAnaliticoParcial) {
-                documentosFaltantes.push('📊 Analítico Parcial');
+            } else if ((planAnioId === 5 || planAnioId === 6) && !tieneAnaliticoParcial && !tieneSolicitudPase) {
+                documentosFaltantes.push('📊 Analítico Parcial (o alternativamente: 📝 Solicitud de Pase)');
             }
         }
     }

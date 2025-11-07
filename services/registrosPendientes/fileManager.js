@@ -46,14 +46,23 @@ const migrarArchivo = async (archivoPath, nuevoNombre) => {
         // Asegurar que el directorio de destino existe
         await fs.mkdir(path.dirname(destinoCompleto), { recursive: true });
         
-        // Copiar archivo
-        await fs.copyFile(archivoCompleto, destinoCompleto);
-        
-        // Eliminar archivo original
-        await fs.unlink(archivoCompleto);
-        
-        console.log(`✅ [migración] Archivo migrado exitosamente`);
-        return `/archivosDocumento/${nuevoNombre}`;
+        try {
+            // Copiar archivo
+            await fs.copyFile(archivoCompleto, destinoCompleto);
+            
+            // Verificar que el archivo se copió correctamente
+            await fs.access(destinoCompleto);
+            
+            // Eliminar archivo original solo si la copia fue exitosa
+            await fs.unlink(archivoCompleto);
+            
+            console.log(`✅ [migración] Archivo migrado exitosamente a ${destinoCompleto}`);
+            return `/archivosDocumento/${nuevoNombre}`;
+        } catch (copyError) {
+            console.error(`❌ [migración] Error en la copia/verificación:`, copyError);
+            // Si falló la copia, mantener el archivo en pendientes
+            return `/archivosPendientes/${path.basename(archivoCompleto)}`;
+        }
     } catch (error) {
         console.error(`❌ [migración] Error al migrar archivo:`, error);
         throw error;
@@ -104,23 +113,35 @@ const detectarArchivosDisponibles = async (registro) => {
 
 // Función para migrar todos los archivos de un registro
 const migrarArchivosRegistro = async (registro, archivosDisponibles) => {
+    console.log('\n📦 [MIGRACIÓN] Iniciando migración de archivos...');
+    console.log(`   - DNI: ${registro.dni}`);
+    console.log(`   - Nombre: ${registro.datos.nombre} ${registro.datos.apellido}`);
+    
     const archivosMigrados = {};
+    let erroresMigracion = false;
     
     for (const [campo, rutaArchivo] of Object.entries(archivosDisponibles)) {
         if (rutaArchivo && rutaArchivo.includes('/archivosPendientes/')) {
             try {
+                console.log(`\n🔄 [MIGRACIÓN] Procesando ${campo}:`);
+                console.log(`   Origen: ${rutaArchivo}`);
+                
                 const nombreArchivo = path.basename(rutaArchivo);
                 const nuevaRuta = await migrarArchivo(rutaArchivo, nombreArchivo);
+                
                 archivosMigrados[campo] = nuevaRuta;
-                console.log(`✅ [migración] ${campo}: ${rutaArchivo} → ${nuevaRuta}`);
+                console.log(`   ✅ Migrado a: ${nuevaRuta}`);
+                
             } catch (error) {
-                console.error(`❌ [migración] Error al migrar ${campo}:`, error);
+                console.error(`   ❌ Error al migrar ${campo}:`, error.message);
+                erroresMigracion = true;
                 // Mantener la ruta original si falla la migración
                 archivosMigrados[campo] = rutaArchivo;
             }
         } else {
             // Archivo ya migrado o no existe
             archivosMigrados[campo] = rutaArchivo;
+            console.log(`   ℹ️ [MIGRACIÓN] ${campo}: ya migrado o no requiere migración`);
         }
     }
     

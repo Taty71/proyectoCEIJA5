@@ -1,6 +1,7 @@
 const { leerRegistrosPendientes, guardarRegistrosPendientes, detectarArchivosDisponibles, migrarArchivosRegistro } = require('./fileManager');
 const { validarDocumentacion, generarMensajePendiente } = require('./documentValidator');
 const { insertarEstudianteCompleto, verificarEstudianteExistente } = require('./databaseManager');
+const { determinarEstadoNotificacion } = require('./vencimientoUtils');
 
 // Controlador: Obtener todos los registros pendientes
 const obtenerTodosLosRegistros = async (req, res) => {
@@ -18,10 +19,12 @@ const obtenerTodosLosRegistros = async (req, res) => {
             // Solo verificar registros PENDIENTES o PROCESADOS
             if (registro.estado === 'PENDIENTE' || registro.estado === 'PROCESADO') {
                 try {
+                    console.log(`🔍 [VERIFICAR] Consultando estudiante con DNI: ${registro.dni}`);
                     const [rows] = await db.query('SELECT id FROM estudiantes WHERE dni = ?', [registro.dni]);
                     
                     if (rows && rows.length > 0) {
                         const idEstudiante = rows[0].id;
+                        console.log(`✅ [VERIFICAR] Estudiante encontrado: ${registro.datos?.nombre || 'N/A'} ${registro.datos?.apellido || 'N/A'} (ID: ${idEstudiante})`);
                         
                         // Verificar inscripciones
                         const [inscripciones] = await db.query(`
@@ -31,35 +34,43 @@ const obtenerTodosLosRegistros = async (req, res) => {
                             WHERE i.idEstudiante = ?
                         `, [idEstudiante]);
                         
+                        console.log(`📋 [VERIFICAR] ${inscripciones.length} inscripción(es) encontrada(s)`);
+                        
                         // Contar documentos
                         const [documentos] = await db.query(`
                             SELECT COUNT(*) as total FROM archivos_estudiantes WHERE idEstudiante = ?
                         `, [idEstudiante]);
                         
                         const totalDocumentos = documentos[0]?.total || 0;
+                        console.log(`📁 [VERIFICAR] ${totalDocumentos} documento(s) en BD`);
+                        
                         let necesitaActualizacion = false;
                         
-                        // Actualizar a PROCESADO si está PENDIENTE
-                        if (registro.estado === 'PENDIENTE') {
-                            registro.estado = 'PROCESADO';
+                        // SOLO enriquecer con información de BD, NO cambiar estados
+                        // El estado lo decide exclusivamente el administrador al completar el registro
+                        if (!registro.idEstudiante) {
                             registro.idEstudiante = idEstudiante;
-                            registro.fechaProcesado = new Date().toISOString();
                             necesitaActualizacion = true;
+                            console.log(`� [SYNC] Vinculando ${registro.dni} con idEstudiante: ${idEstudiante}`);
                         }
                         
-                        // Actualizar a APROBADO si cumple condiciones
-                        if (inscripciones.length > 0 && totalDocumentos >= 5) {
-                            const estadoInscripcion = inscripciones[0].estado;
-                            if (estadoInscripcion === 'aprobado' || estadoInscripcion === 'procesado') {
-                                registro.estado = 'APROBADO';
-                                registro.fechaAprobado = new Date().toISOString();
-                                necesitaActualizacion = true;
-                            }
+                        // Agregar flag para indicar que existe en BD (para el frontend)
+                        if (!registro.estudianteEnBD) {
+                            registro.estudianteEnBD = true;
+                            registro.inscripcionesBD = inscripciones.length;
+                            registro.documentosBD = totalDocumentos;
+                            necesitaActualizacion = true;
+                            console.log(`🏷️ [SYNC] Marcando ${registro.dni} como existente en BD (${inscripciones.length} inscripciones, ${totalDocumentos} documentos)`);
                         }
+                        
+                        // NO cambiar estado - eso lo decide el administrador
+                        console.log(`ℹ️ [SYNC] Estado actual de ${registro.dni}: ${registro.estado} (mantenido, lo decide el administrador)`)
                         
                         if (necesitaActualizacion) {
                             actualizados++;
                         }
+                    } else {
+                        console.log(`❌ [VERIFICAR] No se encontró estudiante con DNI: ${registro.dni}`);
                     }
                 } catch (dbError) {
                     console.warn(`⚠️ [SYNC] Error verificando DNI ${registro.dni}:`, dbError.message);
@@ -73,8 +84,14 @@ const obtenerTodosLosRegistros = async (req, res) => {
             console.log(`🔄 [SYNC] ${actualizados} registros sincronizados automáticamente`);
         }
         
-        console.log(`✅ [GET] Enviando ${registros.length} registros pendientes`);
-        res.json(registros);
+        // Agregar información de vencimiento a cada registro
+        const registrosConVencimiento = registros.map(registro => ({
+            ...registro,
+            vencimiento: determinarEstadoNotificacion(registro)
+        }));
+        
+        console.log(`✅ [GET] Enviando ${registrosConVencimiento.length} registros pendientes`);
+        res.json(registrosConVencimiento);
     } catch (error) {
         console.error('❌ [GET] Error al obtener registros:', error);
         res.status(500).json({ 
@@ -125,26 +142,26 @@ const obtenerRegistroPorDni = async (req, res) => {
                 WHERE ae.idEstudiante = ?
             `, [idEstudiante]);
             
-            // Actualizar registro si es necesario
+            // SOLO enriquecer con información de BD, NO cambiar estados
+            // El estado lo decide exclusivamente el administrador al completar el registro
             let necesitaActualizacion = false;
-            if (registro.estado === 'PENDIENTE') {
-                registro.estado = 'PROCESADO';
+            if (!registro.idEstudiante) {
                 registro.idEstudiante = idEstudiante;
-                registro.fechaProcesado = new Date().toISOString();
                 necesitaActualizacion = true;
-                console.log(`🔄 [SYNC] Actualizando estado de ${registro.datos.nombre} ${registro.datos.apellido} a PROCESADO`);
+                console.log(`� [SYNC] Vinculando ${registro.datos.nombre} ${registro.datos.apellido} con idEstudiante: ${idEstudiante}`);
             }
             
-            // Verificar si debe pasar a APROBADO
-            if (inscripciones.length > 0 && documentos.length >= 5) {
-                const estadoInscripcion = inscripciones[0].estado;
-                if (estadoInscripcion === 'aprobado' || estadoInscripcion === 'procesado') {
-                    registro.estado = 'APROBADO';
-                    registro.fechaAprobado = new Date().toISOString();
-                    necesitaActualizacion = true;
-                    console.log(`✅ [SYNC] Actualizando estado de ${registro.datos.nombre} ${registro.datos.apellido} a APROBADO`);
-                }
+            // Agregar flag para indicar que existe en BD (para el frontend)
+            if (!registro.estudianteEnBD) {
+                registro.estudianteEnBD = true;
+                registro.inscripcionesBD = inscripciones.length;
+                registro.documentosBD = documentos.length;
+                necesitaActualizacion = true;
+                console.log(`🏷️ [SYNC] Marcando ${registro.datos.nombre} ${registro.datos.apellido} como existente en BD`);
             }
+            
+            // NO cambiar estado - eso lo decide el administrador
+            console.log(`ℹ️ [SYNC] Estado actual: ${registro.estado} (mantenido, lo decide el administrador)`)
             
             // Agregar información de la base de datos
             registro.datosBaseDatos = {
@@ -169,6 +186,9 @@ const obtenerRegistroPorDni = async (req, res) => {
             const archivosDisponibles = await detectarArchivosDisponibles(registro);
             registro.archivosDisponibles = archivosDisponibles;
         }
+        
+        // Agregar información de vencimiento
+        registro.vencimiento = determinarEstadoNotificacion(registro);
         
         console.log(`✅ [GET] Registro encontrado para DNI: ${dni} - Estado: ${registro.estado}`);
         res.json(registro);
@@ -372,7 +392,8 @@ const obtenerEstadisticas = async (req, res) => {
 // Controlador: Procesar registro pendiente
 const procesarRegistroPendiente = async (req, res) => {
     try {
-        const { dni } = req.body;
+        // Obtener DNI desde los parámetros de URL o del body
+        const dni = req.params.dni || req.body.dni;
         
         if (!dni) {
             return res.status(400).json({ mensaje: 'DNI es requerido' });
@@ -396,15 +417,45 @@ const procesarRegistroPendiente = async (req, res) => {
         const estudianteExistente = await verificarEstudianteExistente(dni);
         if (estudianteExistente) {
             console.log(`⚠️  [PROCESAR] El estudiante con DNI ${dni} ya existe en la base de datos`);
-            return res.status(409).json({ 
-                mensaje: 'El estudiante ya existe en la base de datos',
-                idEstudiante: estudianteExistente.id
+            console.log(`🔄 [PROCESAR] Marcando registro como PROCESADO y sincronizando...`);
+            
+            // Marcar el registro como PROCESADO automáticamente
+            registro.estado = 'PROCESADO';
+            registro.fechaProcesado = new Date().toISOString();
+            registro.idEstudiante = estudianteExistente.id;
+            
+            registros[indiceRegistro] = registro;
+            await guardarRegistrosPendientes(registros);
+            
+            console.log(`✅ [PROCESAR] Registro sincronizado como PROCESADO`);
+            
+            return res.json({
+                mensaje: 'Estudiante ya existía - registro marcado como procesado',
+                estado: 'PROCESADO',
+                idEstudiante: estudianteExistente.id,
+                yaExistia: true,
+                registro: registro
             });
         }
         
         // 3. Detectar archivos disponibles (incluye los del registro + los encontrados en carpeta)
         const archivosDisponibles = await detectarArchivosDisponibles(registro);
-        console.log(`📁 [PROCESAR] Archivos disponibles:`, Object.keys(archivosDisponibles));
+        console.log(`📁 [PROCESAR] Archivos disponibles en archivosPendientes:`, Object.keys(archivosDisponibles));
+        
+        // 3.1. Agregar archivos recién subidos (si los hay en req.files)
+        if (req.files && req.files.length > 0) {
+            console.log(`📎 [PROCESAR] Archivos recibidos en request (${req.files.length}):`);
+            for (const file of req.files) {
+                const fieldName = file.fieldname;
+                const rutaRelativa = `/archivosPendientes/${file.filename}`;
+                archivosDisponibles[fieldName] = rutaRelativa;
+                console.log(`   ✅ ${fieldName} -> ${rutaRelativa}`);
+            }
+        } else {
+            console.log(`ℹ️ [PROCESAR] No se recibieron archivos nuevos en la petición`);
+        }
+        
+        console.log(`📁 [PROCESAR] Total archivos disponibles para validación:`, Object.keys(archivosDisponibles));
         
         // 4. Validar documentación usando la lógica universal
         const modalidadId = parseInt(registro.modalidadId || registro.datos.modalidadId);
@@ -413,23 +464,49 @@ const procesarRegistroPendiente = async (req, res) => {
         const resultadoValidacion = validarDocumentacion(modalidadId, planAnioId, archivosDisponibles);
         
         if (!resultadoValidacion.documentacionCompleta) {
-            // Actualizar el registro como PENDIENTE con mensaje informativo
+            // FLUJO INCOMPLETO: Actualizar el registro PENDIENTE con archivos subidos
+            console.log(`⚠️  [PROCESAR] Documentación incompleta - actualizando registro PENDIENTE`);
+            
             registro.estado = 'PENDIENTE';
             registro.motivoPendiente = generarMensajePendiente(resultadoValidacion, registro);
             registro.fechaActualizacion = new Date().toISOString();
             
-            // Actualizar los archivos disponibles en el registro
-            registro.archivos = { ...registro.archivos, ...archivosDisponibles };
+            // Combinar archivos: mantener los existentes + agregar nuevos detectados
+            // Los archivos quedan en archivosPendientes/ hasta completar documentación
+            const archivosActualizados = { ...registro.archivos };
+            for (const [campo, ruta] of Object.entries(archivosDisponibles)) {
+                if (ruta) {
+                    archivosActualizados[campo] = ruta;
+                    console.log(`   ✅ Archivo actualizado: ${campo} -> ${ruta}`);
+                }
+            }
+            registro.archivos = archivosActualizados;
+            
+            // Guardar detalles de validación para que el frontend muestre progreso
+            registro.detalleDocumentos = {
+                documentacionBasicaCompleta: resultadoValidacion.documentacionBasicaCompleta,
+                faltantesBasicos: resultadoValidacion.faltantesBasicos,
+                nombreDocumentoRequerido: resultadoValidacion.nombreDocumentoRequerido,
+                tieneAnaliticoParcial: resultadoValidacion.tieneAnaliticoParcial,
+                tieneSolicitudPase: resultadoValidacion.tieneSolicitudPase,
+                tieneCertificadoPrimario: resultadoValidacion.tieneCertificadoPrimario,
+                totalRequerido: 5 + (resultadoValidacion.requiereDocumentoAdicional ? 1 : 0),
+                totalDisponible: Object.keys(archivosActualizados).filter(k => archivosActualizados[k]).length
+            };
             
             registros[indiceRegistro] = registro;
             await guardarRegistrosPendientes(registros);
             
-            console.log(`⚠️  [PROCESAR] Documentación incompleta - registro queda PENDIENTE`);
+            console.log(`💾 [PROCESAR] Registro actualizado en Registros_Pendientes.json (${registro.detalleDocumentos.totalDisponible}/${registro.detalleDocumentos.totalRequerido} documentos)`);
+            console.log(`📁 [PROCESAR] Archivos permanecen en archivosPendientes/ hasta completar documentación`);
+            
             return res.json({
-                mensaje: 'Documentación incompleta',
+                mensaje: 'Documentación incompleta - registro actualizado',
                 estado: 'PENDIENTE',
                 detalles: resultadoValidacion,
                 motivoPendiente: registro.motivoPendiente,
+                archivosActualizados: Object.keys(archivosActualizados).filter(k => archivosActualizados[k]),
+                progreso: `${registro.detalleDocumentos.totalDisponible}/${registro.detalleDocumentos.totalRequerido}`,
                 registro: registro
             });
         }
@@ -437,9 +514,15 @@ const procesarRegistroPendiente = async (req, res) => {
         // 5. Migrar archivos a archivosDocumento
         console.log(`📦 [PROCESAR] Migrando archivos...`);
         const archivosMigrados = await migrarArchivosRegistro(registro, archivosDisponibles);
-        
+
         // 6. Insertar en la base de datos
         console.log(`💾 [PROCESAR] Insertando en base de datos...`);
+        // DEBUG: log breve antes de insertar
+        try {
+            console.log('🔍 [DEBUG] Llamando insertarEstudianteCompleto con:', { dni: registro.dni, nombre: registro.datos?.nombre, archivosMigradosSummary: Array.isArray(archivosMigrados) ? archivosMigrados.map(a => a.campo || a.tipo || a.nombreArchivo) : Object.keys(archivosMigrados || {}) });
+        } catch (e) {
+            console.warn('⚠️ [DEBUG] No se pudo serializar datos previos a inserción:', e.message);
+        }
         const resultadoInsercion = await insertarEstudianteCompleto(registro, archivosMigrados);
         
         // 7. Actualizar registro como PROCESADO
@@ -471,6 +554,79 @@ const procesarRegistroPendiente = async (req, res) => {
     }
 };
 
+// Controlador: Reiniciar alarma de vencimiento
+const reiniciarAlarma = async (req, res) => {
+    try {
+        const { dni } = req.params;
+        const { diasExtension = 7, motivo = 'Extensión solicitada por el estudiante' } = req.body;
+        
+        console.log(`🔄 [REINICIAR-ALARMA] Reiniciando alarma para DNI: ${dni}`);
+        
+        const registros = await leerRegistrosPendientes();
+        const indiceRegistro = registros.findIndex(r => r.dni === dni);
+        
+        if (indiceRegistro === -1) {
+            console.log(`❌ [REINICIAR-ALARMA] Registro no encontrado para DNI: ${dni}`);
+            return res.status(404).json({ mensaje: 'Registro no encontrado' });
+        }
+        
+        const registro = registros[indiceRegistro];
+        
+        // Verificar que el registro esté vencido o próximo a vencer
+        if (registro.estado !== 'PENDIENTE') {
+            console.log(`⚠️  [REINICIAR-ALARMA] El registro no está en estado PENDIENTE: ${registro.estado}`);
+            return res.status(400).json({ 
+                mensaje: 'Solo se pueden reiniciar alarmas de registros pendientes' 
+            });
+        }
+        
+        // Calcular nueva fecha de vencimiento
+        const nuevaFechaVencimiento = new Date();
+        nuevaFechaVencimiento.setDate(nuevaFechaVencimiento.getDate() + parseInt(diasExtension));
+        
+        // Actualizar el registro
+        registros[indiceRegistro] = {
+            ...registro,
+            fechaVencimiento: nuevaFechaVencimiento.toISOString(),
+            alarmaReiniciada: true,
+            fechaReinicio: new Date().toISOString(),
+            motivoExtension: motivo,
+            diasExtension: parseInt(diasExtension),
+            fechaActualizacion: new Date().toISOString(),
+            historialExtensiones: [
+                ...(registro.historialExtensiones || []),
+                {
+                    fecha: new Date().toISOString(),
+                    dias: parseInt(diasExtension),
+                    motivo: motivo,
+                    usuario: req.body.usuario || 'admin'
+                }
+            ]
+        };
+        
+        await guardarRegistrosPendientes(registros);
+        
+        console.log(`✅ [REINICIAR-ALARMA] Alarma reiniciada para ${registro.datos.nombre} ${registro.datos.apellido}`);
+        console.log(`   - Nueva fecha vencimiento: ${nuevaFechaVencimiento.toLocaleDateString('es-AR')}`);
+        console.log(`   - Días de extensión: ${diasExtension}`);
+        console.log(`   - Motivo: ${motivo}`);
+        
+        res.json({
+            mensaje: 'Alarma reiniciada exitosamente',
+            registro: registros[indiceRegistro],
+            nuevaFechaVencimiento: nuevaFechaVencimiento.toLocaleDateString('es-AR'),
+            diasExtension: parseInt(diasExtension)
+        });
+        
+    } catch (error) {
+        console.error('❌ [REINICIAR-ALARMA] Error al reiniciar alarma:', error);
+        res.status(500).json({ 
+            mensaje: 'Error al reiniciar la alarma', 
+            error: error.message 
+        });
+    }
+};
+
 module.exports = {
     obtenerTodosLosRegistros,
     obtenerRegistroPorDni,
@@ -478,5 +634,6 @@ module.exports = {
     actualizarRegistroPendiente,
     eliminarRegistroPendiente,
     obtenerEstadisticas,
-    procesarRegistroPendiente
+    procesarRegistroPendiente,
+    reiniciarAlarma
 };

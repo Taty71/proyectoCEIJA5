@@ -1,14 +1,115 @@
+/* Floating close button at top right of modal header */
+.cerrar-button-flotante {
+  position: absolute;
+  /* move the close button higher so it sits above the header controls */
+  top: 8px;
+  right: 18px;
+  z-index: 100;
+  /* wrapper should be transparent so the inner CloseButton defines the visible circle */
+  background: transparent;
+  color: inherit;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  width: auto;
+  height: auto;
+  display: block;
+  cursor: default;
+  transition: none;
+}
+.cerrar-button-flotante:hover {
+  /* keep hover handled by the inner button */
+  background: transparent;
+  transform: none;
+}
+
+/* Prevent any pseudo-elements from creating rings or extra shapes */
+.cerrar-button-flotante::before,
+.cerrar-button-flotante::after {
+  display: none !important;
+}
+
+.lista-header-superior {
+  position: relative;
+  display: flex;
+  flex-direction: column; /* title row above controls */
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.botones-navegacion {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0;
+}
+
+/* Keep the buttons group aligned to the left so the search input can grow to the left */
+.botones-navegacion {
+  margin-right: auto;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.btn-ver-reportes,
+.btn-filtro-small,
+.btn-filtro,
+.btn-limpiar-busqueda,
+.btn-limpiar-busqueda-dni {
+  min-width: 110px;
+  height: 40px;
+  font-size: 0.95rem;
+  padding: 0 12px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-limpiar-busqueda {
+  margin-left: 8px;
+}
+/* Uniform style for Ver Reportes button in header */
+.btn-ver-reportes {
+  background: #2c3e50;
+  color: white;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.06s;
+}
+.btn-ver-reportes:hover {
+  background: #213242;
+  transform: translateY(-1px);
+}
 /* Estilos mejorados para Lista de Estudiantes */
 
 .lista-estudiantes-container {
-  padding: 20px;
-  max-width: 1400px;
+  padding: 24px;
+  /* Allow wider container for larger screens */
+  /* make the list container wider by default so content has more room */
+  max-width: 100%;
+  width: calc(100% - 40px);
   margin: 0 auto;
   background: #f8f9fa;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
 }
 
+/* Allow the main content wrapper to expand wider so inner containers can fill available space */
+.contenido-principal {
+  max-width: 100%;
+  width: 100%;
+  padding-left: 12px;
+  padding-right: 12px;
+  box-sizing: border-box;
+}
 /* Head.btn-cerrar-modal {
   background: rgba(255, 255, 255, 0.2);
   color: white;
@@ -55,17 +156,73 @@
   align-items: center;
 }
 
-/* Panel de controles simplificado */
-.panel-controles {
-  background: white;
-  border-radius: 8px;
-  padding: 16px 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+/* Row that contains the title and the close button */
+.fila-titulo-cerrar {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 18px 22px 10px 22px;
+  border-bottom: 1px solid rgba(14, 34, 58, 0.06);
+  background: transparent;
+}
+
+.titulo-left-spacer,
+.titulo-right-spacer {
+  width: 44px; /* reserve space equal to close button to keep title visually centered */
+  min-width: 44px;
+}
+
+.titulo-close {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Make sure the close button style matches floating style but inside row */
+.modal-header-buttons-uniforme .boton-small,
+.titulo-close .boton-small {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* Centered title style */
+.lista-titulo {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #213243;
+  text-align: center;
+  line-height: 1.1;
+}
+
+@media (max-width: 900px) {
+  .lista-titulo {
+    font-size: 1.4rem;
+  }
+  .titulo-left-spacer,
+  .titulo-right-spacer {
+    width: 36px;
+    min-width: 36px;
+  }
+}
+
+/* Panel de controles simplificado */
+.panel-controles {
+  background: transparent;
+  border-radius: 6px;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
 }
 
 .grupo-filtros-estado,
@@ -85,8 +242,60 @@
 }
 
 .grupo-buscador {
-  flex: 1;
-  min-width: 250px;
+  /* allow the buscador to grow so the input can expand leftwards when needed */
+  flex: 1 1 auto;
+  /* Increase minimum and maximum widths so the search input isn't cut */
+  min-width: 260px;
+  max-width: 680px;
+}
+
+/* Controls row styling to match provided mockup */
+.controls-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 12px 0;
+}
+.controls-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.controls-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Smaller, compact filter buttons as in sketch */
+.btn-filtro-small {
+  background: white;
+  border: 1px solid #dfe7f5;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.btn-filtro-small.activo {
+  background: #e9f7ef;
+  border-color: #bfe6c7;
+}
+
+/* Place buscador to the right aligned */
+.controls-right .buscador-dni-container {
+  margin: 0;
+}
+.controls-right .buscador-dni-input-group {
+  max-width: 520px;
+  min-width: 320px;
+}
+
+/* Ensure the buscador input fills available space inside its group */
+.controls-right .buscador-dni-input-group .buscador-dni-input {
+  width: 100%;
 }
 
 .grupo-reportes {
@@ -101,15 +310,17 @@
 }
 
 .btn-filtro {
-  padding: 6px 12px;
+  padding: 8px 10px;
   border: 1px solid #dee2e6;
-  border-radius: 5px;
-  background: white;
+  border-radius: 6px;
   color: #495057;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
+  transition: all 0.15s ease;
+  font-weight: 600;
+  min-width: 110px;
+  height: 40px;
+  box-sizing: border-box;
 }
 
 .btn-filtro:hover {
@@ -224,13 +435,14 @@
 }
 
 .modal-reportes-contenido {
-  background: white;
-  border-radius: 12px;
-  width: 90%;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 20px;
+  overflow-y: auto;
   max-width: 800px;
   max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
   animation: modalAppear 0.3s ease-out;
 }
 
@@ -252,9 +464,9 @@
   gap: 15px;
   padding: 20px 24px;
   border-bottom: 1px solid #e9ecef;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2d4177 0%, #4a6bb8 100%);
   color: white;
-  border-radius: 12px 12px 0 0;
+  border-radius: 20px 20px 0 0;
 }
 
 .modal-reportes-header h3 {
@@ -285,6 +497,27 @@
 
 .modal-reportes-body {
   padding: 24px;
+}
+
+/* Improve modal UX: allow modal content to size with viewport and let overlay be the scroll container.
+   Make message textarea expand to fit content (auto-resize via JS) and avoid internal small scrollbar. */
+.modal-reportes-contenido {
+  display: flex;
+  flex-direction: column;
+  max-height: 92vh;
+}
+.modal-reportes-body {
+  flex: 1 1 auto;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+}
+.modal-reportes-body textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  overflow: hidden; /* textarea is auto-resized by JS */
+  min-height: 120px;
 }
 
 .reportes-grid {
@@ -329,32 +562,39 @@
 
 .btn-reporte-accion {
   width: 100%;
-  padding: 10px 16px;
-  background: #007bff;
-  color: white;
+  padding: 12px 18px;
+  background: linear-gradient(145deg, #3d5aa3, #2d4177);
+  color: #fff;
   border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  border-radius: 15px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  box-shadow: 0 8px 16px rgba(45, 65, 119, 0.18), 0 4px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-reporte-accion:hover:not(:disabled) {
-  background: #0056b3;
+  background: linear-gradient(145deg, #4a6bb8, #3d5aa3);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 24px rgba(45, 65, 119, 0.22),
+    0 8px 16px rgba(0, 0, 0, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .btn-reporte-accion:disabled {
-  background: #6c757d;
+  background: #bfc9d9;
+  color: #f4f4f4;
   cursor: not-allowed;
 }
 
 /* Responsive para controles */
 @media (max-width: 1200px) {
   .panel-controles {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
   }
 
   .grupo-filtros-estado,
@@ -451,13 +691,6 @@
   border-bottom: 1px solid #dee2e6;
 }
 
-.tabla-titulo {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin: 0;
-}
-
 .tabla-stats {
   display: flex;
   align-items: center;
@@ -483,7 +716,8 @@
 .tabla-estudiantes {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  /* Increased slightly for better readability (+ ~1.5-2px) */
+  font-size: 1.03rem;
 }
 
 .tabla-estudiantes th {
@@ -494,12 +728,47 @@
   color: #495057;
   border-bottom: 2px solid #dee2e6;
   white-space: nowrap;
+  /* Keep header visible when scrolling */
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  /* ensure solid background when sticking */
+  -webkit-backdrop-filter: none; /* Safari/iOS prefix for compatibility */
+  backdrop-filter: none;
+}
+
+/* Make header font size match the name/row font for visual balance */
+.tabla-estudiantes th {
+  font-size: 16px;
+}
+
+/* Add subtle shadow when header sticks to content */
+.tabla-estudiantes thead th[style],
+.tabla-estudiantes thead th:stick {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .tabla-estudiantes td {
   padding: 12px 8px;
   border-bottom: 1px solid #dee2e6;
   vertical-align: middle;
+}
+
+/* Reduce font-size for specific content columns (estado, curso/plan) to avoid visual noise */
+.tabla-estudiantes td.col-estado-activo,
+.tabla-estudiantes td.col-estado-inscripcion,
+.tabla-estudiantes td.col-plan {
+  font-size: 12px;
+}
+
+/* Ensure fecha header is readable and can wrap if needed */
+.tabla-estudiantes th.col-fecha {
+  white-space: normal;
+}
+.tabla-estudiantes td.col-fecha {
+  font-size: 12px;
+  color: #6c757d;
+  text-align: center;
 }
 
 .fila-estudiante.par {
@@ -525,31 +794,89 @@
 }
 
 .col-nombre {
-  min-width: 200px;
+  min-width: 95px;
 }
 
 .col-email {
-  min-width: 200px;
+  min-width: 180px;
+  width: 30%;
+  font-size: 1.06rem;
 }
 
 .col-estado-activo,
 .col-estado-inscripcion {
-  width: 120px;
+  width: 95px;
+  min-width: 90px;
   text-align: center;
 }
 
-.col-modalidad,
 .col-plan {
-  width: 150px;
+  width: 100px;
+  min-width: 90px;
 }
 
 .col-fecha {
-  width: 120px;
+  width: 100px;
+  min-width: 120px;
+}
+
+/* Increase sizes for important table columns (email, estados, fecha) */
+
+.tabla-estudiantes th.col-email {
+  font-size: 0.88rem;
+}
+.link-email {
+  font-size: 0.88rem;
+}
+.badge-estado {
+  padding: 3px 5px;
+  font-size: 0.88rem;
+}
+
+.fecha-inscripcion {
+  color: #6c757d;
+  font-size: 0.88rem;
+}
+
+/* Increase sizes for estado, estado-inscripcion, curso/plan and fecha */
+
+.tabla-estudiantes th.col-estado-activo,
+.tabla-estudiantes th.col-estado-inscripcion,
+.tabla-estudiantes th.col-plan,
+.tabla-estudiantes th.col-modalidad,
+.tabla-estudiantes th.col-fecha {
+  font-size: 0.88rem;
+}
+
+.plan-info {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Improve stacked layout readability on small screens */
+@media (max-width: 900px) {
+  .tabla-estudiantes td,
+  .tabla-estudiantes td * {
+    font-size: 1.05rem;
+  }
+  .tabla-estudiantes td:before {
+    font-size: 0.98rem;
+    font-weight: 700;
+    flex-basis: 40%;
+  }
+  .acciones-contenedor .accion-boton {
+    width: 25px !important;
+    height: 25px !important;
+  }
 }
 
 .col-acciones {
-  width: 150px;
+  min-width: 80px;
+  width: 1%;
   text-align: center;
+  white-space: nowrap;
+  padding-right: 0;
+  padding-left: 0;
 }
 
 /* Elementos de tabla */
@@ -558,7 +885,8 @@
   color: white;
   padding: 4px 8px;
   border-radius: 12px;
-  font-size: 0.8rem;
+  /* a bit larger to match increased table font */
+  font-size: 0.9rem;
   font-weight: 600;
 }
 
@@ -569,13 +897,16 @@
 }
 
 .nombre {
-  font-weight: 600;
   color: #2c3e50;
+  /* slightly larger for readability */
+  font-size: 14.75px;
 }
 
 .apellido {
-  color: #6c757d;
-  font-size: 0.85rem;
+  font-weight: 600;
+  color: #33383c;
+  /* slightly larger for readability */
+  font-size: 16px;
 }
 
 .link-email {
@@ -674,7 +1005,7 @@
 
 /* Paginación profesional compacta */
 .seccion-paginacion-profesional {
-  margin: 16px 0;
+  margin: 8px 0 6px 0;
   display: flex;
   justify-content: center;
 }
@@ -682,23 +1013,25 @@
 .paginacion-contenedor {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   background: white;
-  padding: 8px 16px;
+  padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid #e9ecef;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .btn-paginacion-small {
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  border-radius: 6px;
   border: 1px solid #dee2e6;
   background: white;
   color: #495057;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  min-width: 72px;
+  height: 34px;
 }
 
 .btn-paginacion-small:hover:not(:disabled) {
@@ -730,33 +1063,33 @@
   color: #6c757d;
 }
 
-/* Resumen final compacto */
-.resumen-final-compacto {
-  margin: 20px 0;
-  padding: 16px;
+/* Resumen final compacto (compacto y más discreto) */
+/*.resumen-final-compacto {
+  margin: 5px 0 6px 0;
+  padding: 5px 8px;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   border-radius: 8px;
   border: 1px solid #dee2e6;
-}
+}*/
 
 .estadisticas-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 8px;
 }
 
 .stat-card {
   background: white;
-  padding: 12px;
+  padding: 8px 10px;
   border-radius: 6px;
   text-align: center;
   border: 1px solid #e9ecef;
-  transition: transform 0.2s ease;
+  transition: transform 0.15s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 
 .stat-card.activos {
@@ -769,17 +1102,17 @@
 
 .stat-numero {
   display: block;
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: #495057;
   margin-bottom: 4px;
 }
 
 .stat-etiqueta {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #6c757d;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
 /* Mejorar dropdown de estados */
@@ -808,6 +1141,8 @@
   transition: border-color 0.2s ease;
   min-width: 150px;
   font-weight: 500;
+  height: 40px;
+  box-sizing: border-box;
 }
 
 .select-estado-inscripcion:hover {
@@ -865,6 +1200,251 @@
 
 .btn-accion-comprobante:hover {
   background: #138496;
+}
+
+/* Unified professional action button style for table actions */
+.accion-boton,
+.btn-accion-comprobante,
+.btn-accion-ver,
+.btn-accion-notificar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  /* smaller action buttons */
+  min-width: 34px;
+  width: auto;
+  height: 34px;
+  padding: 4px 6px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px rgba(39, 83, 142, 0.04);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  border: 1px solid transparent;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.accion-boton:active,
+.btn-accion-comprobante:active,
+.btn-accion-ver:active,
+.btn-accion-notificar:active {
+  transform: translateY(1px);
+}
+
+.btn-accion-ver {
+  background: #17a2b8; /* match comprobante by default but can be differentiated */
+  color: white;
+  border: none;
+}
+
+.btn-accion-ver:hover {
+  background: #138496;
+}
+
+.btn-accion-comprobante {
+  background: linear-gradient(135deg, #3d8db3 0%, #2a7f9b 100%);
+  color: #fff;
+  border: none;
+}
+
+/* Tooltip for action buttons (custom, better styling than default title) */
+
+.accion-boton[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  /* shift tooltip box left so the arrow can sit left of the icon */
+  transform: translateX(calc(-50% - 18px));
+  /* dark blue tooltip background */
+  background: #0b2545;
+  color: #fff;
+  padding: 6px 8px;
+  font-size: 0.88rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(11, 37, 69, 0.18);
+  z-index: 50;
+}
+
+.accion-boton[data-tooltip]::before {
+  /* arrow removed: keep pseudo-element but hide it so only tooltip box shows */
+  content: "";
+  display: none;
+}
+
+/* Responsive table: stacked rows on small screens */
+@media (max-width: 900px) {
+  .tabla-estudiantes thead {
+    display: none;
+  }
+  .tabla-estudiantes th {
+    background: #f8f9fa;
+    padding: 12px 8px;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+    /* Keep header visible when scrolling. Adjust `top` if your page has a fixed navbar. */
+    position: sticky;
+    top: 112px; /* tweak this value if a fixed navbar or header overlaps the table header */
+    z-index: 120; /* ensure it sits above other controls */
+    /* ensure solid background when sticking */
+    -webkit-backdrop-filter: none; /* Safari/iOS prefix for compatibility */
+    backdrop-filter: none;
+  }
+  .tabla-estudiantes td {
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: none;
+  }
+  .tabla-estudiantes td:before {
+    content: attr(data-label);
+    color: #6c757d;
+    font-weight: 600;
+    margin-right: 12px;
+    flex: 0 0 45%;
+  }
+  .tabla-estudiantes td .id-badge,
+  .tabla-estudiantes td .modalidad-tag,
+  .tabla-estudiantes td .plan-info {
+    text-align: right;
+  }
+  .col-acciones {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .acciones-contenedor {
+    gap: 2px;
+  }
+}
+
+@media (max-width: 600px) {
+  /* tighten stacked layout for small phones */
+  .tabla-estudiantes tr {
+    padding: 8px;
+  }
+  .tabla-estudiantes td:before {
+    flex-basis: 50%;
+    font-size: 0.85rem;
+  }
+
+  /* Make comprobante icon larger and label smaller on medium screens */
+  .btn-accion-comprobante .accion-ico {
+    font-size: 1.6rem;
+  }
+  .btn-accion-comprobante .accion-label {
+    font-size: 0.68rem;
+  }
+
+  /* Mobile: slightly larger icons for touch friendliness */
+  .accion-boton .accion-ico {
+    font-size: 0.8rem;
+  }
+}
+
+/* Increase icon size on desktop/tablet for better visibility */
+.accion-boton .accion-ico {
+  font-size: 1rem;
+}
+
+/* Give Comprobante icon a bit more emphasis */
+.btn-accion-comprobante .accion-ico {
+  font-size: 1.45rem;
+}
+
+.btn-accion-notificar.normal {
+  background: linear-gradient(90deg, #ffdca6 0%, #ffc451 100%);
+  color: #4a2f00;
+  border-color: rgba(255, 197, 80, 0.2);
+}
+
+.btn-accion-notificar.inactivo {
+  background: linear-gradient(90deg, #ffd6d6 0%, #ff9b9b 100%);
+  color: #6b0b0b;
+  border-color: rgba(255, 123, 123, 0.12);
+}
+
+.acciones-contenedor {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  overflow-x: visible;
+  padding: 0;
+  margin: 0;
+}
+.acciones-contenedor .accion-boton,
+.acciones-contenedor .btn-accion-comprobante,
+.acciones-contenedor .btn-accion-ver,
+.acciones-contenedor .btn-accion-notificar {
+  margin: 0 1px;
+  display: inline-flex;
+  flex-shrink: 0;
+  min-width: 28px !important;
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+}
+
+.acciones-contenedor button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Make action icons more prominent when buttons are narrow */
+.accion-boton .accion-ico {
+  font-size: 1.1rem !important;
+}
+.accion-boton .accion-label {
+  display: none !important;
+}
+
+/* Medium+ responsive: use icon-only controls to avoid breaking layout */
+/* Ya no es necesario el ajuste responsive para icon-only, siempre icon-only y pequeño */
+
+/* Notificar button styles */
+.btn-accion-notificar {
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-accion-notificar.normal {
+  background: linear-gradient(90deg, #ffefc0 0%, #ffe18d 100%);
+  color: #5a3d00;
+  border-color: #ffd54f88;
+}
+
+.btn-accion-notificar.inactivo {
+  background: linear-gradient(90deg, #ffd6d6 0%, #ff9b9b 100%);
+  color: #6b0b0b;
+  border-color: #ff7b7b88;
+}
+
+.btn-accion-notificar:hover:not(.disabled) {
+  filter: brightness(0.95);
+}
+
+/* Small visual tweak for actions container */
+.acciones-contenedor button {
+  margin: 0 4px;
 }
 
 .sin-acciones {
@@ -945,6 +1525,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  min-height: 0;
 }
 
 .btn-paginacion {
@@ -1047,7 +1630,7 @@
   }
 
   .botones-navegacion {
-    align-self: flex-end;
+    align-self: flex-start;
   }
 
   .estadisticas-resumen {
@@ -1057,6 +1640,38 @@
   .paginacion-controles {
     flex-direction: column;
     gap: 12px;
+  }
+}
+
+/* Mobile: show icon-only buttons to avoid truncation */
+@media (max-width: 600px) {
+  .acciones-contenedor {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .accion-boton {
+    min-width: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    box-shadow: none !important;
+  }
+
+  .accion-boton .accion-label {
+    display: none !important;
+  }
+
+  .accion-boton .accion-ico {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  /* Reduce gaps so buttons fit neatly */
+  .acciones-contenedor .accion-boton {
+    margin: 0 4px;
   }
 }
 
@@ -1124,5 +1739,33 @@
 
   .stat-valor {
     font-size: 1.4rem;
+  }
+}
+
+/* Additional responsive tweaks for header and controls */
+@media (max-width: 1100px) {
+  .lista-titulo {
+    font-size: 1.45rem;
+  }
+  .controls-right .buscador-dni-input-group {
+    max-width: 420px;
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 900px) {
+  .lista-titulo {
+    font-size: 1.3rem;
+  }
+  .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .controls-left {
+    justify-content: flex-start;
+  }
+  .controls-right {
+    justify-content: flex-start;
   }
 }

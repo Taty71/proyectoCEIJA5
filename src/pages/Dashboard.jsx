@@ -8,6 +8,8 @@ import { useAlerts } from '../hooks/useAlerts';
 import AlertaMens from '../components/AlertaMens';
 import ModalRegistrosPendientes from '../components/ModalRegistrosPendientes';
 import GestorRegistrosWeb from '../components/GestorRegistrosWeb';
+import ModalReportesDashboard from '../components/Dashboard/ModalReportesDashboard';
+import ModalHerramientas from '../components/Dashboard/ModalHerramientas';
 import MensajeError from '../utils/MensajeError';
 import { descargarRegistrosJSON, obtenerRegistrosSinDocumentacion, inicializarSistemaLimpieza } from '../utils/registroSinDocumentacion';
 import '../estilos/dashboard.css';
@@ -30,6 +32,8 @@ const Dashboard = () => {
   const [showModalRegistros, setShowModalRegistros] = useState(false); // Estado para modal de registros
   const [registrosPendientes, setRegistrosPendientes] = useState([]); // Estado para los registros
   const [showGestorRegistrosWeb, setShowGestorRegistrosWeb] = useState(false); // Estado para gestor de registros web
+  const [showModalReportes, setShowModalReportes] = useState(false); // Estado para modal de reportes
+  const [showModalHerramientas, setShowModalHerramientas] = useState(false); // Estado para modal de herramientas
 
 
   // Manejar navegación contextual desde formularios
@@ -118,6 +122,28 @@ const handleRegistrosWeb = () => {
 // Handler para cerrar gestor de registros web
 const handleCloseGestorRegistrosWeb = () => {
   setShowGestorRegistrosWeb(false);
+};
+
+// Handler para abrir reportes institucionales
+const handleReportesInstitucionales = () => {
+  console.log('📊 Abriendo centro de reportes institucionales');
+  setShowModalReportes(true);
+};
+
+// Handler para cerrar modal de reportes
+const handleCloseModalReportes = () => {
+  setShowModalReportes(false);
+};
+
+// Handler para abrir herramientas de base de datos
+const handleHerramientas = () => {
+  console.log('🛠️ Abriendo herramientas de base de datos');
+  setShowModalHerramientas(true);
+};
+
+// Handler para cerrar modal de herramientas
+const handleCloseModalHerramientas = () => {
+  setShowModalHerramientas(false);
 };
 
 // Handler para completar un registro web
@@ -291,19 +317,46 @@ const handleCompletarRegistro = (registro) => {
       </div>
       <div className="dashboard-content">
         <div className="dashboard-buttons">
-          <button onClick={handleGestionEstudiante}>Gestión Estudiante</button>
-          <button onClick={handleEquivalencias}>Estudio de Equivalencias</button>
-          <button>Plan A - B - C</button>
-          {/* Solo mostrar para administradores */}
+          <button onClick={handleGestionEstudiante}>
+            <div className="dashboard-button-icon">👥</div>
+            Gestión Estudiante
+          </button>
+          <button onClick={handleEquivalencias}>
+            <div className="dashboard-button-icon">📚</div>
+            Estudio de<br/>Equivalencias
+          </button>
+          <button>
+            <div className="dashboard-button-icon">📋</div>
+            Plan A - B - C
+          </button>
+          
+          {/* Funciones administrativas según rol */}
           {(user.rol === 'admDirector' || user.rol === 'administrador') && (
             <>
-              <button onClick={handleRegistrosSinDocumentacion}>
-                📅 Registros Pendientes (7 días)
+              <button className="admin-button" onClick={handleRegistrosSinDocumentacion}>
+                <div className="dashboard-button-icon">📅</div>
+                Registros Pendientes<br/>(7 días)
               </button>
-              <button onClick={handleRegistrosWeb}>
-                🌐 Registros Web
+              <button className="admin-button" onClick={handleRegistrosWeb}>
+                <div className="dashboard-button-icon">🌐</div>
+                Registros Web
+              </button>
+              <button className="reportes-button" onClick={handleReportesInstitucionales}>
+                <div className="dashboard-button-icon">📊</div>
+                Informes<br/>Estadísticos              </button>
+              <button className="admin-button" onClick={handleHerramientas}>
+                <div className="dashboard-button-icon">🛠️</div>
+                Herramientas<br/>BD
               </button>
             </>
+          )}
+          
+          {/* Reportes para Secretario y Coordinador */}
+          {(user.rol === 'secretario' || user.rol === 'coordinador' || user.rol === 'coordinador administrativo' || user.rol === 'coordinadorAdministrativo') && (
+            <button className="reportes-button" onClick={handleReportesInstitucionales}>
+              <div className="dashboard-button-icon">📊</div>
+              Reportes<br/>Institucionales
+            </button>
           )}
           {/*<NavLink to="/plan-a-b-c" className="dashboard-link">Plan A - B - C</NavLink>*/}
         </div>
@@ -347,6 +400,31 @@ const handleCompletarRegistro = (registro) => {
           onRegistroSeleccionado={handleCompletarRegistroWeb}
           isAdmin={true}
           key={showGestorRegistrosWeb} // Forzar re-render cuando se abre
+        />
+      )}
+
+      {/* Modal de reportes institucionales */}
+      {showModalReportes && (
+        <ModalReportesDashboard 
+          mostrarModal={showModalReportes}
+          onCerrar={handleCloseModalReportes}
+          showAlerta={(message, type) => {
+            switch(type) {
+              case 'success': return showSuccess(message);
+              case 'error': return showError(message);
+              case 'warning': return showInfo(message);
+              case 'info':
+              default: return showInfo(message);
+            }
+          }}
+        />
+      )}
+
+      {/* Modal de herramientas de base de datos */}
+      {showModalHerramientas && (
+        <ModalHerramientas 
+          isOpen={showModalHerramientas}
+          onClose={handleCloseModalHerramientas}
         />
       )}
     </div>

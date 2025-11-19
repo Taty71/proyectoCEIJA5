@@ -152,10 +152,10 @@ const RegistroPendienteItem = ({
 
     // Detectar si es un registro procesado basándose en si existe en BD
     // Independientemente del estado seleccionado por el administrador:
-    // - Si estudianteEnBD = true → mostrar "PROCESADO Y APROBADO"
+    // - Si estudianteEnBD = true → mostrar "PROCESADO Y Completa"
     // - Si estudianteEnBD = false/undefined → mostrar "PENDIENTE"
     const esProcesado = registro.estudianteEnBD === true;
-    const mostrarBadgeAprobado = esProcesado;
+    const mostrarBadgeCompleta = esProcesado;
 
     return (
         <div 
@@ -186,10 +186,10 @@ const RegistroPendienteItem = ({
                                         zIndex: 9999
                                     }}
                                 >
-                                    ✅ Registro Procesado y Aprobado
+                                    ✅ Registro Procesado y Completa
                                 </span>
                             )}
-                            {!esProcesado && mostrarBadgeAprobado && (
+                            {!esProcesado && mostrarBadgeCompleta && (
                                 <span 
                                     className="badge-estudiante-registrado" 
                                     style={{
@@ -206,7 +206,7 @@ const RegistroPendienteItem = ({
                                         zIndex: 9999
                                     }}
                                 >
-                                    ✅ Registro Procesado y Aprobado
+                                    ✅ Registro Procesado y Completa
                                 </span>
                             )}
                         </h4>
@@ -227,7 +227,7 @@ const RegistroPendienteItem = ({
                     {/* Información de la derecha */}
                     <div className="registro-info-derecha">
                         {/* Mostrar alarma/vencimiento solo si NO está registrado NI procesado */}
-                        {!mostrarBadgeAprobado && !esProcesado && (
+                        {!mostrarBadgeCompleta && !esProcesado && (
                             <>
                                 <div className="registro-vencimiento" style={{ color: info.color }}>
                                     {info.vencido ? `🔴 ${info.mensaje}` : `🕒 ${info.mensaje}`}

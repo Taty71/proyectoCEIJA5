@@ -7,16 +7,15 @@
 }
 
 .spinner-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
-  z-index: 9999; /* Asegura que esté sobre otros elementos */
+  background-color: transparent; /* transparencia local */
+  z-index: 2; /* sobre el contenido del botón */
 }
 
 .spinner {
@@ -39,11 +38,49 @@
 
 /* Botón alineado a la derecha */
 .boton-cargando {
-  margin-left: auto; /* Alinea el botón a la derecha */
-  padding: 8px 16px; /* Tamaño delicado */
-  font-size: 0.9rem; /* Fuente más pequeña */
-  border-radius: 8px;
-  text-align: center;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: #ffffff;
+  color: #2c3e50;
+  cursor: pointer;
+}
+
+/* Specific styling when used as the search button (override defaults) */
+.boton-cargando.btn-buscar-dni {
+  background: linear-gradient(135deg, #2d4177, #4a69bd);
+  color: white;
+  border: none;
+  padding: 0 12px;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  font-size: 1.05rem;
+  height: 40px;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.12);
+}
+
+.boton-cargando.btn-buscar-dni:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1e2e5a, #3c5aa6);
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(45, 65, 119, 0.25);
+}
+
+.boton-cargando.btn-buscar-dni:disabled {
+  background: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Hover y colores de buttonF */
@@ -53,6 +90,13 @@
 }
 
 .boton-cargando.disabled {
-  background-color: #ccc; /* Color para el estado deshabilitado */
+  background-color: #e9ecef; /* Color para el estado deshabilitado */
+  color: #6c757d;
   cursor: not-allowed;
+}
+
+/* Small inline spinner styling fallback */
+.boton-cargando .spinner-inline {
+  width: 18px;
+  height: 18px;
 }

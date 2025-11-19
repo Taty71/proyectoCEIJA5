@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import SpinnerCeiJa from './SpinnerCeiJa';
 import PropTypes from 'prop-types';
 import AlertaMens from './AlertaMens';
 import MensajeError from '../utils/MensajeError';
@@ -136,8 +137,7 @@ const VerificadorRegistroPendiente = ({ dni, onRegistroCompleto, onSinRegistro }
   if (loading) {
     return (
       <div className="verificador-registro loading">
-        <div className="loading-spinner"></div>
-        <p>Verificando estado del registro...</p>
+        <SpinnerCeiJa text="Verificando estado del registro..." />
       </div>
     );
   }

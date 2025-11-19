@@ -23,8 +23,8 @@ const ModalReportes = ({
     {
       id: 'analisis-estados',
       icon: '�',
-      titulo: 'Análisis de Estados',
-      descripcion: 'Pendientes, Aprobados, Anulados con porcentajes y tendencias',
+      titulo: 'Análisis de Estados de Inscripción',
+      descripcion: 'Pendientes, Completas, Anulados con porcentajes y tendencias',
       accion: () => {
         generarAnalisisEstados(estudiantes, showAlerta);
         onCerrar();
@@ -34,10 +34,10 @@ const ModalReportes = ({
     {
       id: 'tendencias-planes',
       icon: '📈',
-      titulo: 'Tendencias por Plan/Año',
-      descripcion: 'Porcentajes de inscripción por plan con comparativas históricas',
+      titulo: 'Tendencias en Inscripción Modalidad',
+      descripcion: 'Distribución por modalidad: Presencial (por curso) y Semipresencial (por plan)',
       accion: () => {
-        generarTendenciasPlan(estudiantes, showAlerta);
+        generarTendenciasPlan(estudiantes, showAlerta, 'todas');
         onCerrar();
       },
       texto: 'Ver Tendencias'

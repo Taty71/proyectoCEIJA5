@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const axiosInstance = axios.create({
     baseURL: 'http://localhost:5000/api', // Base URL del backend
-    timeout: 10000, // Tiempo de espera en milisegundos
+    timeout: 30000, // Tiempo de espera en milisegundos (30 segundos)
 });
 
 // Interceptor para agregar el token JWT

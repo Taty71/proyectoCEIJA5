@@ -85,13 +85,13 @@ const GestorRegistrosWeb = ({ onClose, onRegistroSeleccionado, isAdmin = false }
                     
                     if (idx !== -1) {
                         // Actualizar el registro existente
-                        const procesado = ['PROCESADO_Y_APROBADO', 'PROCESADO_A_PENDIENTES', 'PROCESADO', 'APROBADO'].includes(updated.estado);
+                        const procesado = ['PROCESADO_Y_Completa', 'PROCESADO_A_PENDIENTES', 'PROCESADO', 'Completa'].includes(updated.estado);
                         newList = [...prev];
                         newList[idx] = { ...updated, procesado };
                         console.log('✅ Registro actualizado en memoria:', updated.datos?.dni, '→', updated.estado);
                     } else {
                         // Si no existe, agregarlo (caso raro)
-                        const procesado = ['PROCESADO_Y_APROBADO', 'PROCESADO_A_PENDIENTES', 'PROCESADO', 'APROBADO'].includes(updated.estado);
+                        const procesado = ['PROCESADO_Y_Completa', 'PROCESADO_A_PENDIENTES', 'PROCESADO', 'Completa'].includes(updated.estado);
                         newList = [...prev, { ...updated, procesado }];
                         console.log('➕ Nuevo registro agregado:', updated.datos?.dni);
                     }
@@ -120,7 +120,7 @@ const GestorRegistrosWeb = ({ onClose, onRegistroSeleccionado, isAdmin = false }
             console.log('📥 Registros web cargados desde backend:', data?.length || 0);
             // Añadir flag procesado derivado del estado para uso local
             const enriched = (data || []).map(r => {
-                const procesado = ['PROCESADO_Y_APROBADO', 'PROCESADO_A_PENDIENTES', 'PROCESADO', 'APROBADO', 'aprobado'].includes(r.estado);
+                const procesado = ['PROCESADO_Y_Completa', 'PROCESADO_A_PENDIENTES', 'PROCESADO', 'Completa', 'Completa'].includes(r.estado);
                 return { ...r, procesado };
             });
             setRegistros(enriched);
@@ -144,14 +144,14 @@ const GestorRegistrosWeb = ({ onClose, onRegistroSeleccionado, isAdmin = false }
         const pendientes = (list || []).filter(r => 
             r.estado === 'PENDIENTE' || r.estado === 'pendiente'
         ).length;
-        // PROCESADOS: incluye PROCESADO_Y_APROBADO y PROCESADO_A_PENDIENTES
+        // PROCESADOS: incluye PROCESADO_Y_Completa y PROCESADO_A_PENDIENTES
         const procesados = (list || []).filter(r => 
-            r.estado === 'PROCESADO_Y_APROBADO' || 
+            r.estado === 'PROCESADO_Y_Completa' || 
             r.estado === 'PROCESADO_A_PENDIENTES' ||
             r.estado === 'PROCESADO' ||
-            r.estado === 'APROBADO' ||
-            r.estado === 'aprobado' ||
-            r.estado === 'procesado_y_aprobado' ||
+            r.estado === 'Completa' ||
+            r.estado === 'Completa' ||
+            r.estado === 'procesado_y_Completa' ||
             r.estado === 'procesado_a_pendientes'
         ).length;
         const anulados = (list || []).filter(r => 
@@ -165,9 +165,9 @@ const GestorRegistrosWeb = ({ onClose, onRegistroSeleccionado, isAdmin = false }
         // Mapear los valores válidos de estado a los visuales
         const estado = (registro.estado || '').toUpperCase();
         
-        if (estado === 'PROCESADO_Y_APROBADO') return 'PROCESADO Y APROBADO';
+        if (estado === 'PROCESADO_Y_Completa') return 'PROCESADO Y Completa';
         if (estado === 'PROCESADO_A_PENDIENTES') return 'PROCESADO A PENDIENTES';
-        if (estado === 'APROBADO' || estado === 'PROCESADO') return 'PROCESADO';
+        if (estado === 'Completa' || estado === 'PROCESADO') return 'PROCESADO';
         if (estado === 'ANULADO') return 'ANULADO';
         if (estado === 'PENDIENTE') return 'PENDIENTE';
         
@@ -226,7 +226,7 @@ const GestorRegistrosWeb = ({ onClose, onRegistroSeleccionado, isAdmin = false }
     const filtrarRegistros = () => {
         if (filtro === 'TODOS') return registros;
         if (filtro === 'PROCESADO') {
-            // Contar como procesados los que son 'aprobado', 'PROCESADO' o 'PROCESADO A PENDIENTES'
+            // Contar como procesados los que son 'Completa', 'PROCESADO' o 'PROCESADO A PENDIENTES'
             return registros.filter(registro => {
                 const estadoVisual = getEstadoVisual(registro);
                 return estadoVisual === 'PROCESADO' || estadoVisual === 'PROCESADO A PENDIENTES';
@@ -451,31 +451,31 @@ const GestorRegistrosWeb = ({ onClose, onRegistroSeleccionado, isAdmin = false }
                                                             showWarning('⚠️ Este registro ya fue procesado y movido a Registros Pendientes por falta de documentación.');
                                                             return;
                                                         }
-                                                        if (registro.estado === 'PROCESADO_Y_APROBADO') {
+                                                        if (registro.estado === 'PROCESADO_Y_Completa') {
                                                             showSuccess(`✅ Este estudiante ya está registrado en la base de datos.\n\nNombre: ${registro.datos.nombre} ${registro.datos.apellido}\nDNI: ${registro.datos.dni}`);
                                                             return;
                                                         }
                                                         manejarProcesarRegistro(registro);
                                                     }}
-                                                    disabled={registro.estado === 'PROCESADO_A_PENDIENTES' || registro.estado === 'PROCESADO_Y_APROBADO'}
+                                                    disabled={registro.estado === 'PROCESADO_A_PENDIENTES' || registro.estado === 'PROCESADO_Y_Completa'}
                                                     title={
                                                         registro.estado === 'PENDIENTE' 
                                                         ? 'Completar inscripción del registro web'
-                                                        : registro.estado === 'PROCESADO_Y_APROBADO'
+                                                        : registro.estado === 'PROCESADO_Y_Completa'
                                                         ? 'Este estudiante ya está registrado en la base de datos'
                                                         : registro.estado === 'PROCESADO_A_PENDIENTES'
                                                         ? 'Registro verificado pero faltan documentos (movido a pendientes)'
                                                         : 'Gestionar registro web'
                                                     }
                                                     style={{
-                                                        opacity: (registro.estado === 'PROCESADO_A_PENDIENTES' || registro.estado === 'PROCESADO_Y_APROBADO') ? 0.6 : 1,
-                                                        cursor: (registro.estado === 'PROCESADO_A_PENDIENTES' || registro.estado === 'PROCESADO_Y_APROBADO') ? 'not-allowed' : 'pointer'
+                                                        opacity: (registro.estado === 'PROCESADO_A_PENDIENTES' || registro.estado === 'PROCESADO_Y_Completa') ? 0.6 : 1,
+                                                        cursor: (registro.estado === 'PROCESADO_A_PENDIENTES' || registro.estado === 'PROCESADO_Y_Completa') ? 'not-allowed' : 'pointer'
                                                     }}
                                                 >
                                                     {registro.estado === 'PENDIENTE' ? (
                                                         '✅ Completar Inscripción'
-                                                    ) : registro.estado === 'PROCESADO_Y_APROBADO' ? (
-                                                        '✅ Procesado y Aprobado'
+                                                    ) : registro.estado === 'PROCESADO_Y_Completa' ? (
+                                                        '✅ Procesado y Completa'
                                                     ) : registro.estado === 'PROCESADO_A_PENDIENTES' ? (
                                                         // Mostrar texto claro cuando el admin verificó pero faltan documentos
                                                         '⏳ Pendiente (faltan documentos)'

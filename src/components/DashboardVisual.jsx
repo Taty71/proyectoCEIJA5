@@ -150,13 +150,24 @@ const DashboardVisual = ({ estudiantes, estadosInscripcion }) => {
     ]
   };
 
-  // Opciones de gráficos
+  // Opciones de gráficos - CA-32: Tooltips con valor absoluto y porcentaje
   const donutOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
-      title: { display: true, text: 'Estados de Inscripción', font: { size: 14 } }
+      title: { display: true, text: 'Estados de Inscripción', font: { size: 14 } },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const label = context.label || '';
+            const value = context.parsed || 0;
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+            return `${label}: ${value} estudiantes (${percentage}%)`;
+          }
+        }
+      }
     }
   };
 
@@ -165,7 +176,17 @@ const DashboardVisual = ({ estudiantes, estadosInscripcion }) => {
     maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
-      title: { display: true, text: 'Distribución por Plan de Estudios', font: { size: 14 } }
+      title: { display: true, text: 'Distribución por Plan de Estudios', font: { size: 14 } },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const value = context.parsed.y || 0;
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+            return `${value} estudiantes (${percentage}% del total)`;
+          }
+        }
+      }
     },
     scales: {
       y: { beginAtZero: true, ticks: { precision: 0 } },
@@ -178,7 +199,17 @@ const DashboardVisual = ({ estudiantes, estadosInscripcion }) => {
     maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
-      title: { display: true, text: 'Tendencia de Inscripciones', font: { size: 14 } }
+      title: { display: true, text: 'Tendencia de Inscripciones', font: { size: 14 } },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const value = context.parsed.y || 0;
+            const total = estudiantes.length;
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+            return `${context.label}: ${value} inscripciones (${percentage}% del total)`;
+          }
+        }
+      }
     },
     scales: {
       y: { beginAtZero: true, ticks: { precision: 0 } }
@@ -194,7 +225,24 @@ const DashboardVisual = ({ estudiantes, estadosInscripcion }) => {
         position: 'top',
         labels: { boxWidth: 12, font: { size: 11 } }
       },
-      title: { display: true, text: 'Modalidad por Plan de Estudios', font: { size: 14 } }
+      title: { display: true, text: 'Modalidad por Plan de Estudios', font: { size: 14 } },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const value = context.parsed.y || 0;
+            const datasetLabel = context.dataset.label || '';
+            const planEstudiantes = context.dataset.data.reduce((a, b) => a + b, 0);
+            const percentage = planEstudiantes > 0 ? ((value / planEstudiantes) * 100).toFixed(1) : '0.0';
+            return `${datasetLabel}: ${value} estudiantes (${percentage}% del plan)`;
+          },
+          afterLabel: function(context) {
+            const total = estudiantes.length;
+            const value = context.parsed.y || 0;
+            const percentageTotal = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+            return `${percentageTotal}% del total general`;
+          }
+        }
+      }
     },
     scales: {
       y: { beginAtZero: true, ticks: { precision: 0 }, stacked: true },

@@ -69,7 +69,7 @@ const EjemploFormularioWeb = () => {
                     <h3>Datos Personales</h3>
                     
                     <div className="form-group">
-                        <label>Nombre Completo:</label>
+                        <label>Nombre Apellido:</label>
                         <input
                             type="text"
                             name="nombre"
@@ -77,7 +77,7 @@ const EjemploFormularioWeb = () => {
                             onChange={handleInputChange}
                             required
                             className="form-control"
-                            placeholder="Ingrese nombre completo"
+                            placeholder="Ingrese nombre y apellido"
                         />
                     </div>
 

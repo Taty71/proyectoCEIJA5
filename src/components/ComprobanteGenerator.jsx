@@ -315,4 +315,8 @@ class ComprobanteGenerator {
   }
 }
 
+// Exponer utilidades para que otros componentes (ModalPreviewEmail, etc.) las reutilicen
+ComprobanteGenerator.getDocsRequeridos = getDocsRequeridos;
+ComprobanteGenerator.getNombreLegible = getNombreLegible;
+
 export default ComprobanteGenerator;

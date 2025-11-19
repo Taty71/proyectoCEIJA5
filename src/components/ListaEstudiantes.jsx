@@ -148,7 +148,7 @@ const ListaEstudiantes = ({ onAccion, onClose, onVolver, soloParaEliminacion = f
                 {/* Título delicado más arriba */}
                 <div className="lista-header">
                     <h2 className="lista-titulo">{getTituloLista()}</h2>
-                    <p className="lista-subtitulo">Cargando estudiantes...</p>
+                    
                 </div>
                 
                 <div className="loading-container">
@@ -177,7 +177,7 @@ const ListaEstudiantes = ({ onAccion, onClose, onVolver, soloParaEliminacion = f
                         <table className="tabla-estudiantes">
                             <thead>
                                 <tr>
-                                    <th>ID</th><th>DNI</th><th>Nombre Completo</th><th>Email</th><th>Modalidad</th><th>Curso/Plan</th><th>Estado de Inscripción</th><th>Fecha Inscripción</th><th>Fecha Nacimiento</th><th>Acciones</th>
+                                    <th>ID</th><th>DNI</th><th>Nombre Apellido</th><th>Email</th><th>Modalidad</th><th>Curso/Plan</th><th>Estado de Inscripción</th><th>Fecha Inscripción</th><th>Fecha Nacimiento</th><th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>

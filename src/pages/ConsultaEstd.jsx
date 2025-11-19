@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
-import '../estilos/modalUniforme.css';
+import '../estilos/modalVerListaEstd.css';
 import CloseButton from '../components/CloseButton';
-import { serviceInscripcion } from '../services';
+import serviceInscripcion from '../services/serviceInscripcion';
 
 // Función para formatear la fecha
 const formatDate = (dateString) => {
@@ -14,9 +14,9 @@ const ConsultaEstd = ({ data, onClose }) => {
     // Si por alguna razón el objeto no trae success true, mostramos mensaje genérico
     if (!data?.success) {
         return (
-            <div className="modal-overlay-uniforme">
-                <div className="modal-container-uniforme">
-                    <div className="modal-header-buttons-uniforme modal-header-buttons-small">
+            <div className="modal-overlay-verestd">
+                <div className="modal-container-verestd">
+                    <div className="modal-header-verestd">
                         <CloseButton onClose={onClose} className="boton-principal boton-small" />
                     </div>
                     <p>No se encontraron datos para el estudiante.</p>
@@ -83,61 +83,61 @@ const ConsultaEstd = ({ data, onClose }) => {
     console.log('ESTUDIANTE RECIBIDO:', estudiante); // en VisorEstudiante.jsx
 
     return (
-        <div className="modal-overlay-uniforme">
-            <div className="modal-container-uniforme">
-                <div className="modal-header-buttons-uniforme modal-header-buttons-small">
-                    <CloseButton onClose={onClose} className="boton-principal boton-small" />
+        <div className="modal-overlay-verestd">
+            <div className="modal-container-verestd">
+                <div style={{ position: 'absolute', top: 18, right: 18, zIndex: 20 }}>
+                    <CloseButton onClose={onClose} className="boton-small" />
                 </div>
-                <div className="modal-header-uniforme">
+                <div className="modal-header-verestd" style={{ paddingRight: 40 }}>
                     <div>
-                        <h2 className="modal-title-uniforme">Consulta Completa del Estudiante</h2>
-                        <p className="modal-subtitle-uniforme">Información detallada del registro académico</p>
+                        <h2 className="modal-title-verestd">Datos del estudiante {estudiante?.nombre || ''} {estudiante?.apellido || ''}</h2>
+                        <p className="modal-subtitle-verestd">Información detallada del registro académico</p>
                     </div>
                     <button className="btn-uniforme btn-secondary-uniforme" onClick={handleGenerarComprobante}>
                        📄 Emitir Comprobante
                     </button>
                 </div>
-                <div className="modal-content-uniforme">
-                    <div className="consultaEstdRow tarjetas-container">
+                <div className="modal-content-verestd">
+                    <div className="consultaEstdRow">
                         {/* Datos Personales */}
-                        <div className="tarjeta-uniforme">
-                            <div className="tarjeta-header-uniforme"><h3>Datos Personales</h3></div>
-                            <div className="tarjeta-contenido-uniforme">
-                                <div className="dato-item-uniforme">
+                        <div className="tarjeta-verestd">
+                            <div className="tarjeta-header-verestd">Datos Personales</div>
+                            <div>
+                                <div className="dato-item-verestd">
                                     <label>Nombre:</label> 
                                     <span>{estudiante?.nombre || 'No especificado'}</span>
                                 </div>
-                                <div className="dato-item-uniforme">
+                                <div className="dato-item-verestd">
                                     <label>Apellido:</label> 
                                     <span>{estudiante?.apellido || 'No especificado'}</span>
                                 </div>
-                                <div className="dato-item-uniforme">
+                                <div className="dato-item-verestd">
                                     <label>DNI:</label> 
                                     <span>{estudiante?.dni || 'No especificado'}</span>
                                 </div>
-                                <div className="dato-item-uniforme">
+                                <div className="dato-item-verestd">
                                     <label>CUIL:</label> 
                                     <span>{estudiante?.cuil || 'No especificado'}</span>
                                 </div>
-                                <div className="dato-item-uniforme">
+                                <div className="dato-item-verestd">
                                     <label>Email:</label> 
                                     <span>{estudiante?.email || 'Sin email registrado'}</span>
                                 </div>
-                                <div className="dato-item-uniforme">
+                                <div className="dato-item-verestd">
                                     <label>Fecha de Nacimiento:</label> 
                                     <span>{formatDate(estudiante?.fechaNacimiento)}</span>
                                 </div>
-                                <div className="dato-item-uniforme">
+                                <div className="dato-item-verestd">
                                     <label>Tipo de Documento:</label> 
                                     <span>{estudiante?.tipoDocumento || 'DNI'}</span>
                                 </div>
-                                <div className="dato-item-uniforme">
+                                <div className="dato-item-verestd">
                                     <label>País de Emisión:</label> 
                                     <span>{estudiante?.paisEmision || 'Argentina'}</span>
                                 </div>
-                                <div className="dato-item-uniforme">
+                                <div className="dato-item-verestd">
                                     <label>Estado:</label> 
-                                    <span className={`estado-badge-uniforme estado-${estudiante?.activo ? 'activo' : 'inactivo'}-uniforme`}>
+                                    <span className={`estado-badge-verestd ${estudiante?.activo ? '' : 'estado-inactivo-verestd'}`}>
                                         {estudiante?.activo ? 'Activo' : 'Inactivo'}
                                     </span>
                                 </div>
@@ -145,34 +145,34 @@ const ConsultaEstd = ({ data, onClose }) => {
                         </div>
                         
                         {/* Domicilio */}
-                        <div className="tarjeta-uniforme">
-                            <div className="tarjeta-header-uniforme"><h3>Domicilio</h3></div>
-                            <div className="tarjeta-contenido-uniforme">
+                        <div className="tarjeta-verestd">
+                            <div className="tarjeta-header-verestd">Domicilio</div>
+                            <div>
                                 {domicilio ? (
                                     <>
-                                        <div className="dato-item-uniforme">
+                                        <div className="dato-item-verestd">
                                             <label>Calle:</label> 
                                             <span>{domicilio.calle || 'No especificado'}</span>
                                         </div>
-                                        <div className="dato-item-uniforme">
+                                        <div className="dato-item-verestd">
                                             <label>Número:</label> 
                                             <span>{domicilio.numero || 'No especificado'}</span>
                                         </div>
-                                        <div className="dato-item-uniforme">
+                                        <div className="dato-item-verestd">
                                             <label>Barrio:</label> 
                                             <span>{domicilio.barrio || 'No especificado'}</span>
                                         </div>
-                                        <div className="dato-item-uniforme">
+                                        <div className="dato-item-verestd">
                                             <label>Localidad:</label> 
                                             <span>{domicilio.localidad || 'No especificado'}</span>
                                         </div>
-                                        <div className="dato-item-uniforme">
+                                        <div className="dato-item-verestd">
                                             <label>Provincia:</label> 
                                             <span>{domicilio.provincia || 'No especificado'}</span>
                                         </div>
                                     </>
                                 ) : (
-                                    <div className="dato-item-uniforme">
+                                    <div className="dato-item-verestd">
                                         <span>No se encontraron datos de domicilio.</span>
                                     </div>
                                 )}
@@ -180,36 +180,36 @@ const ConsultaEstd = ({ data, onClose }) => {
                         </div>
                         
                         {/* Información Académica */}
-                        <div className="tarjeta-uniforme">
-                            <div className="tarjeta-header-uniforme"><h3>Información Académica</h3></div>
-                            <div className="tarjeta-contenido-uniforme">
+                        <div className="tarjeta-verestd">
+                            <div className="tarjeta-header-verestd">Información Académica</div>
+                            <div>
                                 {inscripcion ? (
                                     <>
-                                        <div className="dato-item-uniforme">
+                                        <div className="dato-item-verestd">
                                             <label>Modalidad:</label> 
                                             <span>{inscripcion.modalidad || 'No especificada'}</span>
                                         </div>
-                                        <div className="dato-item-uniforme">
+                                        <div className="dato-item-verestd">
                                             <label>Curso / Plan:</label> 
                                             <span>{inscripcion.plan || inscripcion.planAnio || 'No especificado'}</span>
                                         </div>
-                                        <div className="dato-item-uniforme">
+                                        <div className="dato-item-verestd">
                                             <label>Módulo:</label> 
                                             <span>{inscripcion.modulo || inscripcion.modulos || 'No especificado'}</span>
                                         </div>
-                                        <div className="dato-item-uniforme">
+                                        <div className="dato-item-verestd">
                                             <label>Estado de Inscripción:</label> 
-                                            <span className={`estado-badge-uniforme estado-${inscripcion.estado?.toLowerCase().replace(/\s+/g, '-') || 'sin-estado'}-uniforme`}>
+                                            <span className={`estado-badge-verestd ${inscripcion.estado?.toLowerCase() === 'pendiente' ? 'estado-pendiente-verestd' : ''}`}>
                                                 {inscripcion.estado || 'No especificado'}
                                             </span>
                                         </div>
-                                        <div className="dato-item-uniforme">
+                                        <div className="dato-item-verestd">
                                             <label>Fecha de Inscripción:</label> 
                                             <span>{formatDate(inscripcion?.fechaInscripcion)}</span>
                                         </div>
                                     </>
                                 ) : (
-                                    <div className="dato-item-uniforme">
+                                    <div className="dato-item-verestd">
                                         <span>No se encontraron datos de inscripción.</span>
                                     </div>
                                 )}
@@ -218,46 +218,46 @@ const ConsultaEstd = ({ data, onClose }) => {
                     </div>
                     
                     {/* Documentación */}
-                    <div className="tarjeta-uniforme documentacion-section">
-                        <div className="tarjeta-header-uniforme"><h3>Documentación Presentada</h3></div>
-                        <div className="tarjeta-contenido-uniforme">
-                            {documentacion && Array.isArray(documentacion) && documentacion.length > 0 ? (
-                                <div className="documentacion-lista-uniforme">
-                                    <div className="documentacion-header-uniforme">
-                                        <span className="doc-nombre-uniforme">Documento</span>
-                                        <span className="doc-estado-uniforme">Estado</span>
-                                        <span className="doc-fecha-uniforme">Fecha de Entrega</span>
-                                        <span className="doc-archivo-uniforme">Archivo</span>
-                                    </div>
+                    <div className="documentacion-verestd">
+                        <h4>Documentación Presentada</h4>
+                        {documentacion && Array.isArray(documentacion) && documentacion.length > 0 ? (
+                            <table className="tabla-documentacion-verestd">
+                                <thead>
+                                    <tr>
+                                        <th>Documento</th>
+                                        <th>Estado</th>
+                                        <th>Fecha de Entrega</th>
+                                        <th>Archivo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                     {documentacion.map((doc, index) => (
-                                        <div key={index} className="documentacion-item-uniforme">
-                                            <span className="doc-nombre-uniforme">
-                                                {doc.descripcionDocumentacion || 'Documento sin nombre'}
-                                            </span>
-                                            <span className={`doc-estado-uniforme estado-${doc.estadoDocumentacion?.toLowerCase() || 'faltante'}-uniforme`}>
-                                                {doc.estadoDocumentacion || 'Faltante'}
-                                            </span>
-                                            <span className="doc-fecha-uniforme">
-                                                {doc.fechaEntrega ? formatDate(doc.fechaEntrega) : 'No entregado'}
-                                            </span>
-                                            <span className="doc-archivo-uniforme">
+                                        <tr key={index}>
+                                            <td>{doc.descripcionDocumentacion || 'Documento sin nombre'}</td>
+                                            <td>
+                                                <span className={`estado-badge-verestd ${doc.estadoDocumentacion?.toLowerCase() === 'pendiente' ? 'estado-pendiente-verestd' : ''} ${doc.estadoDocumentacion?.toLowerCase() === 'faltante' ? 'estado-inactivo-verestd' : ''}`}>
+                                                    {doc.estadoDocumentacion || 'Faltante'}
+                                                </span>
+                                            </td>
+                                            <td>{doc.fechaEntrega ? formatDate(doc.fechaEntrega) : 'No entregado'}</td>
+                                            <td>
                                                 {doc.archivoDocumentacion ? (
-                                                    <a href={doc.archivoDocumentacion} target="_blank" rel="noopener noreferrer" className="btn-ver-archivo-uniforme">
+                                                    <a href={doc.archivoDocumentacion} target="_blank" rel="noopener noreferrer">
                                                         Ver
                                                     </a>
                                                 ) : (
-                                                    <span className="sin-archivo-uniforme">Sin archivo</span>
+                                                    <span style={{ color: '#aaa' }}>Sin archivo</span>
                                                 )}
-                                            </span>
-                                        </div>
+                                            </td>
+                                        </tr>
                                     ))}
-                                </div>
-                            ) : (
-                                <p className="no-documentacion-uniforme">
-                                    No se encontró documentación registrada para este estudiante.
-                                </p>
-                            )}
-                        </div>
+                                </tbody>
+                            </table>
+                        ) : (
+                            <p style={{ color: '#888', margin: '10px 0 0 0' }}>
+                                No se encontró documentación registrada para este estudiante.
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>

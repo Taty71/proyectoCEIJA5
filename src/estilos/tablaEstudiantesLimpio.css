@@ -1,0 +1,459 @@
+/* Tamaño destacado para datos clave */
+.badge-estado {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.plan-info {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.inscripcion-estado {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.lista-estudiantes-container {
+  /* Use almost full width within the app with small side gutters */
+  width: calc(100% - 48px);
+  max-width: none;
+  min-width: 0;
+  margin: 28px 24px;
+  box-sizing: border-box;
+  /* --- ACCIONES Y TOOLTIP LIMPIO --- */
+}
+
+/* =============================
+   TABLA ESTUDIANTES LIMPIO
+   ============================= */
+
+.badge-estado {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.plan-info,
+.inscripcion-estado {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.lista-estudiantes-container {
+  width: calc(100% - 48px);
+  max-width: none;
+  min-width: 0;
+  margin: 28px 24px;
+  box-sizing: border-box;
+}
+
+.tabla-wrapper {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  max-height: calc(100vh - 260px) !important;
+  overflow-y: auto !important;
+}
+
+.tabla-estudiantes {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.col-nombre {
+  width: 90px;
+  max-width: 95px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.col-email {
+  width: 170px !important;
+  max-width: 175px !important;
+  min-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+}
+.col-estado-activo {
+  width: 100px !important;
+  max-width: 100px;
+}
+.col-plan {
+  width: 80px;
+  position: relative;
+}
+.col-estado-inscripcion {
+  width: 80px;
+  max-width: 90px;
+  white-space: normal;
+}
+.col-fecha {
+  width: 85px;
+  max-width: 100px;
+  white-space: nowrap;
+  justify-content: center;
+  min-width: 90px;
+}
+
+/* --- COLUMNA ACCIONES --- */
+/* Header (th) y celdas (td) alineados, sticky solo donde corresponde */
+.tabla-estudiantes th.col-acciones {
+  min-width: 140px !important;
+  max-width: 200px !important;
+  text-align: center !important;
+  position: sticky;
+  top: 0;
+  right: 8px;
+  z-index: 80;
+  background: #f8fafc;
+}
+.tabla-estudiantes td.col-acciones {
+  min-width: 130px;
+  max-width: 200px !important;
+  text-align: center !important;
+  position: sticky;
+  right: 8px;
+  background: #fff;
+  z-index: 50;
+  box-shadow: -6px 0 12px -8px rgba(0, 0, 0, 0.06);
+  vertical-align: middle;
+  overflow: visible !important;
+  padding: 0 !important;
+}
+
+.acciones-contenedor {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .acciones-contenedor .accion-boton,
+  .acciones-contenedor .btn-accion-comprobante,
+  .acciones-contenedor .btn-accion-ver,
+  .acciones-contenedor .btn-accion-notificar {
+    padding: 6px;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .acciones-contenedor .accion-label {
+    display: none !important;
+  }
+  .acciones-contenedor .accion-ico {
+    font-size: 1.05rem;
+  }
+}
+@media (max-width: 600px) {
+  .acciones-contenedor .accion-boton,
+  .acciones-contenedor .btn-accion-comprobante,
+  .acciones-contenedor .btn-accion-ver,
+  .acciones-contenedor .btn-accion-notificar {
+    width: 34px;
+    height: 34px;
+    padding: 4px;
+  }
+  .acciones-contenedor .accion-ico {
+    font-size: 1.1rem;
+  }
+}
+
+/* --- TOOLTIP LIMPIO --- */
+.acciones-contenedor [data-tooltip] {
+  position: relative;
+  cursor: pointer;
+}
+/* Tooltip por defecto (pseudo-elemento) */
+.acciones-contenedor [data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: 120%;
+  transform: translateX(-50%);
+  background: #12222e;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  font-size: 13px;
+  z-index: 99999 !important;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  min-width: 70px;
+  text-align: center;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  overflow: visible !important;
+}
+.acciones-contenedor [data-tooltip]:hover::after,
+.acciones-contenedor [data-tooltip]:focus::after {
+  opacity: 1;
+  pointer-events: none;
+}
+
+/* Asegurar que la celda de acciones de cualquier fila pueda apilar el tooltip por encima de todo */
+.tabla-estudiantes td.col-acciones {
+  overflow: visible !important;
+  z-index: 1000;
+}
+@media (max-width: 900px) {
+  .acciones-contenedor [data-tooltip]::after {
+    left: auto;
+    right: 110%;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    min-width: 90px;
+    max-width: 220px;
+  }
+}
+
+/* Si está en la primera fila, mostrar el tooltip abajo (debajo del botón), con z-index alto y position absolute */
+.tabla-estudiantes tr:first-child .acciones-contenedor [data-tooltip]::after {
+  position: absolute !important;
+  left: 50%;
+  top: calc(100% + 8px) !important;
+  bottom: auto !important;
+  transform: translateX(-50%) !important;
+  z-index: 99999 !important;
+}
+
+/* Si no hay espacio arriba (por ejemplo, cerca del header), mostrar a la izquierda */
+@media (max-width: 900px) {
+  .acciones-contenedor [data-tooltip]::after {
+    left: auto;
+    right: 110%;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    min-width: 90px;
+    max-width: 220px;
+  }
+}
+
+/* --- CABECERA Y OTROS --- */
+.tabla-estudiantes th .th-text {
+  display: block;
+  white-space: normal !important;
+  line-height: 1.15;
+  word-break: break-word;
+  text-align: center !important;
+  font-size: 0.98rem;
+  font-weight: 600;
+  padding: 0 2px;
+  min-height: 32px;
+}
+.tabla-estudiantes th.col-fecha .th-text,
+.tabla-estudiantes th.col-nombre .th-text,
+.tabla-estudiantes th.col-plan .th-text {
+  max-width: 90px !important;
+  min-width: 70px;
+  white-space: normal !important;
+  word-break: break-word;
+  text-align: center !important;
+  line-height: 1.15;
+}
+.tabla-estudiantes thead th {
+  vertical-align: bottom;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  height: 38px;
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: #f8fafc;
+}
+.tabla-estudiantes thead th .th-text,
+.tabla-estudiantes thead th.col-acciones .th-text,
+.tabla-estudiantes thead th.col-fecha .th-text {
+  -webkit-writing-mode: horizontal-tb !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  transform: none !important;
+  display: block !important;
+  white-space: normal !important;
+  text-align: center !important;
+  padding: 0 !important;
+}
+.tabla-estudiantes thead th.col-fecha .th-text {
+  max-width: 140px !important;
+  margin: 0 auto;
+  min-width: 90px;
+}
+.tabla-estudiantes thead th .th-text {
+  max-width: 200px !important;
+  text-align: center !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+.tabla-estudiantes thead th.col-acciones {
+  min-width: 140px !important;
+  /* Ensure header cell stays visible at top and aligned to the right like the column */
+  position: sticky;
+  top: 0;
+  right: 8px;
+  z-index: 80; /* above other header cells */
+}
+
+/* --- FILAS Y CELDAS --- */
+.tabla-estudiantes tr.fila-estudiante td {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.col-acciones > * {
+  pointer-events: auto;
+}
+
+/* Fix: mostrar correctamente tooltips solo en la primera fila (no tocar el resto) */
+.tabla-estudiantes tr:first-child td.col-acciones {
+  overflow: visible !important;
+  z-index: 9999 !important;
+  position: relative !important;
+}
+.tabla-estudiantes tr:first-child .acciones-contenedor [data-tooltip]::after {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  opacity: 0;
+  transition: opacity 0.12s ease !important;
+}
+.tabla-estudiantes
+  tr:first-child
+  .acciones-contenedor
+  [data-tooltip]:hover::after,
+.tabla-estudiantes
+  tr:first-child
+  .acciones-contenedor
+  [data-tooltip]:focus::after {
+  opacity: 1 !important;
+  pointer-events: none;
+}
+
+/* Mostrar tooltip hacia abajo también en la segunda fila para evitar que lo tape el header */
+.tabla-estudiantes tbody tr:nth-child(2) td.col-acciones {
+  overflow: visible !important;
+}
+.tabla-estudiantes
+  tbody
+  tr:nth-child(2)
+  .acciones-contenedor
+  [data-tooltip]::after {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 20010 !important;
+}
+.tabla-estudiantes
+  tbody
+  tr:nth-child(2)
+  .acciones-contenedor
+  [data-tooltip]:hover::after,
+.tabla-estudiantes
+  tbody
+  tr:nth-child(2)
+  .acciones-contenedor
+  [data-tooltip]:focus::after {
+  opacity: 1 !important;
+}
+
+/* --- PANEL Y HEADER --- */
+.lista-header-superior .botones-navegacion {
+  align-items: flex-start;
+}
+.lista-header-superior .cerrar-button {
+  align-self: flex-start;
+  margin-top: 0;
+  transform: translateY(-6px);
+}
+.panel-controles .btn-filtro-small {
+  min-width: 88px;
+  text-align: center;
+  padding: 6px 10px;
+}
+
+/* --- RESUMEN FINAL --- */
+.resumen-final-compacto {
+  margin-top: 5px;
+  color: #fff;
+}
+.resumen-final-compacto .estadisticas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  z-index: 1000;
+}
+.resumen-final-compacto .stat-card {
+  background: #fff;
+  padding: 5px 8px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(44, 62, 80, 0.04);
+  text-align: center;
+}
+.resumen-final-compacto .stat-numero {
+  font-size: 1rem;
+  font-weight: 600;
+  display: block;
+}
+.resumen-final-compacto .stat-etiqueta {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+/* Prevent breaking between letters; keep header words intact */
+.tabla-estudiantes thead th .th-text {
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+
+/* Ensure the actions header th itself reserves enough width */
+.tabla-estudiantes thead th.col-acciones {
+  min-width: 140px !important;
+}
+
+/* Make the table wrapper allow vertical scrolling while keeping layout stable */
+.tabla-wrapper {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  max-height: calc(100vh - 260px) !important;
+  overflow-y: auto !important;
+}
+
+/* Header alignment tweaks: place close button slightly higher and keep buttons aligned */
+.lista-header-superior .botones-navegacion {
+  align-items: flex-start;
+}
+.lista-header-superior .cerrar-button {
+  align-self: flex-start;
+  margin-top: 0;
+  transform: translateY(-6px);
+}
+
+/* Make small filter buttons uniform and inline with header */
+.panel-controles .btn-filtro-small {
+  min-width: 88px;
+  text-align: center;
+  padding: 6px 10px;
+}
+
+/* Tighter table footprint so more rows fit on-screen */
+.tabla-estudiantes tr.fila-estudiante td {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+/* Ensure actions column is visually separate on wide screens */
+.col-acciones > * {
+  pointer-events: auto;
+}

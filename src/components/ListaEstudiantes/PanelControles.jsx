@@ -8,21 +8,29 @@ const PanelControles = ({
   estadoFiltro,
   setEstadoFiltro,
   onBuscarDNI,
+  onBuscarGeneral,
   onLimpiarBusqueda,
   modoBusqueda,
-  setMostrarModalReportes,
-  loading
+  loading,
+  showSearch = true,
+  showFilters = true,
+  onResetFiltros // Nuevo prop para resetear todos los filtros
 }) => {
   const handleFiltroChange = (nuevoFiltro) => {
     if (nuevoFiltro !== filtroActivo) {
       setFiltroActivo(nuevoFiltro);
+    }
+    // Si el usuario presiona "Todos", resetea todos los filtros y búsqueda
+    if (nuevoFiltro === 'todos' && typeof onResetFiltros === 'function') {
+      onResetFiltros();
     }
   };
 
   return (
     <div className="panel-controles">
       {/* Filtros de Estado */}
-      <div className="grupo-filtros-estado">
+      {showFilters && (
+        <div className="grupo-filtros-estado">
         <button
           className={`btn-filtro-small ${filtroActivo === 'todos' ? 'activo' : ''}`}
           onClick={() => handleFiltroChange('todos')}
@@ -44,11 +52,13 @@ const PanelControles = ({
         >
           ❌ Inactivos
         </button>
-      </div>
+        </div>
+      )}
 
       {/* Filtro por Estado de Inscripción */}
-      <div className="grupo-select-estado">
-        <label className="select-label">Estado:</label>
+      {showFilters && (
+        <div className="grupo-select-estado">
+        
         <select
           className="select-estado-inscripcion"
           value={estadoFiltro}
@@ -65,41 +75,42 @@ const PanelControles = ({
           ) : (
             <>
               <option value="1">Pendiente</option>
-              <option value="2">Aprobado</option>
+              <option value="2">Completa</option>
               <option value="3">Anulado</option>
             </>
           )}
         </select>
-      </div>
+        </div>
+      )}
+
+      {/* Filtro por inicial de apellido eliminado (se reemplaza por buscador general) */}
 
       {/* Buscador DNI */}
-      <div className="grupo-buscador">
-        <BuscadorDNI
-          onBuscar={onBuscarDNI}
-          placeholder="Buscar por DNI..."
-          disabled={loading}
-        />
-        {modoBusqueda && (
-          <button
-            className="btn-limpiar-busqueda"
-            onClick={onLimpiarBusqueda}
-            disabled={loading}
-          >
-            🗑️ Limpiar
-          </button>
-        )}
-      </div>
+      {showSearch && (
+        <div className="grupo-buscador">
+          <div className="buscador-wrapper">
+            <BuscadorDNI
+              onBuscar={onBuscarDNI}
+              onBuscarGeneral={typeof onBuscarGeneral === 'function' ? onBuscarGeneral : undefined}
+              placeholder="Buscar por Nombre, Apellido o DNI..."
+              disabled={loading}
+            />
+          </div>
 
-      {/* Botón de Reportes */}
-      <div className="grupo-reportes">
-        <button
-          className="btn-reportes"
-          onClick={() => setMostrarModalReportes(true)}
-          disabled={loading}
-        >
-          📊 Reportes
-        </button>
-      </div>
+          {modoBusqueda && (
+            <div className="limpiar-debajo">
+              <button
+                className="btn-limpiar-busqueda"
+                onClick={onLimpiarBusqueda}
+                disabled={loading}
+              >
+                🗑️ Limpiar
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
     </div>
   );
 };
@@ -113,8 +124,11 @@ PanelControles.propTypes = {
   onBuscarDNI: PropTypes.func.isRequired,
   onLimpiarBusqueda: PropTypes.func.isRequired,
   modoBusqueda: PropTypes.bool.isRequired,
-  setMostrarModalReportes: PropTypes.func.isRequired,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
+  onBuscarGeneral: PropTypes.func,
+  onResetFiltros: PropTypes.func,
+  showSearch: PropTypes.bool,
+  showFilters: PropTypes.bool
 };
 
 export default PanelControles;

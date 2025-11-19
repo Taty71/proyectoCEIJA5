@@ -15,7 +15,7 @@ export const mapPlanAnioToId = (planAnio) => {
 export const mapEstadoInscripcionToId = (estado) => {
     switch ((estado || '').toLowerCase()) {
         case 'pendiente': return 1;
-        case 'aprobado': return 2;
+        case 'Completa': return 2;
         case 'anulado': return 3;                   
         default: return null;
     }

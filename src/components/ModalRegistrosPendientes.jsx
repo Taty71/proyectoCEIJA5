@@ -404,7 +404,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
     };
     // Función para eliminar un registro del listado de pendientes
     const procesarEliminacion = async (registro) => {
-        // Construir nombre completo robusto
+        // Construir nombre y apellido completo robusto
         const nombreCompleto = `${registro.datos?.nombre || registro.nombre || ''} ${registro.datos?.apellido || registro.apellido || ''}`.trim();
         try {
             showInfo(`🗑️ Eliminando ${nombreCompleto || 'registro'} del listado de pendientes...`);

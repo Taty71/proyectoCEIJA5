@@ -5,16 +5,18 @@ import PropTypes from 'prop-types';
 import { ClimbingBoxLoader } from 'react-spinners'; // Asegúrate de que este paquete esté instalado
 
 
-const BotonCargando = ({ loading, children = "Cargando..." }) => {
+const BotonCargando = ({ loading, children = "Cargando...", className = '', type = 'button', ...props }) => {
+    const combinedClass = `boton-cargando ${className} ${loading ? 'disabled' : ''}`.trim();
     return (
         <button
-            type="submit"
-            className={`boton-cargando ${loading ? 'disabled' : ''}`} // Usa la clase buttonF
-            disabled={loading} // Desactiva el botón mientras está cargando
+            type={type}
+            className={combinedClass}
+            disabled={loading || props.disabled}
+            {...props}
         >
             {loading ? (
                 <div className="spinner-overlay">
-                    <ClimbingBoxLoader color="#2d4177" size={15} /> {/* Spinner ClimbingBoxLoader */}
+                    <ClimbingBoxLoader color="#2d4177" size={15} />
                 </div>
             ) : (
                 children

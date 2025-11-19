@@ -18,14 +18,21 @@ export const notificacionesService = {
     },
 
     // Enviar email individual
-    enviarEmailIndividual: async (dni) => {
+    enviarEmailIndividual: async (dni, options = {}) => {
         try {
+            const payload = { dni };
+            if (options && typeof options === 'object') {
+                if (options.subject) payload.subject = options.subject;
+                if (options.body) payload.body = options.body;
+                if (options.attachComprobante) payload.attachComprobante = true;
+            }
+
             const response = await fetch('/api/notificaciones/enviar-individual', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ dni })
+                body: JSON.stringify(payload)
             });
 
             const data = await response.json();

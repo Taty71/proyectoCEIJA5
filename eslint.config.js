@@ -33,6 +33,19 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+      // Reglas personalizadas para compatibilidad multiplataforma
+      'no-unused-vars': ['warn', { 
+        argsIgnorePattern: '^_', 
+        varsIgnorePattern: '^_',
+        ignoreRestSiblings: true 
+      }],
+      'no-console': ['warn', { allow: ['warn', 'error', 'log'] }], // Permitir console.log en desarrollo
+      'prefer-const': 'warn',
+      'no-var': 'error',
+      // Evitar problemas de rutas en diferentes OS
+      'import/no-unresolved': 'off',
+      // Permitir funciones de flecha para callbacks
+      'react/display-name': 'off',
     },
   },
 ]

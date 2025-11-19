@@ -1,29 +1,54 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import BotonCargando from './BotonCargando';
 import '../estilos/buscadorDNI.css';
 
 const BuscadorDNI = ({ 
-  onBuscar, 
-  onLimpiar, 
+  onBuscar,
+  onBuscarGeneral,
   loading = false, 
   disabled = false, 
-  modoBusqueda = false,
-  placeholder = "Ingresa el DNI del estudiante (ej: 12345678)"
+  modoBusqueda: _modoBusqueda = false,
+  placeholder = "Ingresa el DNI del estudiante (ej: 12345678)",
+  suppressGlobalLoading = true
 }) => {
-  const [dniBusqueda, setDniBusqueda] = useState('');
+  const [term, setTerm] = useState('');
+  const [searching, setSearching] = useState(false);
 
   const handleBuscar = () => {
-    if (!dniBusqueda.trim()) {
-      return;
+    if (!term || !term.trim()) return;
+    const texto = term.trim();
+    // Si es solo dígitos (DNI), usar onBuscar (buscar por DNI). Si no, usar onBuscarGeneral si está disponible.
+    const soloDigitos = /^\d+$/.test(texto.replace(/\s+/g, ''));
+    try {
+      let result;
+      if (soloDigitos) {
+        if (typeof onBuscar === 'function') result = onBuscar(texto);
+      } else {
+        if (typeof onBuscarGeneral === 'function') result = onBuscarGeneral(texto);
+        else if (typeof onBuscar === 'function') result = onBuscar(texto);
+      }
+
+      // If handler returned a promise, show local spinner until it resolves
+      if (result && typeof result.then === 'function') {
+        setSearching(true);
+        result.finally(() => setSearching(false));
+      }
+    } catch (err) {
+      // ignore handler errors here (they'll be handled upstream)
+      setSearching(false);
     }
-    onBuscar(dniBusqueda.trim());
   };
 
-  const handleLimpiar = () => {
-    setDniBusqueda('');
-    onLimpiar();
+  // Nota: la limpieza se renderiza externamente en PanelControles.
+
+  const handleInputChange = (e) => {
+    // Permitir texto libre (nombre/apellido/DNI). Limitar longitud a 60
+    const valor = e.target.value.slice(0, 60);
+    setTerm(valor);
   };
 
+  // Ejecutar búsqueda cuando el usuario presiona Enter
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -31,59 +56,43 @@ const BuscadorDNI = ({
     }
   };
 
-  const handleInputChange = (e) => {
-    // Solo permite números y máximo 8 dígitos
-    const valor = e.target.value.replace(/\D/g, '').slice(0, 8);
-    setDniBusqueda(valor);
-  };
+  const showSpinner = (!suppressGlobalLoading && loading) || searching;
 
   return (
     <div className="buscador-dni-container">
+      {/* Buscador general por Nombre / Apellido / DNI (solo si se provee handler) */}
       <div className="buscador-dni-input-group">
         <input
           type="text"
-          className="buscador-dni-input"
           placeholder={placeholder}
-          value={dniBusqueda}
+          className="buscador-dni-input"
+          value={term}
           onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
           disabled={loading || disabled}
-          maxLength="8"
         />
-        <button
+        <BotonCargando
+          loading={showSpinner}
           className="btn-buscar-dni"
           onClick={handleBuscar}
-          disabled={loading || disabled || !dniBusqueda.trim()}
-          title="Buscar estudiante por DNI"
+          disabled={loading || disabled || !term.trim()}
+          title="Buscar estudiante"
         >
-          {loading ? (
-            <span className="loading-spinner">⟳</span>
-          ) : (
-            '🔍'
-          )}
-        </button>
+          🔍
+        </BotonCargando>
       </div>
       
-      {modoBusqueda && (
-        <button
-          className="btn-limpiar-busqueda-dni"
-          onClick={handleLimpiar}
-          disabled={loading || disabled}
-          title="Limpiar búsqueda y volver a la lista"
-        >
-          🗑️ Limpiar Búsqueda
-        </button>
-      )}
+      {/* Limpieza se mostrará externamente justo debajo del buscador en PanelControles */}
     </div>
   );
 };
 
 BuscadorDNI.propTypes = {
-  onBuscar: PropTypes.func.isRequired,
-  onLimpiar: PropTypes.func.isRequired,
+  onBuscar: PropTypes.func,
   loading: PropTypes.bool,
   disabled: PropTypes.bool,
   modoBusqueda: PropTypes.bool,
+  onBuscarGeneral: PropTypes.func,
   placeholder: PropTypes.string,
 };
 

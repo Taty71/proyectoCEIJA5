@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import AlertaMens from './AlertaMens';
 import FormatError from '../utils/MensajeError';
+import SpinnerCeiJa from './SpinnerCeiJa';
 import '../estilos/ModalAgregarBarrio.css';
 
 export const Domicilio = ({ esAdmin = false }) => {
@@ -403,7 +404,7 @@ export const Domicilio = ({ esAdmin = false }) => {
                             >
                                 {guardandoBarrio ? (
                                     <>
-                                        <span className="modal-agregar-barrio-spinner"></span>
+                                        <SpinnerCeiJa size={12} text="" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: 4 }} />
                                         Guardando...
                                     </>
                                 ) : (

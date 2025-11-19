@@ -1,26 +1,38 @@
 /* Contenedor principal del buscador DNI */
 .buscador-dni-container {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  gap: 12px;
-  margin: 15px 0;
-  padding: 0 20px;
+  gap: 10px;
+  margin: 6px 0;
+  padding: 0 8px;
 }
 
 /* Grupo de input y botón de búsqueda */
 .buscador-dni-input-group {
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 8px;
   background: white;
   border: 2px solid #2d4177;
   border-radius: 8px;
   padding: 0;
   transition: all 0.3s ease;
-  max-width: 400px;
+  /* increase so input has more room in the header */
+  min-width: 260px;
+  max-width: 680px; /* increased per request for wider search */
   width: 100%;
-  box-shadow: 0 2px 4px rgba(45, 65, 119, 0.1);
+  box-shadow: 0 2px 4px rgba(45, 65, 119, 0.06);
+  height: 40px; /* This line remains unchanged */
+}
+
+/* wrapper provided by PanelControles to align buscador inside the controls row */
+.buscador-wrapper {
+  /* place the buscador next to the controls; allow it to expand leftwards */
+  margin-left: 12px;
+  width: 100%;
+  max-width: 680px;
+  flex: 1 1 auto;
 }
 
 .buscador-dni-input-group:focus-within {
@@ -33,13 +45,15 @@
 .buscador-dni-input {
   border: none;
   outline: none;
-  padding: 12px 16px;
+  padding: 8px 12px;
   font-size: 0.95rem;
   width: 100%;
   background: transparent;
   color: #333;
   font-family: "Roboto Slab", serif;
   letter-spacing: 0.5px;
+  height: 40px; /* This line remains unchanged */
+  box-sizing: border-box;
 }
 
 .buscador-dni-input::placeholder {
@@ -59,17 +73,17 @@
   background: linear-gradient(135deg, #2d4177, #4a69bd);
   color: white;
   border: none;
-  padding: 12px 16px;
+  padding: 0 12px;
   border-radius: 0 6px 6px 0;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 52px;
-  font-size: 1.2rem;
-  height: 48px;
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.2);
+  min-width: 44px;
+  font-size: 1.05rem; /* This line remains unchanged */
+  height: 40px;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.12);
 }
 
 .btn-buscar-dni:hover:not(:disabled) {
@@ -112,17 +126,18 @@
   background: linear-gradient(135deg, #6c757d, #495057);
   color: white;
   border: none;
-  padding: 10px 18px;
+  padding: 0 10px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 2px 6px rgba(108, 117, 125, 0.2);
+  box-shadow: 0 2px 6px rgba(108, 117, 125, 0.18);
   white-space: nowrap;
+  height: 40px;
 }
 
 .btn-limpiar-busqueda-dni:hover:not(:disabled) {

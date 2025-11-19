@@ -95,7 +95,7 @@ const LoginButton = ({ onClose, onRegisterClick }) => {
                         <Input label="Contraseña" placeholder="Password" type="password" registro={{ ...register("password") }} error={errors.password?.message} />
                         <div className="button-container" style={{ justifyContent: 'flex-end' }}> {/* Alinea el botón a la derecha */}
 
-                            <BotonCargando loading={loading}>
+                            <BotonCargando loading={loading} type="submit">
                                 Iniciar Sesión
                             </BotonCargando>
                         </div>

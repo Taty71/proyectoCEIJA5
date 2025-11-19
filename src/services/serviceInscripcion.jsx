@@ -13,27 +13,80 @@ const getAll = async () => {
     }
 };
 
-// Obtener estudiantes paginados y filtrados por modalidadId
-const getPaginatedEstudiantes = async (page, limit, filtroActivo = 'activos', modalidadId) => {
+// Obtener estudiantes paginados y filtrados por modalidadId y estado
+const getPaginatedEstudiantes = async (page, limit, filtroActivo = 'activos', modalidadId, estadoId, apellidoInicial) => {
     try {
         let endpoint = `/consultar-estudiantes?page=${page}&limit=${limit}`;
         // Agregar parámetro de filtro según el estado
         if (filtroActivo === 'activos') {
             endpoint += '&activo=1';
-        } else if (filtroActivo === 'desactivados') {
+        } else if (filtroActivo === 'desactivados' || filtroActivo === 'inactivos') {
             endpoint += '&activo=0';
+        } else if (filtroActivo === 'todos') {
+            // NO agregar filtro por activo - traer todos los estudiantes
+            console.log('📊 Solicitando TODOS los estudiantes (activos e inactivos)');
         }
         // Agregar modalidadId si está definido
         if (typeof modalidadId === 'number' && !isNaN(modalidadId)) {
             endpoint += `&modalidadId=${modalidadId}`;
         }
+        // Agregar estadoId (id de estado_inscripciones) si está definido
+        if (typeof estadoId === 'string' && estadoId !== '') {
+            // estadoId viene como string desde el select; convertir a número si es posible
+            const parsed = Number(estadoId);
+            if (!isNaN(parsed)) {
+                endpoint += `&estadoId=${parsed}`;
+            }
+        } else if (typeof estadoId === 'number' && !isNaN(estadoId)) {
+            endpoint += `&estadoId=${estadoId}`;
+        }
+        // Agregar filtro por inicial de apellido si está definido
+        if (apellidoInicial && typeof apellidoInicial === 'string' && apellidoInicial.trim() !== '') {
+            const letter = encodeURIComponent(String(apellidoInicial).trim().charAt(0));
+            endpoint += `&apellidoInicial=${letter}`;
+        }
         console.log('🌐 Llamando al endpoint:', endpoint);
-        console.log('📋 Parámetros:', { page, limit, filtroActivo, modalidadId });
+        console.log('📋 Parámetros:', { page, limit, filtroActivo, modalidadId, estadoId, apellidoInicial });
         const response = await axiosInstance.get(endpoint);
         console.log('🔄 Respuesta del backend:', response.data);
         return response.data;
     } catch (error) {
         console.error('🚨 Error en getPaginatedEstudiantes:', error);
+        const message = FormatError(error);
+        return { error: message, success: false };
+    }
+};
+
+// Obtener estudiantes paginados usando la nueva ruta /listar-estudiantes
+const getPaginatedAllEstudiantes = async (page, limit, filtroActivo = 'todos', modalidadId, estadoId, apellidoInicial) => {
+    try {
+        let endpoint = `/listar-estudiantes?page=${page}&limit=${limit}`;
+        // Sólo pasar parametro activo si se especifica (activos o desactivados)
+        if (filtroActivo === 'activos') {
+            endpoint += '&activo=1';
+        } else if (filtroActivo === 'desactivados' || filtroActivo === 'inactivos') {
+            endpoint += '&activo=0';
+        } // si es 'todos' no añadimos parametro activo
+
+        if (typeof modalidadId === 'number' && !isNaN(modalidadId)) {
+            endpoint += `&modalidadId=${modalidadId}`;
+        }
+        if (typeof estadoId === 'string' && estadoId !== '') {
+            const parsed = Number(estadoId);
+            if (!isNaN(parsed)) {
+                endpoint += `&estadoId=${parsed}`;
+            }
+        } else if (typeof estadoId === 'number' && !isNaN(estadoId)) {
+            endpoint += `&estadoId=${estadoId}`;
+        }
+        if (apellidoInicial && typeof apellidoInicial === 'string' && apellidoInicial.trim() !== '') {
+            const letter = encodeURIComponent(String(apellidoInicial).trim().charAt(0));
+            endpoint += `&apellidoInicial=${letter}`;
+        }
+        const response = await axiosInstance.get(endpoint);
+        return response.data;
+    } catch (error) {
+        console.error('🚨 Error en getPaginatedAllEstudiantes:', error);
         const message = FormatError(error);
         return { error: message, success: false };
     }
@@ -121,7 +174,18 @@ const deactivateEstd = async (dni) => {
 const getEstadoDocumental = async (idInscripcion) => {
     try {
         const response = await axiosInstance.get(`/estado-documental/${idInscripcion}`);
-        return response.data;
+        // Normalize backend shape to { success, data: { subidos, faltantes } }
+        if (response && response.data) {
+            const resp = response.data;
+            if (resp.success) {
+                // backend may return { requeridos, presentados, faltantes } or { subidos, faltantes }
+                const subidos = resp.presentados || resp.subidos || [];
+                const faltantes = resp.faltantes || [];
+                return { success: true, data: { subidos, faltantes, requeridos: resp.requeridos || [] } };
+            }
+            return resp;
+        }
+        return { success: false, error: 'Respuesta inválida del servidor' };
     } catch (error) {
         return { success: false, error: error.message || 'Error al consultar estado documental.' };
     }
@@ -150,8 +214,32 @@ export default {
     deactivateEstd,
     getAll,
     getPaginatedEstudiantes,
+    getPaginatedAllEstudiantes,
     getDocumentosFaltantes,
     getEstudiantePorDNI,
     getEstadoDocumental,
     updateEstadoInscripcion,
+    // Server-side search endpoint
+    buscarEstudiantes: async (q, modalidadId, estadoId, page = 1, limit = 5, filtroActivo) => {
+        try {
+            let endpoint = `/buscar-estudiantes?q=${encodeURIComponent(q || '')}&page=${page}&limit=${limit}`;
+            // Pasar filtroActivo si está definido (activos/desactivados)
+            if (filtroActivo === 'activos' || filtroActivo === 'activo' || filtroActivo === 1 || filtroActivo === '1') {
+                endpoint += '&activo=1';
+            } else if (filtroActivo === 'desactivados' || filtroActivo === 'inactivos' || filtroActivo === 'desactivado' || filtroActivo === 0 || filtroActivo === '0') {
+                endpoint += '&activo=0';
+            }
+            if (typeof modalidadId === 'number' && !isNaN(modalidadId)) endpoint += `&modalidadId=${modalidadId}`;
+            if (estadoId !== undefined && estadoId !== null && estadoId !== '') {
+                const parsed = Number(estadoId);
+                if (!isNaN(parsed)) endpoint += `&estadoId=${parsed}`;
+            }
+            const response = await axiosInstance.get(endpoint);
+            return response.data;
+        } catch (error) {
+            console.error('🚨 Error en buscarEstudiantes:', error);
+            const message = FormatError(error);
+            return { error: message, success: false };
+        }
+    }
 };

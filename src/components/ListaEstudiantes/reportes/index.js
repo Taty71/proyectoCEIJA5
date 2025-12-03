@@ -14,7 +14,7 @@ export * from './tendenciasPlan';
 
 // Análisis de Documentación y Rendimiento
 export * from './analisisDocumentacion';
-export * from './analisisRendimiento';
+export * from './analisisEstadoInstitucional';
 
 // Reportes Básicos y Estadísticos
 export * from './reportesBasicos';

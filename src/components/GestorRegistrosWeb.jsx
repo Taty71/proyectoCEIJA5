@@ -373,14 +373,9 @@ const GestorRegistrosWeb = ({ onClose, onRegistroSeleccionado, isAdmin = false }
                                                 </div>
                                                 {/* Mostrar documentos adjuntos */}
                                                 {registro.archivos && Object.keys(registro.archivos).length > 0 && (
-                                                    <div className="registro-documentos">
-                                                        <strong style={{ color: '#2e7d32' }}>📎 Documentos adjuntos ({Object.keys(registro.archivos).length}):</strong>
-                                                        <ul style={{ 
-                                                            margin: '5px 0 0 15px', 
-                                                            padding: 0, 
-                                                            fontSize: '0.85rem',
-                                                            color: '#666'
-                                                        }}>
+                                                    <div className="registro-documentos documentos-subidos">
+                                                        <strong>📎 Documentos adjuntos ({Object.keys(registro.archivos).length}):</strong>
+                                                        <ul>
                                                             {Object.entries(registro.archivos).map(([tipo, ruta]) => {
                                                                 const nombreDocumento = {
                                                                     'foto': '📷 Foto',
@@ -392,33 +387,24 @@ const GestorRegistrosWeb = ({ onClose, onRegistroSeleccionado, isAdmin = false }
                                                                     'archivo_analiticoParcial': '📊 Analítico Parcial',
                                                                     'archivo_certificadoNivelPrimario': '🎓 Certificado Primario'
                                                                 }[tipo] || `📎 ${tipo}`;
-                                                                
+
                                                                 return (
                                                                     <li key={tipo} style={{ marginBottom: '2px' }}>
-                                                                        <span style={{ color: '#4caf50' }}>✅ {nombreDocumento}</span>
-                                                                        <small style={{ color: '#999', marginLeft: '5px' }}>
-                                                                            ({ruta.split('/').pop()})
-                                                                        </small>
+                                                                        <span className="doc-presentado">✅ {nombreDocumento}</span>
+                                                                        <small className="doc-nombre-archivo">({ruta.split('/').pop()})</small>
                                                                     </li>
                                                                 );
                                                             })}
                                                         </ul>
-                                                        <div style={{ 
-                                                            fontSize: '0.8rem', 
-                                                            color: '#ff9800', 
-                                                            marginTop: '5px',
-                                                            fontStyle: 'italic'
-                                                        }}>
+                                                        <div className="info-al-completar">
                                                             💡 Al completar inscripción se mostrarán estos documentos para verificar
                                                         </div>
                                                     </div>
                                                 )}
                                                 {/* Mensaje si no hay documentos */}
                                                 {(!registro.archivos || Object.keys(registro.archivos).length === 0) && (
-                                                    <div className="registro-documentos">
-                                                        <span style={{ color: '#f44336', fontSize: '0.85rem' }}>
-                                                            ⚠️ Sin documentos adjuntos - Deberá completar toda la documentación
-                                                        </span>
+                                                    <div className="registro-documentos documentos-faltantes">
+                                                        <span className="sin-documentos">⚠️ Sin documentos adjuntos - Deberá completar toda la documentación</span>
                                                     </div>
                                                 )}
                                                 <div className="registro-info">

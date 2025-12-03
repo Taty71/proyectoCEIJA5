@@ -14,43 +14,15 @@ const AccionesRegistro = ({
     // Si el registro está procesado, mostrar mensaje y solo botón de eliminar desactivado
     if (info.esProcesado) {
         return (
-            <div className="registro-acciones" style={{
-                display: 'flex',
-                gap: '8px',
-                marginTop: '15px',
-                padding: '15px 10px 10px 10px',
-                borderTop: '2px solid #2d4177',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                backgroundColor: '#f8f9fd',
-                borderRadius: '0 0 8px 8px',
-                minHeight: '50px',
-                zIndex: 999,
-                position: 'relative'
-            }}>
-                <span style={{ fontSize: '1rem', color: '#28a745', fontWeight: 'bold', marginRight: '10px' }}>
+            <div className="registro-acciones">
+                <span className="badge-unificado" style={{ marginRight: '10px' }}>
                     ✅ Registro Procesado y Completa - Documentación guardada en BD
                 </span>
                 <button
                     onClick={() => onEliminar(registro)}
-                    className="btn-eliminar"
+                    className="btn-eliminar-unificado"
                     title="Eliminar este registro del listado de pendientes (ya está registrado y Completa en la base de datos)"
                     disabled={enviandoEmail}
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        backgroundColor: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        padding: '8px 12px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        margin: '2px',
-                        visibility: 'visible',
-                        opacity: 1,
-                        whiteSpace: 'nowrap'
-                    }}
                 >
                     🗑️ Eliminar del Listado
                 </button>
@@ -73,31 +45,16 @@ const AccionesRegistro = ({
             zIndex: 999,
             position: 'relative'
         }}>
-            <div style={{ fontSize: '10px', color: '#666', marginRight: '10px' }}>
+            <div style={{ fontSize: '10px', color: 'var(--color-mid)', marginRight: '10px' }}>
                 🔧 Botones de acción:
             </div>
             {/* Botón para completar/editar registro */}
             {!info.vencido && (
                 <button
                     onClick={() => onCompletar(registro)}
-                    className="btn-completar"
+                    className="btn-unificado"
                     title="Abrir formulario para completar la documentación y editar datos"
                     disabled={enviandoEmail}
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        backgroundColor: '#28a745',
-                        color: 'white',
-                        border: 'none',
-                        padding: '8px 12px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        margin: '2px',
-                        visibility: 'visible',
-                        opacity: 1,
-                        whiteSpace: 'nowrap'
-                    }}
                 >
                     📝 Completar
                 </button>
@@ -106,51 +63,22 @@ const AccionesRegistro = ({
             {(registro.datos?.email || registro.email) && (
                 <button
                     onClick={() => onEnviarEmail(registro)}
-                    className="btn-notificar"
+                    className="btn-unificado"
                     disabled={enviandoEmail}
                     title={`Enviar notificación por email a ${registro.datos?.email || registro.email}`}
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        backgroundColor: info.vencido ? '#6c757d' : '#17a2b8',
-                        color: 'white',
-                        border: 'none',
-                        padding: '8px 12px',
-                        borderRadius: '4px',
-                        cursor: enviandoEmail ? 'not-allowed' : 'pointer',
-                        fontSize: '12px',
-                        margin: '2px',
-                        opacity: info.vencido ? 0.6 : 1,
-                        visibility: 'visible',
-                        whiteSpace: 'nowrap'
-                    }}
+                    aria-disabled={enviandoEmail}
                 >
                     {enviandoEmail ? '📧 Enviando...' : `📧 ${info.vencido ? 'Vencido' : 'Notificar'}`}
                 </button>
             )}
             {/* Botón para reiniciar alarma - solo si está vencido o próximo a vencer Y puede reiniciar */}
-            {(info.vencido || info.diasRestantes <= 3) && info.puedeReiniciarAlarma && (
+            {(info.vencido || info.diasRestantes <= 3) && (
                 <button
                     onClick={() => onReiniciarAlarma(registro)}
-                    className="btn-reiniciar-alarma"
+                    className="btn-unificado"
                     disabled={enviandoEmail}
                     title="Extender plazo de entrega por 7 días adicionales"
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        backgroundColor: '#ffc107',
-                        color: '#212529',
-                        border: 'none',
-                        padding: '8px 12px',
-                        borderRadius: '4px',
-                        cursor: enviandoEmail ? 'not-allowed' : 'pointer',
-                        fontSize: '12px',
-                        margin: '2px',
-                        visibility: 'visible',
-                        opacity: enviandoEmail ? 0.6 : 1,
-                        whiteSpace: 'nowrap',
-                        fontWeight: 'bold'
-                    }}
+                    aria-disabled={enviandoEmail}
                 >
                     ⏰ Reiniciar Alarma
                 </button>
@@ -158,24 +86,9 @@ const AccionesRegistro = ({
             {/* Botón para eliminar registro */}
             <button
                 onClick={() => onEliminar(registro)}
-                className="btn-eliminar"
+                className="btn-eliminar-unificado"
                 title="Eliminar este registro del listado de pendientes (usar después de que el estudiante esté registrado y Completa)"
                 disabled={enviandoEmail}
-                style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    backgroundColor: '#dc3545',
-                    color: 'white',
-                    border: 'none',
-                    padding: '8px 12px',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                    margin: '2px',
-                    visibility: 'visible',
-                    opacity: 1,
-                    whiteSpace: 'nowrap'
-                }}
             >
                 🗑️ Eliminar del Listado
             </button>

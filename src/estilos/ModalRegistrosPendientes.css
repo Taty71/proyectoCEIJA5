@@ -1,3 +1,46 @@
+/* Paleta profesional para el modal de registros pendientes */
+:root {
+  --color-bg-main: #fff;
+  --color-btn-main: #2d4177;
+  --color-btn-shadow: #87ceeb;
+  --color-btn-hover: #696969;
+  --color-title: #2d4177;
+}
+
+/* Unificación de botones de descarga estilo dashboard */
+.descarga-unificada {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 0.7em;
+}
+.btn-descarga {
+  background: var(--color-bg-main);
+  color: var(--color-dark);
+  border: 2px solid var(--color-btn-main);
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.45em 1em;
+  min-width: 140px;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+  box-shadow: 0 6px 18px rgba(45, 65, 119, 0.06);
+}
+.btn-descarga:disabled {
+  background: #f3f3f3;
+  color: #9aa0a6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.btn-descarga:hover:not(:disabled),
+.btn-descarga:focus:not(:disabled) {
+  background: var(--color-btn-main);
+  color: #fff;
+  transform: translateY(-1px);
+}
 /* Estilos para Modal de Registros Pendientes */
 .modal-registros-pendientes .modal-overlay {
   position: fixed;
@@ -33,21 +76,21 @@
 
 /* Header del modal */
 .modal-registros-pendientes .modal-header {
-  background: linear-gradient(135deg, #2d4177 0%, #3d5aa7 100%);
-  color: white;
+  background: var(--color-bg-main);
+  color: var(--color-title);
   padding: 20px 25px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-radius: 12px 12px 0 0;
-  border-bottom: 2px solid #2d4177;
+  border-bottom: 2px solid var(--color-btn-main);
 }
 
 .modal-registros-pendientes .modal-header h2 {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
-  color: white;
+  color: var(--color-title);
 }
 
 /* Contenido principal */
@@ -68,7 +111,7 @@
   flex: 1 !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  background-color: #2c2c2c !important;
+  background-color: #f7f8fb !important; /* fondo claro, profesional */
   padding: 25px !important;
   margin: 0 !important;
   width: 100% !important;
@@ -172,7 +215,7 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #3d5aa7;
+  background: #2d4177;
   color: white;
   width: 20px;
   height: 20px;
@@ -216,7 +259,7 @@
 .modal-registros-pendientes .registro-item:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(61, 90, 167, 0.2);
-  border-color: #3d5aa7;
+  border-color: #2d4177;
   background: #fafbfc;
 }
 
@@ -255,10 +298,10 @@
 
 .modal-registros-pendientes .registro-info-estudiante h4 {
   margin: 0 0 12px 0;
-  color: #2d4177;
+  color: var(--color-btn-main);
   font-size: 1.3rem;
   font-weight: 700;
-  text-shadow: 0 1px 2px rgba(45, 65, 119, 0.1);
+  text-shadow: 0 1px 2px rgba(45, 65, 119, 0.06);
   letter-spacing: 0.3px;
 }
 
@@ -278,7 +321,7 @@
   margin: 4px 0;
   line-height: 1.5;
   font-size: 0.95rem;
-  color: #555;
+  color: var(--color-dark);
 }
 
 .modal-registros-pendientes .registro-info-estudiante .info-item {
@@ -298,9 +341,10 @@
 }
 
 .modal-registros-pendientes .registro-vencimiento {
-  font-weight: bold;
+  font-weight: 700;
   font-size: 0.95rem;
   margin-bottom: 4px;
+  color: var(--color-btn-main);
 }
 
 .modal-registros-pendientes .registro-fecha-limite {
@@ -344,22 +388,26 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
   font-weight: 500;
   text-align: center;
   white-space: nowrap;
   font-weight: 500;
   white-space: nowrap;
-}
-
-.modal-registros-pendientes .registro-acciones .btn-completar {
-  background-color: #28a745 !important;
-  color: white !important;
-  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3) !important;
+  background-color: #f0f0f0 !important;
+  color: rgb(34, 33, 33) !important;
+  box-shadow: 0 2px 4px #6c757d !important;
   font-weight: bold !important;
 }
 
-.modal-registros-pendientes .registro-acciones .btn-notificar {
+/*.modal-registros-pendientes .registro-acciones .btn-completar, .btn-notificar, .btn-eliminar {
+  background-color: #f0f0f0 !important;
+  color: rgb(34, 33, 33) !important;
+  box-shadow: 0 2px 4px #6c757d !important;
+  font-weight: bold !important;
+}
+
+/*.modal-registros-pendientes .registro-acciones .btn-notificar {
   background-color: #17a2b8 !important;
   color: white !important;
   box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3) !important;
@@ -371,11 +419,43 @@
   color: white !important;
   box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
   font-weight: bold !important;
-}
+}*/
 
 .modal-registros-pendientes .registro-acciones button:hover:not(:disabled) {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Específicos: aplicar estilos iguales a los de Registros Pendientes para botones concretos */
+.modal-registros-pendientes .registro-acciones .btn-eliminar {
+  background: #6c757d !important; /* mismo gris del btn-eliminar en RegistrosPendientes.css */
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  box-shadow: 0 6px 18px rgba(45, 65, 119, 0.06) !important;
+  font-weight: 700 !important;
+}
+.modal-registros-pendientes
+  .registro-acciones
+  .btn-eliminar:hover:not(:disabled) {
+  background: #5a6268 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Opcional: hacer que los botones principales del modal tengan un efecto elegante similar */
+.modal-registros-pendientes .registro-acciones .btn-procesar,
+.modal-registros-pendientes .registro-acciones .btn-rechazar {
+  border-radius: 6px !important;
+  box-shadow: 0 6px 18px rgba(45, 65, 119, 0.06) !important;
+}
+.modal-registros-pendientes
+  .registro-acciones
+  .btn-procesar:hover:not(:disabled),
+.modal-registros-pendientes
+  .registro-acciones
+  .btn-rechazar:hover:not(:disabled) {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) !important;
 }
 
 .modal-registros-pendientes .registro-acciones button:disabled {
@@ -390,10 +470,10 @@
   width: 100%;
   margin: 15px 0 20px 0;
   clear: both;
-  padding: 15px;
-  background: #f8f9fa;
+  padding: 12px;
+  background: transparent;
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid rgba(45, 65, 119, 0.06);
 }
 
 .modal-registros-pendientes .seccion-documentos {
@@ -410,13 +490,13 @@
 }
 
 .modal-registros-pendientes .documentos-subidos {
-  background-color: #e8f5e8;
-  border: 2px solid #28a745;
-  border-left: 4px solid #28a745;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-left: 4px solid var(--color-btn-main);
 }
 
 .modal-registros-pendientes .documentos-subidos strong {
-  color: #2e7d32;
+  color: var(--color-btn-main);
 }
 
 .modal-registros-pendientes .documentos-subidos ul {
@@ -425,19 +505,19 @@
 }
 
 .modal-registros-pendientes .documentos-subidos li {
-  color: #2e7d32;
+  color: var(--color-dark);
   line-height: 1.2;
   font-size: 0.75rem;
 }
 
 .modal-registros-pendientes .documentos-faltantes {
-  background-color: #fff3e0;
-  border: 2px solid #ffc107;
-  border-left: 4px solid #ffc107;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-left: 4px solid var(--color-btn-main);
 }
 
 .modal-registros-pendientes .documentos-faltantes strong {
-  color: #f57c00;
+  color: var(--color-mid);
 }
 
 .modal-registros-pendientes .documentos-faltantes ul {
@@ -446,7 +526,7 @@
 }
 
 .modal-registros-pendientes .documentos-faltantes li {
-  color: #f57c00;
+  color: var(--color-mid);
   line-height: 1.2;
   font-size: 0.75rem;
 }
@@ -454,23 +534,23 @@
 /* Info de documentos alternativos */
 .modal-registros-pendientes .info-alternativos {
   margin-top: 4px;
-  padding: 3px 5px;
-  background-color: #e3f2fd;
-  border: 1px solid #bbdefb;
-  border-radius: 3px;
-  font-size: 0.75rem;
-  color: #1565c0;
+  padding: 6px 8px;
+  background-color: #f3f4f6;
+  border: 1px solid rgba(45, 65, 119, 0.04);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: var(--color-btn-main);
   font-style: italic;
 }
 
 .modal-registros-pendientes .info-documento-usado {
   margin-top: 8px;
-  padding: 6px;
-  background-color: #f3e5f5;
-  border: 1px solid #e1bee7;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  color: #7b1fa2;
+  padding: 8px;
+  background-color: #f3f4f6;
+  border: 1px solid rgba(45, 65, 119, 0.04);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--color-btn-main);
   font-style: italic;
 }
 
@@ -578,19 +658,19 @@
 
 /* Footer con botones de descarga - compacto */
 .modal-registros-pendientes .modal-footer {
-  border-top: 1px solid #e1e8ed;
+  border-top: 1px solid #2d4177;
   width: 100%;
-  padding: 15px 20px;
+  padding: 10px 5px;
   box-sizing: border-box;
-  background-color: #ffffff;
+  background-color: #2d4177;
   margin: 0;
   flex-shrink: 0;
   text-align: left;
-  max-height: 300px; /* Aumentado de 200px a 300px para más espacio */
+  max-height: 210px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 2px;
 }
 
 .modal-registros-pendientes .botones-descarga {
@@ -627,41 +707,16 @@
   opacity: 0.6;
 }
 
-/* Estilos específicos para botones de reportes */
+/* Estilos específicos para botones de reportes (unificados) */
 .modal-registros-pendientes .btn-reporte-txt {
-  background-color: #28a745;
-  color: white;
+  background-color: var(--color-btn-main);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 12px rgba(45, 65, 119, 0.08);
 }
 
 .modal-registros-pendientes .btn-reporte-txt:hover {
-  background-color: #218838;
-}
-
-.modal-registros-pendientes .btn-excel-csv {
-  background-color: #17a2b8;
-  color: white;
-}
-
-.modal-registros-pendientes .btn-excel-csv:hover {
-  background-color: #138496;
-}
-
-.modal-registros-pendientes .btn-json-tecnico {
-  background-color: #6f42c1;
-  color: white;
-}
-
-.modal-registros-pendientes .btn-json-tecnico:hover:not(:disabled) {
-  background-color: #5a36aa;
-}
-
-.modal-registros-pendientes .btn-reporte-pdf {
-  background-color: #dc3545;
-  color: white;
-}
-
-.modal-registros-pendientes .btn-reporte-pdf:hover:not(:disabled) {
-  background-color: #c82333;
+  background-color: rgba(45, 65, 119, 0.92);
 }
 
 /* Organización de elementos del footer */
@@ -682,7 +737,7 @@
   content: "📊 Reportes y Descargas";
   display: block;
   font-size: 0.85rem; /* Aumentado de 0.75rem a 0.85rem */
-  color: #2d4177; /* Color más visible, igual al de títulos */
+  color: var(--color-btn-main); /* Color más visible, igual al de títulos */
   text-align: center;
   margin-bottom: 8px; /* Aumentado de 5px a 8px */
   font-weight: 600;
@@ -690,73 +745,11 @@
 }
 
 /* Colores específicos para botones */
-.modal-registros-pendientes .btn-urgente {
-  background-color: #dc3545;
-  color: white;
-}
-
-.modal-registros-pendientes .btn-urgente:hover:not(:disabled) {
-  background-color: #c82333;
-}
-
-.modal-registros-pendientes .btn-todos-emails {
-  background-color: #28a745;
-  color: white;
-}
-
-.modal-registros-pendientes .btn-todos-emails:hover:not(:disabled) {
-  background-color: #218838;
-}
-
-.modal-registros-pendientes .btn-completar {
-  background-color: #007bff;
-  color: white;
-}
-
-.modal-registros-pendientes .btn-completar:hover:not(:disabled) {
-  background-color: #0056b3;
-}
-
-.modal-registros-pendientes .btn-notificar {
-  background-color: #28a745;
-  color: white;
-}
-
-.modal-registros-pendientes .btn-notificar:hover:not(:disabled) {
-  background-color: #218838;
-}
-
-.modal-registros-pendientes .btn-reporte-txt {
-  background-color: #007bff;
-  color: white;
-}
-
-.modal-registros-pendientes .btn-reporte-txt:hover:not(:disabled) {
-  background-color: #0056b3;
-}
-
-.modal-registros-pendientes .btn-excel-csv {
-  background-color: #17a2b8;
-  color: white;
-}
-
-.modal-registros-pendientes .btn-excel-csv:hover:not(:disabled) {
-  background-color: #138496;
-}
-
-.modal-registros-pendientes .btn-json-tecnico {
-  background-color: #28a745;
-  color: white;
-}
-
-.modal-registros-pendientes .btn-json-tecnico:hover:not(:disabled) {
-  background-color: #218838;
-}
 
 /* Estados de registros vencidos */
 .modal-registros-pendientes .registro-vencido {
-  background-color: #fff5f5;
-  border-left-color: #dc3545;
+  background-color: #ffffff;
+  border-left-color: var(--color-btn-main);
   border-left-width: 4px;
 }
 
@@ -801,40 +794,27 @@
   }
 }
 
-/* Badge para estudiante ya registrado */
+/* Badge para estudiante ya registrado - unificado con paleta institucional */
 .badge-estudiante-registrado {
   display: inline-block;
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: white;
+  background: var(--color-btn-main);
+  color: #ffffff;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   padding: 4px 8px;
   border-radius: 12px;
   margin-left: 10px;
   white-space: nowrap;
-  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  animation: pulse-success 2s infinite;
-}
-
-@keyframes pulse-success {
-  0% {
-    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
-  }
-  50% {
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.5);
-  }
-  100% {
-    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
-  }
+  box-shadow: 0 2px 6px rgba(45, 65, 119, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-transform: none;
+  letter-spacing: 0.2px;
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
 .badge-estudiante-registrado:hover {
-  background: linear-gradient(135deg, #059669, #047857);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 6px 14px rgba(45, 65, 119, 0.16);
 }
 
 @media (max-width: 768px) {
@@ -924,31 +904,7 @@
   }
 }
 
-/* Badge para estudiante registrado */
-.badge-estudiante-registrado {
-  display: inline-block;
-  margin-left: 10px;
-  padding: 4px 8px;
-  background-color: #28a745;
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: 12px;
-  white-space: nowrap;
-  box-shadow: 0 1px 3px rgba(40, 167, 69, 0.3);
-  animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-2px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* (previous badge rules consolidated above) */
 
 @media (max-width: 768px) {
   .badge-estudiante-registrado {

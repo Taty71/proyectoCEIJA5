@@ -122,13 +122,21 @@ const getDocumentosFaltantes = async (dni) => {
 // Obtener estudiante específico por DNI
 const getEstudiantePorDNI = async (dni) => {
     try {
-        console.log('🔍 Buscando estudiante por DNI:', dni);
-        // Usar el endpoint que retorna la documentación
+        console.log('🔍 [LOG] Buscando estudiante por DNI:', dni);
         const response = await axiosInstance.get(`/consultar-estudiantes-dni/${dni}`);
-        console.log('👤 Respuesta búsqueda por DNI:', response.data);
+        console.log('👤 [LOG] Respuesta búsqueda por DNI:', response.data);
+        if (response.data && response.data.estudiante) {
+            console.log('📦 [LOG] Datos completos recibidos:', JSON.stringify(response.data.estudiante, null, 2));
+            if (response.data.estudiante.inscripcion) {
+                console.log('🎓 [LOG] Datos de inscripción:', JSON.stringify(response.data.estudiante.inscripcion, null, 2));
+            }
+            if (response.data.estudiante.documentacion) {
+                console.log('📄 [LOG] Documentación:', JSON.stringify(response.data.estudiante.documentacion, null, 2));
+            }
+        }
         return response.data;
     } catch (error) {
-        console.error('🚨 Error al buscar estudiante por DNI:', error);
+        console.error('🚨 [LOG] Error al buscar estudiante por DNI:', error);
         const message = FormatError(error);
         return { error: message, success: false };
     }
@@ -136,13 +144,25 @@ const getEstudiantePorDNI = async (dni) => {
 
 const updateEstd = async (data, dni, config = {}) => {
     try {
-        console.log('🔄 Enviando datos al backend:', { dni, data }); // Debug log
+        // Dump de FormData si corresponde
+        if (data instanceof FormData) {
+            console.log('🔄 [LOG] Enviando FormData al backend para DNI:', dni);
+            for (const pair of data.entries()) {
+                if (pair[1] instanceof File) {
+                    console.log(`📎 [LOG] Archivo adjunto: ${pair[0]} -> nombre: ${pair[1].name}, tipo: ${pair[1].type}`);
+                } else {
+                    console.log(`📦 [LOG] Campo: ${pair[0]} =`, pair[1]);
+                }
+            }
+        } else {
+            console.log('🔄 [LOG] Enviando datos (no FormData) al backend:', { dni, data });
+        }
         const response = await axiosInstance.put(`/modificar-estudiante/${dni}`, data, config);
-        console.log('✅ Respuesta del backend:', response.data); // Debug log
+        console.log('✅ [LOG] Respuesta del backend:', response.data);
         return response.data;
     } catch (error) {
         const message = FormatError(error);
-        console.error('🚨 Error al actualizar estudiante:', message); // Debug log
+        console.error('🚨 [LOG] Error al actualizar estudiante:', message);
         throw new Error(message); 
     }
 };

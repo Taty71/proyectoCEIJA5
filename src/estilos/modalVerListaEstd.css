@@ -66,15 +66,15 @@
 .modal-container-verestd {
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(45,65,119,0.18);
+  box-shadow: 0 8px 32px rgba(45, 65, 119, 0.18);
   padding: 32px 28px 24px 28px;
   max-width: 900px;
   width: 96vw;
   max-height: 92vh;
   overflow-y: auto;
   border: 2px solid #87ceeb;
-  font-family: 'Roboto Slab', serif;
-  animation: modalSlideIn 0.3s cubic-bezier(.4,1.4,.6,1);
+  font-family: "Roboto Slab", serif;
+  animation: modalSlideIn 0.3s cubic-bezier(0.4, 1.4, 0.6, 1);
   position: relative;
   z-index: 10001;
 }
@@ -87,7 +87,7 @@
   z-index: 10100;
   background: #f0f0f0;
   border: 1.5px solid #ccc;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.13);
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.13);
 }
 .modal-container-verestd .cerrar-button.boton-small:hover,
 .modal-container-verestd .cerrar-button.boton-small:focus {

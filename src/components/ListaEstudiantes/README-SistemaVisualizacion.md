@@ -56,7 +56,7 @@ El Sistema de Visualización Avanzada es una herramienta integral que permite an
 - Clasificación por nivel de completitud
 - Identificación de estudiantes con documentación crítica
 
-#### 7. **💼 KPIs Ejecutivos (Mejorado)**
+#### 7. **💼 Resumen Ejecutivo de Métricas Institucionales (Mejorado)**
 
 - **KPIs Básicos**: Total, tasa de aprobación, pendientes, distribución
 - **KPIs Avanzados**:
@@ -295,7 +295,7 @@ El Sistema de Visualización Avanzada transforma la experiencia de análisis de 
 ✅ **Análisis en tiempo real** sin esperar la generación de PDFs  
 ✅ **Interfaz moderna y responsiva** para cualquier dispositivo  
 ✅ **7 tipos de reportes** con análisis profundo  
-✅ **KPIs ejecutivos mejorados** con recomendaciones automáticas  
+✅ **Resumen ejecutivo de métricas institucionales mejorado** con recomendaciones automáticas  
 ✅ **Sistema de alertas inteligente** para detección de anomalías  
 ✅ **Integración perfecta** con el sistema de reportes existente
 

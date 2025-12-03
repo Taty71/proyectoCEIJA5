@@ -255,14 +255,26 @@ const calcularTendencia = (datos) => {
 const agruparPor = (array, propiedad) => {
   return array.reduce((acc, item) => {
     // Manejar propiedades anidadas como 'datos.modalidad'
-    let key;
+    let rawKey;
     if (propiedad.includes('.')) {
       const propiedades = propiedad.split('.');
-      key = propiedades.reduce((obj, prop) => obj && obj[prop], item) || 'Sin definir';
+      rawKey = propiedades.reduce((obj, prop) => obj && obj[prop], item);
     } else {
-      key = item[propiedad] || 'Sin definir';
+      rawKey = item[propiedad];
     }
-    
+
+    // Normalizar la clave: string, trim, uppercase. Usar valor por defecto claro si no existe.
+    let key;
+    if (rawKey === undefined || rawKey === null || (typeof rawKey === 'string' && rawKey.trim() === '')) {
+      key = 'SIN_DEFINIR';
+    } else {
+      try {
+        key = String(rawKey).trim().toUpperCase();
+      } catch (e) {
+        key = String(rawKey || 'SIN_DEFINIR');
+      }
+    }
+
     if (!acc[key]) acc[key] = [];
     acc[key].push(item);
     return acc;
@@ -307,30 +319,31 @@ export const analizarEstados = (estudiantes) => {
     estado,
     cantidad: lista.length
   })));
-  
-  // Mapear IDs a descripciones si el campo es numérico (idEstadoInscripcion)
-  let estadosConDescripcion = {};
-  if (campoEstado === 'idEstadoInscripcion') {
-    Object.entries(estados).forEach(([estadoId, estudiantes]) => {
-      let descripcion = 'Sin definir';
-      switch (parseInt(estadoId)) {
-        case 1:
-          descripcion = 'pendiente';
-          break;
-        case 2:
-          descripcion = 'completa';
-          break;
-        case 3:
-          descripcion = 'anulado';
-          break;
-        default:
-          descripcion = `Estado ${estadoId}`;
+
+  // Normalizar y consolidar claves de estado en un mapeo consistente (claves en minúsculas)
+  const mapEstadoNormalizado = (key) => {
+    if (key === undefined || key === null || String(key).trim() === '') return 'sin_definir';
+    const str = String(key).trim();
+    // Si es numérico, mapear a etiquetas conocidas
+    if (/^\d+$/.test(str)) {
+      const id = parseInt(str, 10);
+      switch (id) {
+        case 1: return 'pendiente';
+        case 2: return 'completa';
+        case 3: return 'anulado';
+        default: return `estado_${id}`;
       }
-      estadosConDescripcion[descripcion] = estudiantes;
-    });
-  } else {
-    estadosConDescripcion = estados;
-  }
+    }
+    // No numérico: normalizar texto y devolver en minúsculas
+    return String(str).toLowerCase();
+  };
+
+  const estadosConDescripcion = {};
+  Object.entries(estados).forEach(([rawKey, lista]) => {
+    const normalized = mapEstadoNormalizado(rawKey);
+    if (!estadosConDescripcion[normalized]) estadosConDescripcion[normalized] = [];
+    estadosConDescripcion[normalized] = estadosConDescripcion[normalized].concat(lista);
+  });
   
   console.log('🏷️ Estados de inscripción con descripción:', Object.keys(estadosConDescripcion));
   

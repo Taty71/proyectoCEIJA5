@@ -104,7 +104,7 @@ const PanelControles = ({
                 onClick={onLimpiarBusqueda}
                 disabled={loading}
               >
-                🗑️ Limpiar
+                🗑️ 
               </button>
             </div>
           )}

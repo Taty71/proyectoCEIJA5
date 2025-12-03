@@ -1,5 +1,4 @@
-
-const API_BASE = 'http://localhost:5000/api/ubicaciones';
+import axios from '../config/axios';
 
 /**
  * Servicio para obtener información de ubicaciones (provincias, localidades, barrios)
@@ -9,12 +8,8 @@ const ubicacionesService = {
     // Obtener todas las provincias
     getProvincias: async () => {
         try {
-            const response = await fetch(`${API_BASE}/provincias`);
-            const data = await response.json();
-            if (data.success && data.data) {
-                return data.data;
-            }
-            throw new Error('Error al obtener provincias');
+            const response = await axios.get('/ubicaciones/provincias');
+            return response.data.data; // Retorna solo el array de provincias
         } catch (error) {
             console.error('❌ Error obteniendo provincias:', error);
             throw error;
@@ -24,12 +19,8 @@ const ubicacionesService = {
     // Obtener localidades por provincia
     getLocalidadesByProvincia: async (idProvincia) => {
         try {
-            const response = await fetch(`${API_BASE}/localidades/${idProvincia}`);
-            const data = await response.json();
-            if (data.success && data.data) {
-                return data.data;
-            }
-            throw new Error(`Error al obtener localidades para provincia ${idProvincia}`);
+            const response = await axios.get(`/ubicaciones/localidades/${idProvincia}`);
+            return response.data.data; // Retorna solo el array de localidades
         } catch (error) {
             console.error(`❌ Error obteniendo localidades para provincia ${idProvincia}:`, error);
             throw error;
@@ -39,12 +30,8 @@ const ubicacionesService = {
     // Obtener barrios por localidad
     getBarriosByLocalidad: async (idLocalidad) => {
         try {
-            const response = await fetch(`${API_BASE}/barrios/${idLocalidad}`);
-            const data = await response.json();
-            if (data.success && data.data) {
-                return data.data;
-            }
-            throw new Error(`Error al obtener barrios para localidad ${idLocalidad}`);
+            const response = await axios.get(`/ubicaciones/barrios/${idLocalidad}`);
+            return response.data.data; // Retorna solo el array de barrios
         } catch (error) {
             console.error(`❌ Error obteniendo barrios para localidad ${idLocalidad}:`, error);
             throw error;

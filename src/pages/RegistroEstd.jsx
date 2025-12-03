@@ -17,6 +17,7 @@ import EstadoInscripcion from '../components/EstadoInscripcion';
 import BotonCargando from '../components/BotonCargando';
 import { useContext } from 'react';
 import { AlertContext } from '../context/alertContextDefinition';
+import BotEncuestaSatisfaccion from '../components/BotEncuestaSatisfaccion';
 
 const RegistroEstd = ({
     previews,
@@ -37,6 +38,9 @@ const RegistroEstd = ({
     completarRegistro // Nuevo prop para detectar si se está completando un registro
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    // Estado para controlar el bot de encuestas
+    const [showEncuesta, setShowEncuesta] = useState(false);
 
     // Limpiar archivos/documentos y sessionStorage justo ANTES de abrir el modal de documentación para un registro nuevo
     const handleAbrirModalDocumentacion = () => {
@@ -115,6 +119,7 @@ const RegistroEstd = ({
 
     const customHandleSubmit = async (e) => {
         e.preventDefault();
+        
         if (!values.idEstadoInscripcion) {
             showError('Debe seleccionar un estado de inscripción.');
             return;
@@ -142,24 +147,49 @@ const RegistroEstd = ({
 
         // Si no hay errores, delegar en Formik para que invoque el onSubmit definido en el padre
         if (typeof submitForm === 'function') {
-            await submitForm();
+            console.log('🔄 Ejecutando submitForm...');
+            
+            const result = await submitForm();
+            
+            console.log('📊 Resultado de submitForm:', result);
+            console.log('📊 isWebUser:', isWebUser, 'isAdmin:', isAdmin);
+            
+            // Si el registro fue exitoso y es usuario web, mostrar encuesta después de 1 segundo
+            if (result && result.success && isWebUser && !isAdmin) {
+                console.log('✅ Condiciones cumplidas para mostrar encuesta');
+                setTimeout(() => {
+                    console.log('🎯 Mostrando encuesta ahora');
+                    setShowEncuesta(true);
+                }, 1000);
+            } else {
+                console.log('❌ No se mostró encuesta. result:', result, 'isWebUser:', isWebUser, 'isAdmin:', isAdmin);
+            }
+            
             return;
         }
 
         // Fallback: si no tenemos submitForm (por compatibilidad), intentar llamar handleSubmit
         if (typeof handleSubmit === 'function') {
+            console.log('🔄 Ejecutando handleSubmit (fallback)...');
+            
             const result = await handleSubmit(values, { 
                 setSubmitting: () => {}, 
                 resetForm: () => {} 
             }, accion, isAdmin, isWebUser, completarRegistro, values.modalidad, null);
 
-            // Mostrar feedback según resultado si el padre devuelve algo
-            if (result && result.success) {
-                if (result.migradoABaseDatos) {
-                    if (window?.showSuccess) window.showSuccess('✅ Registro completado y guardado en la base de datos');
-                    else alert('✅ Registro completado y guardado en la base de datos');
-                }
+            console.log('📊 Resultado de handleSubmit:', result);
+
+            // Mostrar encuesta para usuarios web después de registro exitoso
+            if (result && result.success && isWebUser && !isAdmin) {
+                console.log('✅ Condiciones cumplidas para mostrar encuesta (fallback)');
+                setTimeout(() => {
+                    console.log('🎯 Mostrando encuesta ahora (fallback)');
+                    setShowEncuesta(true);
+                }, 1000);
+            } else {
+                console.log('❌ No se mostró encuesta (fallback). result:', result);
             }
+            
             return;
         }
 
@@ -167,110 +197,126 @@ const RegistroEstd = ({
         // en el padre (GestionEstudiante). Aquí solo nos aseguramos de validar y disparar submit.
     };
 
+    const handleCerrarEncuesta = () => {
+        setShowEncuesta(false);
+    };
+
     return (
-        <Form encType="multipart/form-data" onSubmit={customHandleSubmit}>
-            {/* Header con título y botones bien organizados */}
-            <div className="registro-header-container">
-                <div className="registro-header-row">
-                    <div className="registro-nav-left">
-                        {onVolver && <VolverButton onClick={onVolver} />}
+        <>
+            <Form encType="multipart/form-data" onSubmit={customHandleSubmit}>
+                {/* Header con título y botones bien organizados */}
+                <div className="registro-header-container">
+                    <div className="registro-header-row">
+                        <div className="registro-nav-left">
+                            {onVolver && <VolverButton onClick={onVolver} />}
+                        </div>
+                        <h2 className="modal-title-registro">
+                            {accion === 'Eliminar' ? 'Eliminar Estudiante' : accion === 'Modificar' ? 'Modificar Estudiante' : 'Registro de Estudiante'}
+                        </h2>
+                        <div className="registro-nav-right">
+                            {onClose && <CloseButton onClose={onClose} variant="modal" />}
+                        </div>
                     </div>
-                    <h2 className="modal-title-registro">
-                        {accion === 'Eliminar' ? 'Eliminar Estudiante' : accion === 'Modificar' ? 'Modificar Estudiante' : 'Registro de Estudiante'}
-                    </h2>
-                    <div className="registro-nav-right">
-                        {onClose && <CloseButton onClose={onClose} variant="modal" />}
-                    </div>
                 </div>
-            </div>
 
-            {/* Verificador de registros pendientes - Solo para nuevos registros */}
-            {accion !== 'Eliminar' && accion !== 'Modificar' && showVerificador && (
-                <VerificadorRegistroPendiente
-                    dni={values.dni}
-                    onRegistroCompleto={handleRegistroCompleto}
-                    onSinRegistro={handleSinRegistro}
-                />
-            )}
-
-            {/* Mensaje informativo cuando se está completando un registro */}
-            {completarRegistro && (
-                <div className="mensaje-registro-pendiente">
-                    <h4>🔄 Completando Registro Pendiente</h4>
-                    <p>
-                        Los datos del registro pendiente han sido cargados automáticamente. 
-                        Complete la documentación faltante para finalizar la inscripción.
-                    </p>
-                </div>
-            )}
-
-            <div className="formd">
-                <div className="form-datos">
-                    <DatosPersonales />
-                </div>
-                <div className="form-domicilio">
-                    <Domicilio esAdmin={isAdmin} />
-                </div>
-                <div className="form-eleccion">
-                    <ModalidadSelection
-                        modalidad={values.modalidad}
-                        modalidadId={values.modalidadId}
-                        setFieldValue={setFieldValue}
-                        values={values}
-                        showMateriasList={showMateriasList}
-                        handleChange={handleChange}
-                        editMode={{}}
-                        formData={formData}
-                        setFormData={setFormData}
+                {/* Verificador de registros pendientes - Solo para nuevos registros */}
+                {accion !== 'Eliminar' && accion !== 'Modificar' && showVerificador && (
+                    <VerificadorRegistroPendiente
+                        dni={values.dni}
+                        onRegistroCompleto={handleRegistroCompleto}
+                        onSinRegistro={handleSinRegistro}
                     />
-                </div>
-                <div className="left-container button-stack">
-                    <h4>Acciones</h4>
-                    <button type="button" className="boton-principal" onClick={handleAbrirModalDocumentacion}>
-                        Adjuntar Documentación
-                    </button>
-                        {accion === "Eliminar" ? (
-                            <button
-                                type="button"
-                                className="boton-principal"
-                                            onClick={async () => {
-                                                // Para eliminación usamos el submitHandler si está disponible
-                                                if (typeof submitHandler === 'function') {
-                                                    await submitHandler(values, { setSubmitting: () => {} }, accion, isAdmin, isWebUser, null, values.modalidad);
-                                                } else if (typeof handleSubmit === 'function') {
-                                                    // Fallback (antiguo) - puede no funcionar si handleSubmit es Formik's handleSubmit
-                                                    await handleSubmit(values, { setSubmitting: () => {} }); // Llama a la función de eliminación
-                                                } else {
-                                                    showError('No se encontró el manejador de eliminación');
-                                                }
-                                            }}
-                            >
-                                Confirmar eliminación
-                            </button>
-                        ) : isSubmitting ? (
-                            <BotonCargando loading={true}>{accion || "Registrando..."}</BotonCargando>
-                        ) : (
-                            <button type="submit" className="boton-principal">{accion || "Registrar"}</button>
-                        )}
-                        {/* Solo mostrar EstadoInscripcion para admins y NO para usuarios web */}
-                        {isAdmin && !isWebUser && (
-                            <EstadoInscripcion
-                                value={values.idEstadoInscripcion}
-                                handleChange={e => setFieldValue('idEstadoInscripcion', e.target.value)}
+                )}
+
+                {/* Mensaje informativo cuando se está completando un registro */}
+                {completarRegistro && (
+                    <div className="mensaje-registro-pendiente">
+                        <h4>🔄 Completando Registro Pendiente</h4>
+                        <p>
+                            Los datos del registro pendiente han sido cargados automáticamente. 
+                            Complete la documentación faltante para finalizar la inscripción.
+                        </p>
+                    </div>
+                )}
+
+                <div className="formd">
+                    <div className="form-datos">
+                        <DatosPersonales />
+                    </div>
+                    <div className="form-domicilio">
+                        <Domicilio esAdmin={isAdmin} />
+                    </div>
+                    <div className="form-eleccion">
+                        <ModalidadSelection
+                            modalidad={values.modalidad}
+                            modalidadId={values.modalidadId}
+                            setFieldValue={setFieldValue}
+                            values={values}
+                            showMateriasList={showMateriasList}
+                            handleChange={handleChange}
+                            editMode={{}}
+                            formData={formData}
+                            setFormData={setFormData}
+                        />
+                    </div>
+                    <div className="left-container button-stack">
+                        <h4>Acciones</h4>
+                        <button type="button" className="boton-principal" onClick={handleAbrirModalDocumentacion}>
+                            Adjuntar Documentación
+                        </button>
+                            {accion === "Eliminar" ? (
+                                <button
+                                    type="button"
+                                    className="boton-principal"
+                                                onClick={async () => {
+                                                    // Para eliminación usamos el submitHandler si está disponible
+                                                    if (typeof submitHandler === 'function') {
+                                                        await submitHandler(values, { setSubmitting: () => {} }, accion, isAdmin, isWebUser, null, values.modalidad);
+                                                    } else if (typeof handleSubmit === 'function') {
+                                                        // Fallback (antiguo) - puede no funcionar si handleSubmit es Formik's handleSubmit
+                                                        await handleSubmit(values, { setSubmitting: () => {} }); // Llama a la función de eliminación
+                                                    } else {
+                                                        showError('No se encontró el manejador de eliminación');
+                                                    }
+                                                }}
+                                >
+                                    Confirmar eliminación
+                                </button>
+                            ) : isSubmitting ? (
+                                <BotonCargando loading={true}>{accion || "Registrando..."}</BotonCargando>
+                            ) : (
+                                <button type="submit" className="boton-principal">{accion || "Registrar"}</button>
+                            )}
+                            {/* Solo mostrar EstadoInscripcion para admins y NO para usuarios web */}
+                            {isAdmin && !isWebUser && (
+                                <EstadoInscripcion
+                                    value={values.idEstadoInscripcion}
+                                    handleChange={e => setFieldValue('idEstadoInscripcion', e.target.value)}
+                                />
+                            )}
+                        </div>
+                        {isModalOpen && (
+                            <FormDocumentacion
+                                onClose={closeModal}
+                                previews={previews}
+                                handleFileChange={(e, field) => handleFileChange(e, field, setFieldValue)}
+                                setFieldValue={setFieldValue}
+                                onProceedToRegister={handleProceedToRegister}
                             />
                         )}
                     </div>
-                    {isModalOpen && (
-                        <FormDocumentacion
-                            onClose={closeModal}
-                            previews={previews}
-                            handleFileChange={(e, field) => handleFileChange(e, field, setFieldValue)}
-                            setFieldValue={setFieldValue}
-                            onProceedToRegister={handleProceedToRegister}
-                        />
-                    )}
-                </div>
-        </Form>
+            </Form>
+
+            {/* Bot de encuesta de satisfacción - Solo para usuarios web DESPUÉS del registro exitoso */}
+            {isWebUser && !isAdmin && showEncuesta && (
+                <BotEncuestaSatisfaccion
+                    isOpen={showEncuesta}
+                    onClose={handleCerrarEncuesta}
+                    dniEstudiante={values.dni}
+                    modalidad={values.modalidad}
+                />
+            )}
+        </>
     );
 };
 

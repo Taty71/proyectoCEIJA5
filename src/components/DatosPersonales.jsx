@@ -1,10 +1,17 @@
 import {Field, ErrorMessage, useFormikContext } from 'formik';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useEffect, memo } from 'react';
 import ValidadorDni from '../validaciones/ValidadorDNI.jsx';
+import ValidadorSintaxisDNI from '../validaciones/ValidadorSintaxisDNI.jsx';
 
 export const DatosPersonales = memo(() => {
     const { values, setFieldValue, errors } = useFormikContext();
+    const [isDniValid, setIsDniValid] = useState(true);
+
+    const handleDniValidation = (isValid, _errorMessage) => {
+        setIsDniValid(isValid);
+    };
+    
     // Si no existe modalidadId, establecer un valor por defecto (ejemplo: 1)
     if (!values.modalidadId && values.modalidad) {
         // Si modalidad es string, puedes mapearlo a un id si es necesario
@@ -16,21 +23,7 @@ export const DatosPersonales = memo(() => {
         if (modalidadId) setFieldValue('modalidadId', modalidadId);
     }
 
-    // Función para calcular el dígito verificador del CUIL
-    /**
-     * Calcula el dígito verificador del CUIL/CUIT según el algoritmo oficial.
-     * - prefijo: string o número de 2 dígitos (ej. '20', '27', '23')
-     * - dni: string o número de 8 dígitos
-     * Retorna el dígito verificador (0-9).
-     *
-     * Regla:
-     * 1) Construir la cadena de 10 dígitos = prefijo (2) + dni (8)
-     * 2) Multiplicar cada dígito por los pesos [5,4,3,2,7,6,5,4,3,2]
-     * 3) Sumar los productos, obtener resto = suma % 11
-     * 4) dígito = 11 - resto
-     *    - si dígito === 11 => dígito = 0
-     *    - si dígito === 10 => dígito = 9 (caso especial manejado así por la práctica común)
-     */
+   
     const calcularDigitoVerificador = (prefijo, dni) => {
         const multiplicadores = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
         const pref = String(prefijo).padStart(2, '0');
@@ -114,7 +107,15 @@ export const DatosPersonales = memo(() => {
     
     // Referencia para evitar doble validación en el mismo blur
     const blurTimeout = useRef();
-
+    const handleDniInput = (e) => {
+    const value = e.target.value;
+    
+    if (values.tipoDocumento === 'DNI') {
+        // Solo permitir números y limitar a 8 dígitos
+        const cleaned = value.replace(/\D/g, '').slice(0, 8);
+        e.target.value = cleaned;
+        }
+    };
     // Validación manual al salir del input
     const handleDniBlur = () => {
         // Forzar re-render para que ValidadorDni (que depende de values.dni) se ejecute
@@ -128,6 +129,7 @@ export const DatosPersonales = memo(() => {
     return (
     <>
         <ValidadorDni />
+        <ValidadorSintaxisDNI onValidationChange={handleDniValidation} />
         <div className="form-datos">
                 <h3>Datos Personales</h3>
                 
@@ -193,7 +195,8 @@ export const DatosPersonales = memo(() => {
                             maxLength={values.tipoDocumento === 'DNI' ? 8 : 20}
                             inputMode={values.tipoDocumento === 'DNI' ? 'numeric' : 'text'}
                             pattern={values.tipoDocumento === 'DNI' ? '\\d{8}' : undefined}
-                            onBlur={handleDniBlur}
+                            onInput={handleDniInput}
+                             onBlur={handleDniBlur}
                         />
                         <ErrorMessage name="dni" component="div" className="error" />
                     </div>
@@ -209,6 +212,7 @@ export const DatosPersonales = memo(() => {
                                             type="text"
                                             placeholder="CUIL"
                                             className={`form-control ${errors && errors.cuil ? 'is-invalid' : ''}`}
+                                            disabled={!isDniValid}
                                             onChange={(e) => {
                                                 // Si el usuario edita manualmente el CUIL, desactivamos la bandera de autogenerado
                                                 form.setFieldValue('cuil', e.target.value);
@@ -218,6 +222,7 @@ export const DatosPersonales = memo(() => {
                                                 } catch {
                                                     // ignore
                                                 }
+                                                
                                             }}
                                         />
                                         <ErrorMessage name="cuil" component="div" className="error" />
@@ -276,7 +281,7 @@ export const DatosPersonales = memo(() => {
 
                     <div className="form-group">
                         <label>Email:</label>
-                        <Field type="email" name="email" placeholder="Correo electrónico" className={`form-control ${errors && errors.email ? 'is-invalid' : ''}`} />
+                        <Field type="email" name="email" placeholder="Correo electrónico" className={`form-control ${errors && errors.email ? 'is-invalid' : ''}`} disabled={!isDniValid} />
                         <ErrorMessage name="email" component="div" className="error" />
                     <small className="form-text text-muted">
                         Email para notificaciones y envío de comprobantes
@@ -289,6 +294,7 @@ export const DatosPersonales = memo(() => {
                             type="tel" 
                             name="telefono" 
                             placeholder="Ej: 11-1234-5678 o 0351-4567890" 
+                            disabled={!isDniValid}
                             className={`form-control ${errors && errors.telefono ? 'is-invalid' : ''}`}
                             maxLength="15"
                         />
@@ -300,7 +306,7 @@ export const DatosPersonales = memo(() => {
                 
                 <div className="form-group">
                     <label>Fecha Nacimiento:</label>
-                    <Field type="date" name="fechaNacimiento" className={`form-control ${errors && errors.fechaNacimiento ? 'is-invalid' : ''}`} placeholder="Fecha de Nacimiento"/>
+                    <Field type="date" name="fechaNacimiento" disabled={!isDniValid}className={`form-control ${errors && errors.fechaNacimiento ? 'is-invalid' : ''}`} placeholder="Fecha de Nacimiento"/>
                     <ErrorMessage name="fechaNacimiento" component="div" className="error" />
                     {/*<small>Debug: <Field name="fechaNacimiento">{({ field }) => field.value}</Field></small>*/}
                 </div>

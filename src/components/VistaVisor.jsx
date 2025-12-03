@@ -15,36 +15,45 @@ const VistaVisor = ({ estudiante, onClose, onVolver, isConsulta, isEliminacion, 
             let res;
             if (accion === 'todo') {
                 const formData = new FormData();
-
-            // Datos generales
-            Object.entries(datos).forEach(([key, value]) => {
-                if (key === 'archivos' || key === 'detalleDocumentacion') return; // Los manejamos aparte
-                formData.append(key, value ?? '');
-            });
-
-            // Documentación
-            formData.append('detalleDocumentacion', JSON.stringify(datos.detalleDocumentacion || []));
-            if (datos.archivos) {
-                Object.entries(datos.archivos).forEach(([desc, archivo]) => {
-                    if (archivo) {
-                        // ✅ NO convertir a lowercase - mantener nombres originales
-                        const clave = desc.replace(/\s+/g, '');
-                        formData.append(clave, archivo, archivo.name);
+                // Solo los campos válidos para modificación
+                const camposValidos = [
+                    'nombre', 'apellido', 'dni', 'cuil', 'email', 'telefono', 'fechaNacimiento', 'tipoDocumento', 'paisEmision',
+                    'provincia', 'localidad', 'barrio', 'calle', 'numero',
+                    'modalidadId', 'planAnioId', 'modulosId', 'estadoInscripcionId', 'fechaInscripcion'
+                ];
+                Object.entries(datos).forEach(([key, value]) => {
+                    if (key === 'archivos' || key === 'detalleDocumentacion') return;
+                    if (camposValidos.includes(key)) {
+                        formData.append(key, value ?? '');
                     }
                 });
+                // Documentación: asegurar nombreArchivo correcto
+                let detalle = Array.isArray(datos.detalleDocumentacion)
+                    ? datos.detalleDocumentacion.map(doc => ({
+                        ...doc,
+                        nombreArchivo: doc.nombreArchivo || doc.descripcionDocumentacion?.replace(/\s+/g, '')
+                    }))
+                    : [];
+                formData.append('detalleDocumentacion', JSON.stringify(detalle));
+                if (datos.archivos) {
+                    Object.entries(datos.archivos).forEach(([desc, archivo]) => {
+                        if (archivo) {
+                            // El nombre debe coincidir con nombreArchivo en detalleDocumentacion
+                            const clave = desc.replace(/\s+/g, '');
+                            formData.append(clave, archivo, archivo.name);
+                        }
+                    });
+                }
+                // Llamar al servicio unificado
+                res = await serviceModificarEstudiante.modificarEstudiante(datos.dni, formData);
             }
-
-            // Llamar al servicio unificado
-            res = await serviceModificarEstudiante.modificarEstudiante(datos.dni, formData);
+            setAlerta({
+                tipo: res?.success ? 'success' : 'error',
+                mensaje: res?.message || 'Estudiante actualizado correctamente.',
+            });
+        } catch (err) {
+            setAlerta({ tipo: 'error', mensaje: err.message || 'Error inesperado al guardar todo.' });
         }
-
-        setAlerta({
-            tipo: res?.success ? 'success' : 'error',
-            mensaje: res?.message || 'Estudiante actualizado correctamente.',
-        });
-    } catch (err) {
-        setAlerta({ tipo: 'error', mensaje: err.message || 'Error inesperado al guardar todo.' });
-    }
 };
 
 

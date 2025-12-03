@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback } from 'react';
 import service from '../services/serviceInscripcion';
 import serviceListaEstudiantes from '../services/serviceListaEstudiantes';
@@ -6,7 +7,6 @@ import FormatError from '../utils/MensajeError';
 import '../estilos/listaEstudiantes.css';
 import '../estilos/listaEstudiantesNueva.css';
 import '../estilos/estilosInscripcion.css';
-import '../estilos/tablaEstudiantesLimpio.css';
 import CloseButton from '../components/CloseButton';
 import PropTypes from 'prop-types';
 // Componentes divididos
@@ -32,7 +32,7 @@ const ListaEstudiantes = ({ onClose, refreshKey = 0, modalidad }) => {
   const [estadosInscripcion, setEstadosInscripcion] = useState([]);
   const [estadoFiltro, setEstadoFiltro] = useState('');
   const [inicialApellido] = useState('');
-  
+
   const [totalRegistros, setTotalRegistros] = useState({ total: 0, activos: 0, inactivos: 0 });
   const limit = 5; // show 5 records per page
 
@@ -105,7 +105,7 @@ const ListaEstudiantes = ({ onClose, refreshKey = 0, modalidad }) => {
     cargarEstudiantes(page);
   }, [page, cargarEstudiantes, refreshKey]);
 
-  
+
   useEffect(() => {
     cargarEstudiantes(1);
   }, [filtroActivo, cargarEstudiantes]);
@@ -116,7 +116,7 @@ const ListaEstudiantes = ({ onClose, refreshKey = 0, modalidad }) => {
         console.log('🔍 Cargando estados de inscripción...');
         const data = await serviceEstados.getEstadosInscripcion();
         console.log('📊 Estados recibidos:', data);
-        
+
         if (Array.isArray(data)) {
           setEstadosInscripcion(data);
         } else if (data && data.estados && Array.isArray(data.estados)) {
@@ -175,7 +175,7 @@ const ListaEstudiantes = ({ onClose, refreshKey = 0, modalidad }) => {
     } catch (error) {
       console.error('🚨 Error en handleEmitirComprobante:', error);
       const errorMessage = error.message || 'Error al generar el comprobante';
-  setError(errorMessage);
+      setError(errorMessage);
       setLoading(false);
     }
   };
@@ -459,7 +459,7 @@ const ListaEstudiantes = ({ onClose, refreshKey = 0, modalidad }) => {
                 title="Ver reportes PDF de estudiantes"
                 disabled={loadingReporte}
               >
-                 📊 Ver Reportes
+                📊 Ver Reportes
               </button>
               {modalReportesOpen && (
                 <ModalReportesEstudiantes
@@ -510,8 +510,8 @@ const ListaEstudiantes = ({ onClose, refreshKey = 0, modalidad }) => {
           <div className="error-content">
             <span className="error-icon">⚠️</span>
             <p>{error}</p>
-            <button 
-              className="btn-reintentar" 
+            <button
+              className="btn-reintentar"
               onClick={() => cargarEstudiantes(page)}
             >
               🔄 Reintentar
@@ -523,7 +523,7 @@ const ListaEstudiantes = ({ onClose, refreshKey = 0, modalidad }) => {
       <TablaEstudiantes
         estudiantes={estudiantesFiltrados}
         loading={loading}
-  error={error}
+        error={error}
         onEmitirComprobante={handleEmitirComprobante}
         onVerEstudiante={handleVerEstudiante}
         onPreviewNotificacion={handlePreviewNotificacion}
@@ -534,6 +534,7 @@ const ListaEstudiantes = ({ onClose, refreshKey = 0, modalidad }) => {
         page={page}
         totalPages={totalPages}
         limit={limit}
+        hideActions={modalReportesOpen}
       />
 
       {consultaOpen && consultaData && (

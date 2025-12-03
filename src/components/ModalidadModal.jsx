@@ -1,14 +1,16 @@
 // src/components/ModalidadModal.jsx
 import PropTypes from 'prop-types';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import CloseButton from './CloseButton';
 import VolverButton from './VolverButton';
+import ModalRequisitosPreinscripcion from './ModalRequisitosPreinscripcion';
 import '../estilos/modalM.css';
 import '../estilos/botones.css';
 
-
 const ModalidadModal = ({ modalidad, onClose, onBackToSelector }) => {
     const navigate = useNavigate();
+    const [showRequisitos, setShowRequisitos] = useState(false);
 
     const goHome = () => {
         // Cerrar todo y navegar a Home
@@ -23,6 +25,14 @@ const ModalidadModal = ({ modalidad, onClose, onBackToSelector }) => {
         } else {
             onClose();
         }
+    };
+
+    const handleIniciarPreinscripcion = () => {
+        setShowRequisitos(true);
+    };
+
+    const handleCerrarRequisitos = () => {
+        setShowRequisitos(false);
     };
 
     const renderContent = () => {
@@ -118,41 +128,53 @@ const ModalidadModal = ({ modalidad, onClose, onBackToSelector }) => {
         return null;
     };
     return (
-        <div className="modal-overlay">
-            <div className="modal-container modal-modalidad-info">
-                {/* Header con navegación limpia */}
-                <div className="modalidad-modal-header">
-                    <div className="modalidad-nav-left">
-                        <VolverButton onClick={handleBack} />
+        <>
+            <div className="modal-overlay">
+                <div className="modal-container modal-modalidad-info">
+                    {/* Header con navegación limpia */}
+                    <div className="modalidad-modal-header">
+                        <div className="modalidad-nav-left">
+                            <VolverButton onClick={handleBack} />
+                        </div>
+                        <div className="modalidad-nav-center">
+                            <span className="modal-logo-text">CEIJA 5</span>
+                            <button 
+                                onClick={goHome}
+                                className="inicio-button-center"
+                                title="Ir al inicio"
+                            >
+                                🏠 Inicio
+                            </button>
+                        </div>
+                        <div className="modalidad-nav-right">
+                            <CloseButton onClose={onClose} variant="modal" />
+                        </div>
                     </div>
-                    <div className="modalidad-nav-center">
-                        <span className="modal-logo-text">CEIJA 5</span>
-                        <button 
-                            onClick={goHome}
-                            className="inicio-button-center"
-                            title="Ir al inicio"
-                        >
-                            🏠 Inicio
-                        </button>
-                    </div>
-                    <div className="modalidad-nav-right">
-                        <CloseButton onClose={onClose} variant="modal" />
-                    </div>
-                </div>
 
-                {/* Contenido del modal */}
-                <div className="modal-content-body">
-                    {renderContent()}
-                    <div className="modal-actions" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 32 }}>
-                        <Link to={`/preinscripcion-estd?modalidad=${modalidad}&web=true`}>
-                            <button type="button" className="boton-principal modal-cta-button">
+                    {/* Contenido del modal */}
+                    <div className="modal-content-body">
+                        {renderContent()}
+                        <div className="modal-actions" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 32 }}>
+                            <button 
+                                type="button" 
+                                className="boton-principal modal-cta-button"
+                                onClick={handleIniciarPreinscripcion}
+                            >
                                 ✨ Iniciar Preinscripción
                             </button>
-                        </Link>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            {/* Modal de requisitos */}
+            {showRequisitos && (
+                <ModalRequisitosPreinscripcion
+                    modalidad={modalidad}
+                    onClose={handleCerrarRequisitos}
+                />
+            )}
+        </>
     );
 };
 ModalidadModal.propTypes = {

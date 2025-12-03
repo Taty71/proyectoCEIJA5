@@ -1,4 +1,4 @@
-import ListaEstudiantes from './ListaEstudiantes';
+import ListaEstudiantes from './ListaEstudiantesCRUD';
 import ListaEstudiantesPages from '../pages/ListaEstudiantes';
 import ErrorBoundary from './ErrorBoundary';
 import PropTypes from 'prop-types';

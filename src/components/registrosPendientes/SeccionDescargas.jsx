@@ -5,40 +5,33 @@ const SeccionDescargas = ({
     onGenerarReporteTXT, 
     onGenerarReporteCSV, 
     onGenerarReportePDF,
-    onDescargarJSON 
+    children
 }) => {
     return (
-        <div className="botones-descarga">
+        <div className="botones-descarga descarga-unificada">
             <button 
                 onClick={onGenerarReporteTXT}
-                className="btn-reporte-txt"
+                className="boton-pendiente"
                 title="Generar reporte legible para administración escolar"
             >
                 📋 Reporte TXT
             </button>
             <button 
                 onClick={onGenerarReporteCSV}
-                className="btn-excel-csv"
-                title="Generar archivo Excel (CSV) para análisis de datos"
+                className="boton-pendiente"
+                title="Generar archivo Excel profesional y legible (.xlsx)"
             >
-                📊 Excel (CSV)
+                📊 Excel
             </button>
             <button 
                 onClick={onGenerarReportePDF}
-                className="btn-reporte-pdf"
+                className="boton-pendiente"
                 disabled={descargando}
                 title="Generar reporte PDF profesional para presentaciones"
             >
                 {descargando ? '⏳ Generando...' : '📄 Reporte PDF'}
             </button>
-            <button 
-                onClick={onDescargarJSON}
-                className="btn-json-tecnico"
-                disabled={descargando}
-                title="Descargar archivo JSON técnico (para programadores)"
-            >
-                {descargando ? '⏳ Descargando...' : '💾 JSON Técnico'}
-            </button>
+            {children}
         </div>
     );
 };
@@ -48,7 +41,7 @@ SeccionDescargas.propTypes = {
     onGenerarReporteTXT: PropTypes.func.isRequired,
     onGenerarReporteCSV: PropTypes.func.isRequired,
     onGenerarReportePDF: PropTypes.func.isRequired,
-    onDescargarJSON: PropTypes.func.isRequired
+    children: PropTypes.node
 };
 
 export default SeccionDescargas;

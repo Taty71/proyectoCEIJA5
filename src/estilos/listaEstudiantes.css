@@ -164,7 +164,8 @@
 
 .tabla-estudiantes th:nth-child(8),
 .tabla-estudiantes td:nth-child(8) {
-  width: 200px; /* o más si lo necesitás */
+  width: 200px;
+  /* o más si lo necesitás */
   text-align: center;
 }
 
@@ -184,7 +185,8 @@
   gap: 1px;
   box-shadow: 0 2px 6px rgba(45, 65, 119, 0.15);
   max-width: 100%;
-  white-space: normal; /* permite que se corte en varias líneas si es necesario */
+  white-space: normal;
+  /* permite que se corte en varias líneas si es necesario */
   text-align: center;
   height: 32px;
   justify-content: center;
@@ -269,6 +271,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -327,59 +330,266 @@
   font-weight: bold;
   border-bottom: 2px solid #1a2654;
   font-size: 0.8rem;
-  white-space: nowrap;
+  white-space: normal;
+  /* Permitir salto de línea */
+  vertical-align: bottom;
+  /* Alinear al fondo para que se vea prolijo */
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .tabla-estudiantes td {
   padding: 8px 4px;
   border-bottom: 1px solid #ddd;
   vertical-align: middle;
+  font-size: 13px;
+  /* Tamaño base para todas las celdas */
 }
 
 /* Ancho específico para columnas */
-.tabla-estudiantes th:nth-child(1), /* ID */
+.tabla-estudiantes th:nth-child(1),
+/* ID */
 .tabla-estudiantes td:nth-child(1) {
   width: 50px;
   text-align: center;
 }
 
-.tabla-estudiantes th:nth-child(2), /* DNI */
+.tabla-estudiantes th:nth-child(2),
+/* DNI */
 .tabla-estudiantes td:nth-child(2) {
   width: 90px;
 }
 
-.tabla-estudiantes th:nth-child(4), /* Email */
+.tabla-estudiantes th:nth-child(3),
+/* Nombre Apellido */
+.tabla-estudiantes td:nth-child(3) {
+  width: 150px;
+  text-align: left;
+}
+
+.tabla-estudiantes th:nth-child(4),
+/* Email */
 .tabla-estudiantes td:nth-child(4) {
   width: 180px;
   max-width: 180px;
 }
 
-.tabla-estudiantes th:nth-child(10), /* Acciones */
-.tabla-estudiantes td:nth-child(10) {
-  width: 200px;
+.tabla-estudiantes th:nth-child(5),
+/* Curso/Plan */
+.tabla-estudiantes td:nth-child(5) {
+  width: 80px;
   text-align: center;
 }
 
-/* Ancho específico para columnas */
-.tabla-estudiantes th:nth-child(1), /* ID */
-.tabla-estudiantes td:nth-child(1) {
-  width: 60px;
-  text-align: center;
-}
-
-.tabla-estudiantes th:nth-child(2), /* DNI */
-.tabla-estudiantes td:nth-child(2) {
+.tabla-estudiantes th:nth-child(6),
+/* Estado de Inscripción */
+.tabla-estudiantes td:nth-child(6) {
   width: 90px;
+  text-align: center;
 }
 
-.tabla-estudiantes th:nth-child(8), /* Acciones */
+.tabla-estudiantes th:nth-child(7),
+/* Fecha Inscripción */
+.tabla-estudiantes td:nth-child(7) {
+  width: 85px;
+  text-align: center;
+}
+
+.tabla-estudiantes th:nth-child(8),
+/* Fecha Nacimiento */
 .tabla-estudiantes td:nth-child(8) {
+  width: 85px;
+  text-align: center;
+}
+
+.tabla-estudiantes th:nth-child(9),
+/* Acciones */
+.tabla-estudiantes td:nth-child(9) {
   width: 120px;
   text-align: center;
 }
 
+/* === ESTILOS BASADOS EN CLASES (para TablaEstudiantes.jsx) === */
+/* Estos estilos permiten que TablaEstudiantes use las mismas definiciones */
+
+.tabla-estudiantes th.col-id,
+.tabla-estudiantes td.col-id {
+  width: 50px;
+  text-align: center;
+}
+
+.tabla-estudiantes th.col-dni,
+.tabla-estudiantes td.col-dni {
+  width: 90px;
+}
+
+.tabla-estudiantes th.col-nombre,
+.tabla-estudiantes td.col-nombre {
+  width: 150px;
+  text-align: left;
+}
+
+.tabla-estudiantes th.col-email,
+.tabla-estudiantes td.col-email {
+  width: 180px;
+  max-width: 180px;
+}
+
+.tabla-estudiantes th.col-estado-activo,
+.tabla-estudiantes td.col-estado-activo {
+  width: 70px;
+  text-align: center;
+}
+
+.tabla-estudiantes th.col-plan,
+.tabla-estudiantes td.col-plan {
+  width: 80px;
+  text-align: center;
+}
+
+.tabla-estudiantes th.col-estado-inscripcion,
+.tabla-estudiantes td.col-estado-inscripcion {
+  width: 90px;
+  text-align: center;
+}
+
+.tabla-estudiantes th.col-fecha,
+.tabla-estudiantes td.col-fecha {
+  width: 85px;
+  text-align: center;
+}
+
+.tabla-estudiantes th.col-acciones,
+.tabla-estudiantes td.col-acciones {
+  width: 120px;
+  text-align: center;
+}
+
+/* Contenedor de acciones */
+.acciones-contenedor {
+  display: flex;
+  gap: 2px;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilos para botones SVG en TablaEstudiantes */
+.btn-accion svg,
+.btn-accion-notificar svg,
+.btn-accion-comprobante svg,
+.btn-accion-ver svg {
+  width: 20px;
+  height: 20px;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.btn-accion:hover svg,
+.btn-accion-notificar:hover svg,
+.btn-accion-comprobante:hover svg,
+.btn-accion-ver:hover svg {
+  transform: translateY(-2px) scale(1.1);
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Badges de estado e inscripción */
+.badge-estado {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.badge-estado.activo {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.badge-estado.inactivo {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.badge-inscripcion {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+/* Estilos específicos para la estructura de TablaEstudiantes */
+.col-dni strong {
+  font-weight: normal;
+  font-size: 13px;
+}
+
+.nombre-completo {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-size: 13px;
+}
+
+.nombre-completo .nombre,
+.nombre-completo .apellido {
+  display: block;
+  line-height: 1.2;
+}
+
+/* Forzar transparencia en TODOS los botones de acción */
+.btn-accion,
+.btn-accion-notificar,
+.btn-accion-comprobante,
+.btn-accion-ver,
+button.btn-accion,
+button.btn-accion-notificar,
+button.btn-accion-comprobante,
+button.btn-accion-ver {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 4px !important;
+}
+
+.btn-accion:hover,
+.btn-accion-notificar:hover,
+.btn-accion-comprobante:hover,
+.btn-accion-ver:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Fix tooltip clipping on last button */
+.acciones-contenedor [data-tooltip]:last-child:hover::after,
+.acciones-grupo [data-tooltip]:last-child:hover::after {
+  left: auto;
+  right: 0;
+  transform: translateX(0);
+}
+
 .tabla-estudiantes tr:hover {
   background-color: #f8f9fa;
+}
+
+/* Badge ID Circular */
+.id-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 0.6rem;
 }
 
 /* Estados */
@@ -401,114 +611,115 @@
   color: #856404;
 }
 
-.estado-rechazado {
-  background-color: #f8d7da;
-  color: #721c24;
+
+.estado-completa {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
 }
 
-.estado-sin-estado {
-  background-color: #e9ecef;
-  color: #6c757d;
+.estado-anulada {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
 /* Grupo de acciones */
 .acciones-grupo {
   display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
+  gap: 2px;
+  flex-wrap: nowrap;
   justify-content: center;
+  width: 100%;
 }
 
+/* Nuevos estilos de botones 3D delicados */
 .btn-accion {
-  padding: 4px 6px;
+  padding: 4px;
   border: none;
-  border-radius: 6px;
+  background: transparent;
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 400;
-  transition: all 0.3s ease;
-  min-width: 32px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  /* Opcional: si quieres un hover circular */
+  width: 32px;
   height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.btn-modificar {
-  background-color: #e8f4fd;
-  color: #2980b9;
-  border: 1px solid #bee5eb;
+.btn-accion img {
+  width: 20px;
+  /* Ajustar tamaño del icono */
+  height: 20px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
+  /* Sombra suave al icono */
+  transition: transform 0.2s ease;
 }
 
-.btn-modificar:hover {
-  background-color: #d1ecf1;
-  color: #1c5460;
-  transform: translateY(-1px);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+.btn-accion:hover img {
+  transform: translateY(-2px) scale(1.1);
+  /* Efecto de elevación 3D */
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.2));
+  /* Sombra más pronunciada al elevarse */
 }
 
-.btn-eliminar {
-  background-color: #fdf2f2;
-  color: #e74c3c;
-  border: 1px solid #f8d7da;
+/* Tooltip Delicado */
+.btn-accion {
+  position: relative;
 }
 
-.btn-eliminar:hover {
-  background-color: #f8d7da;
-  color: #c0392b;
-  transform: translateY(-1px);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-}
-
-.btn-ver {
-  background-color: #f8f9fa;
-  color: #6c757d;
-  border: 1px solid #e9ecef;
-}
-
-.btn-ver:hover {
-  background-color: #e9ecef;
-  color: #495057;
-  transform: translateY(-1px);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-}
-
-/* Paginación */
-.paginacion {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-top: 15px;
-  padding: 10px;
-}
-
-.btn-paginacion {
-  background-color: #007bff;
+.btn-accion[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 100%;
+  /* Mostrar abajo */
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 5px;
+  /* Espacio desde el botón */
+  padding: 5px 10px;
+  background-color: #333;
   color: white;
-  border: none;
-  padding: 8px 16px;
+  font-size: 0.75rem;
   border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s;
+  white-space: nowrap;
+  opacity: 0;
+  animation: fadeInTooltip 0.2s forwards;
+  pointer-events: none;
+  z-index: 1000;
+  /* Asegurar que esté por encima */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.btn-paginacion:hover:not(:disabled) {
-  background-color: #0056b3;
+@keyframes fadeInTooltip {
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
-.btn-paginacion:disabled {
-  background-color: #e9ecef;
-  color: #6c757d;
-  cursor: not-allowed;
+/* Eliminar estilos de fondo antiguos */
+.btn-modificar,
+.btn-eliminar,
+.btn-ver {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
-.info-paginacion {
-  font-weight: 500;
-  color: #495057;
+.btn-modificar:hover,
+.btn-eliminar:hover,
+.btn-ver:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  transform: none;
+  box-shadow: none !important;
 }
+
+
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -551,7 +762,7 @@
 
   .tabla-estudiantes th,
   .tabla-estudiantes td {
-    padding: 8px 6px;
+    padding: 4px 2px;
   }
 
   .acciones-grupo {
@@ -562,105 +773,23 @@
   }
 
   .btn-accion {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-    min-width: 32px;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    min-width: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
   .acciones-estudiante {
-    gap: 6px;
+    gap: 2px;
     flex-wrap: wrap;
     justify-content: center;
   }
 }
 
-/* Estilos para botones de acciones - Elegantes y más pequeños */
-.acciones-estudiante {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  align-items: center;
-}
 
-.btn-accion {
-  border: none;
-  border-radius: 8px;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Botón Ver - Degradado azul elegante del sitio */
-.btn-ver {
-  background: linear-gradient(135deg, #2d4177 0%, #4a69bd 50%, #74b9ff 100%);
-  color: white;
-  box-shadow: 0 2px 6px rgba(45, 65, 119, 0.25);
-}
-
-.btn-ver:hover {
-  background: linear-gradient(135deg, #1e2d5a 0%, #3c5aa6 50%, #0984e3 100%);
-  transform: translateY(-1px) scale(1.05);
-  box-shadow: 0 4px 12px rgba(45, 65, 119, 0.4);
-}
-
-/* Botón Modificar - Degradado naranja suave con gris */
-.btn-modificar {
-  background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 50%, #a29bfe 100%);
-  color: #2d3436;
-}
-
-.btn-modificar:hover {
-  background: linear-gradient(135deg, #fdcb6e 0%, #e17055 50%, #6c5ce7 100%);
-  transform: translateY(-1px) scale(1.05);
-  box-shadow: 0 4px 8px rgba(250, 177, 160, 0.3);
-}
-
-/* Botón Eliminar - Degradado rojo suave */
-.btn-eliminar {
-  background: linear-gradient(135deg, #fd79a8 0%, #e84393 50%, #a29bfe 100%);
-  color: white;
-}
-
-.btn-eliminar:hover {
-  background: linear-gradient(135deg, #fd5585 0%, #e01e7c 50%, #6c5ce7 100%);
-  transform: translateY(-1px) scale(1.05);
-  box-shadow: 0 4px 8px rgba(253, 121, 168, 0.3);
-}
-
-.btn-accion:active {
-  transform: translateY(0) scale(0.95);
-}
-
-/* Efecto de ondas al hacer clic */
-.btn-accion::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.3s, height 0.3s;
-}
-
-.btn-accion:active::before {
-  width: 100%;
-  height: 100%;
-}
 
 /* Paginación */
 .pagination {
@@ -744,6 +873,7 @@
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);

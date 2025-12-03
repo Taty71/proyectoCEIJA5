@@ -2,7 +2,7 @@
 :root {
   --color-bg-main: #fff;
   --color-btn-main: #2d4177;
-  --color-btn-shadow: #87ceeb;
+  --color-btn-shadow: #3a3a5a;
   --color-btn-hover: #696969;
   --color-title: #2d4177;
 }
@@ -144,6 +144,18 @@
 }
 .dashboard-buttons button:nth-child(6) {
   animation: slideInButton 0.6s ease-out 0.6s both;
+}
+.dashboard-buttons button:nth-child(7) {
+  animation: slideInButton 0.6s ease-out 0.7s both;
+}
+.dashboard-buttons button:nth-child(8) {
+  animation: slideInButton 0.6s ease-out 0.8s both;
+}
+.dashboard-buttons button:nth-child(9) {
+  animation: slideInButton 0.6s ease-out 0.9s both;
+}
+.dashboard-buttons button:nth-child(10) {
+  animation: slideInButton 0.6s ease-out 1s both;
 }
 
 @keyframes slideInButton {

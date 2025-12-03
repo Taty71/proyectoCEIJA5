@@ -1,16 +1,19 @@
 
-import '../../estilos/tablaEstudiantesLimpio.css';
+import '../../estilos/listaEstudiantes.css';
+import '../../estilos/tablaEstudiantes.css';
 import ComprobanteGenerator from '../ComprobanteGenerator';
 import serviceListaEstudiantes from '../../services/serviceListaEstudiantes';
 import PropTypes from 'prop-types';
 import { useState, useEffect, useRef } from 'react';
 import BotonCargando from '../BotonCargando';
+import iconVer from '../../assets/logos/ver.svg';
+import iconPDF from '../../assets/logos/pdf.svg';
 // notificacionesService is not used here directly; keep component focused
 
-const TablaEstudiantes = ({ 
-  estudiantes, 
-  loading, 
-  error, 
+const TablaEstudiantes = ({
+  estudiantes,
+  loading,
+  error,
   _onEmitirComprobante,
   onVerEstudiante,
   onPreviewNotificacion,
@@ -70,12 +73,12 @@ const TablaEstudiantes = ({
             <tr>
               <th className="col-id"><div className="th-text">ID</div></th>
               <th className="col-dni"><div className="th-text">DNI</div></th>
-              <th className="col-nombre"><div className="th-text">Nombre<br/>Apellido</div></th>
+              <th className="col-nombre"><div className="th-text">Nombre<br />Apellido</div></th>
               <th className="col-email"><div className="th-text">Email</div></th>
               <th className="col-estado-activo"><div className="th-text">Estado</div></th>
-              <th className="col-plan"><div className="th-text">Curso/<br/>Plan</div></th>
-              <th className="col-estado-inscripcion"><div className="th-text">Estado<br/>Inscripción</div></th>
-              <th className="col-fecha"><div className="th-text">Fecha<br/>inscripción</div></th>
+              <th className="col-plan"><div className="th-text">Curso/<br />Plan</div></th>
+              <th className="col-estado-inscripcion"><div className="th-text">Estado<br />Inscripción</div></th>
+              <th className="col-fecha"><div className="th-text">Fecha<br />inscripción</div></th>
               <th className="col-acciones"><div className="th-text">Acciones</div></th>
             </tr>
           </thead>
@@ -92,138 +95,140 @@ const TablaEstudiantes = ({
               </tr>
             ) : (
               <>
-              {lista.map((estudiante, index) => (
-                <tr key={estudiante.id || `est-${index}`} className={`fila-estudiante ${index % 2 === 0 ? 'par' : 'impar'}`}>
-                  <td className="col-id" data-label="ID">
-                    <span className="id-badge">{estudiante.id}</span>
-                  </td>
-                  <td className="col-dni" data-label="DNI">
-                    <strong>{estudiante.dni}</strong>
-                  </td>
-                  <td className="col-nombre" data-label="Nombre Completo">
-                    <div className="nombre-completo">
-                      <span className="nombre">{estudiante.nombre}</span>
-                      <span className="apellido">{estudiante.apellido}</span>
-                    </div>
-                  </td>
-                  <td className="col-email" data-label="Email">
-                    <span className="email-estudiante" title={estudiante.email || 'Sin email registrado'}>
-                      {estudiante.email ? (
-                        <a href={`mailto:${estudiante.email}`} className="link-email">
-                          {estudiante.email}
-                        </a>
-                      ) : (
-                        <span className="sin-email">Sin email</span>
-                      )}
-                    </span>
-                  </td>
-                  <td className="col-estado-activo" data-label="Estado">
-                    <span className={`badge-estado ${estudiante.activo ? 'activo' : 'inactivo'}`}>
-                      {estudiante.activo ? '✅ Activo' : '❌ Inactivo'}
-                    </span>
-                  </td>
-                  <td className="col-plan" data-label="Curso/Plan">
-                    <span className="plan-info">
-                      {estudiante.cursoPlan || 'Sin asignar'}
-                    </span>
-                  </td>
-                  <td className="col-estado-inscripcion" data-label="Estado Inscripción">
-                    <span className={`badge-inscripcion estado-${(estudiante.estadoInscripcion || '').toLowerCase().replace(/\s+/g, '-')}`}>
-                      {estudiante.estadoInscripcion || 'Sin estado'}
-                    </span>
-                  </td>
-                      <td className="col-fecha" data-label="Fecha Inscripción">
-                    <span className="fecha-inscripcion">
-                      {typeof formatearFecha === 'function' ? formatearFecha(estudiante.fechaInscripcion) : (estudiante.fechaInscripcion || '')}
-                    </span>
-                  </td>
-                  <td className="col-acciones">
-                    <div className="acciones-contenedor">
-                      {/* Notificar (color según estado activo/inactivo) */}
-                      <div className="accion-notificar-wrap">
-                        <BotonCargando
-                          loading={!!enviandoMap[estudiante.id]}
-                          className={`accion-boton btn-accion-notificar ${estudiante.activo ? 'normal' : 'inactivo'}`}
-                          onClick={() => typeof onPreviewNotificacion === 'function' && onPreviewNotificacion({ ...estudiante, documentos: estudiante.documentos || [] })}
-                          aria-label="Notificar"
-                          data-tooltip="Notificar"
-                        >
-                          <span className="accion-ico">🔔</span>
-                         
-                        </BotonCargando>
+                {lista.map((estudiante, index) => (
+                  <tr key={estudiante.id || `est-${index}`} className={`fila-estudiante ${index % 2 === 0 ? 'par' : 'impar'}`}>
+                    <td className="col-id" data-label="ID">
+                      <span className="id-badge">{estudiante.id}</span>
+                    </td>
+                    <td className="col-dni" data-label="DNI">
+                      <strong>{estudiante.dni}</strong>
+                    </td>
+                    <td className="col-nombre" data-label="Nombre Completo">
+                      <div className="nombre-completo">
+                        <span className="nombre">{estudiante.nombre}</span>
+                        <span className="apellido">{estudiante.apellido}</span>
                       </div>
+                    </td>
+                    <td className="col-email" data-label="Email">
+                      <span className="email-estudiante" title={estudiante.email || 'Sin email registrado'}>
+                        {estudiante.email ? (
+                          <a href={`mailto:${estudiante.email}`} className="link-email">
+                            {estudiante.email}
+                          </a>
+                        ) : (
+                          <span className="sin-email">Sin email</span>
+                        )}
+                      </span>
+                    </td>
+                    <td className="col-estado-activo" data-label="Estado">
+                      <span className={`badge-estado ${estudiante.activo ? 'activo' : 'inactivo'}`}>
+                        {estudiante.activo ? '✅ Activo' : '❌ Inactivo'}
+                      </span>
+                    </td>
+                    <td className="col-plan" data-label="Curso/Plan">
+                      <span className="plan-info">
+                        {estudiante.cursoPlan || 'Sin asignar'}
+                      </span>
+                    </td>
+                    <td className="col-estado-inscripcion" data-label="Estado Inscripción">
+                      <span className={`badge-inscripcion estado-${(estudiante.estadoInscripcion || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                        {estudiante.estadoInscripcion || 'Sin estado'}
+                      </span>
+                    </td>
+                    <td className="col-fecha" data-label="Fecha Inscripción">
+                      <span className="fecha-inscripcion">
+                        {typeof formatearFecha === 'function' ? formatearFecha(estudiante.fechaInscripcion) : (estudiante.fechaInscripcion || '')}
+                      </span>
+                    </td>
+                    <td className="col-acciones">
+                      <div className="acciones-contenedor">
+                        {/* Notificar (color según estado activo/inactivo) */}
+                        <div className="accion-notificar-wrap">
+                          <BotonCargando
+                            loading={!!enviandoMap[estudiante.id]}
+                            className={`btn-accion btn-accion-notificar ${estudiante.activo ? 'normal' : 'inactivo'}`}
+                            onClick={() => typeof onPreviewNotificacion === 'function' && onPreviewNotificacion({ ...estudiante, documentos: estudiante.documentos || [] })}
+                            aria-label="Notificar"
+                            data-tooltip="Notificar"
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.19 14,4.29 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21" />
+                            </svg>
 
-                      {/* Emitir comprobante para activos */}
-                      {estudiante.activo ? (
-                        <button
-                          className="accion-boton btn-accion-comprobante"
-                          onClick={async () => {
-                            // Traer datos completos del estudiante antes de generar el comprobante
-                            try {
-                              const resp = await serviceListaEstudiantes.getEstudiantePorDNI(estudiante.dni);
-                              // El backend puede devolver { estudiante, inscripcion, documentacion, ... }
-                              let estudianteCompleto = { ...estudiante };
-                              if (resp && resp.success && resp.estudiante) {
-                                estudianteCompleto = {
-                                  ...resp.estudiante,
-                                  ...resp.inscripcion,
-                                  documentacion: resp.documentacion || resp.estudiante.documentacion || [],
-                                  modulo: resp.inscripcion?.modulo || resp.estudiante.modulo || '',
-                                  planAnio: resp.inscripcion?.planAnio || resp.estudiante.planAnio || '',
-                                  cursoPlan: resp.inscripcion?.cursoPlan || resp.estudiante.cursoPlan || '',
-                                  estadoInscripcion: resp.inscripcion?.estadoInscripcion || resp.estudiante.estadoInscripcion || '',
-                                };
+                          </BotonCargando>
+                        </div>
+
+                        {/* Emitir comprobante para activos */}
+                        {estudiante.activo ? (
+                          <button
+                            className="btn-accion btn-accion-comprobante"
+                            onClick={async () => {
+                              // Traer datos completos del estudiante antes de generar el comprobante
+                              try {
+                                const resp = await serviceListaEstudiantes.getEstudiantePorDNI(estudiante.dni);
+                                // El backend puede devolver { estudiante, inscripcion, documentacion, ... }
+                                let estudianteCompleto = { ...estudiante };
+                                if (resp && resp.success && resp.estudiante) {
+                                  estudianteCompleto = {
+                                    ...resp.estudiante,
+                                    ...resp.inscripcion,
+                                    documentacion: resp.documentacion || resp.estudiante.documentacion || [],
+                                    modulo: resp.inscripcion?.modulo || resp.estudiante.modulo || '',
+                                    planAnio: resp.inscripcion?.planAnio || resp.estudiante.planAnio || '',
+                                    cursoPlan: resp.inscripcion?.cursoPlan || resp.estudiante.cursoPlan || '',
+                                    estadoInscripcion: resp.inscripcion?.estadoInscripcion || resp.estudiante.estadoInscripcion || '',
+                                  };
+                                }
+                                ComprobanteGenerator.generar(estudianteCompleto);
+                              } catch {
+                                alert('No se pudo obtener la información completa del estudiante para el comprobante.');
                               }
-                              ComprobanteGenerator.generar(estudianteCompleto);
-                            } catch {
-                              alert('No se pudo obtener la información completa del estudiante para el comprobante.');
-                            }
-                          }}
-                          aria-label="Comprobante"
-                          data-tooltip="Comprobante"
+                            }}
+                            aria-label="Comprobante"
+                            data-tooltip="Comprobante"
+                          >
+                            <img src={iconPDF} alt="Comprobante" />
+                          </button>
+                        ) : null}
+
+                        {/* Ver detalles */}
+                        <button
+                          className="btn-accion btn-accion-ver"
+                          onClick={() => typeof onVerEstudiante === 'function' && onVerEstudiante(estudiante)}
+
+                          aria-label="Ver"
+                          data-tooltip="Ver"
                         >
-                          <span className="accion-ico">📄</span>
+                          <img src={iconVer} alt="Ver" />
+
                         </button>
-                      ) : null}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {/* Render placeholder empty rows so the table keeps a fixed height */}
+                {(() => {
+                  const visible = estudiantes.length;
+                  const toFill = Math.max(0, limit - visible);
+                  const placeholders = [];
+                  for (let i = 0; i < toFill; i++) {
+                    placeholders.push(
+                      <tr key={`empty-${i}`} className={`fila-estudiante fila-vacia`}>
+                        <td className="col-id">&nbsp;</td>
+                        <td className="col-dni">&nbsp;</td>
+                        <td className="col-nombre">&nbsp;</td>
+                        <td className="col-email">&nbsp;</td>
+                        <td className="col-estado-activo">&nbsp;</td>
 
-                      {/* Ver detalles */}
-                      <button
-                        className="accion-boton btn-accion-ver"
-                        onClick={() => typeof onVerEstudiante === 'function' && onVerEstudiante(estudiante)}
-                      
-                        aria-label="Ver"
-                        data-tooltip="Ver"
-                      >
-                        <span className="accion-ico">👁️</span>
-                       
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {/* Render placeholder empty rows so the table keeps a fixed height */}
-              {(() => {
-                const visible = estudiantes.length;
-                const toFill = Math.max(0, limit - visible);
-                const placeholders = [];
-                for (let i = 0; i < toFill; i++) {
-                  placeholders.push(
-                    <tr key={`empty-${i}`} className={`fila-estudiante fila-vacia`}>
-                      <td className="col-id">&nbsp;</td>
-                      <td className="col-dni">&nbsp;</td>
-                      <td className="col-nombre">&nbsp;</td>
-                      <td className="col-email">&nbsp;</td>
-                      <td className="col-estado-activo">&nbsp;</td>
-
-                      <td className="col-plan">&nbsp;</td>
-                      <td className="col-estado-inscripcion">&nbsp;</td>
-                      <td className="col-fecha">&nbsp;</td>
-                      <td className="col-acciones">&nbsp;</td>
-                    </tr>
-                  );
-                }
-                return placeholders;
-              })()}
+                        <td className="col-plan">&nbsp;</td>
+                        <td className="col-estado-inscripcion">&nbsp;</td>
+                        <td className="col-fecha">&nbsp;</td>
+                        <td className="col-acciones">&nbsp;</td>
+                      </tr>
+                    );
+                  }
+                  return placeholders;
+                })()}
               </>
             )}
           </tbody>

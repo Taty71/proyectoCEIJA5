@@ -17,7 +17,7 @@ src/components/ListaEstudiantes/
     ├── analisisPeriodos.js         # 📅 Análisis temporal y períodos
     ├── analisisDocumentacion.js    # 📄 Análisis de documentación
     ├── tendenciasPlan.js           # 📚 Tendencias de planes de estudio
-    ├── analisisRendimiento.js      # 🎓 Análisis de rendimiento académico
+    ├── analisisEstadoInstitucional.js      # 🎓 Análisis de rendimiento académico
     └── reportesBasicos.js          # 📋 Reportes estadísticos básicos
 ```
 
@@ -78,7 +78,7 @@ src/components/ListaEstudiantes/
 - 🎯 Análisis estratégico de oferta académica
 - **Funciones**: `generarTendenciasPlan()`, `generarTendenciasPlanExcel()`
 
-### 6. **Análisis de Rendimiento** (`analisisRendimiento.js`)
+### 6. **Análisis de Rendimiento** (`analisisEstadoInstitucional.js`)
 
 - 🎓 Tasas de retención y finalización
 - 📊 Factores de riesgo identificados
@@ -219,7 +219,7 @@ import { generarAnalisisEstados } from "./reportes/analisisEstados.js";
 - `analisisPeriodos.js`: ~170 líneas
 - `analisisDocumentacion.js`: ~220 líneas
 - `tendenciasPlan.js`: ~190 líneas
-- `analisisRendimiento.js`: ~200 líneas
+- `analisisEstadoInstitucional.js`: ~200 líneas
 - `reportesBasicos.js`: ~180 líneas
 - `index.js`: ~50 líneas (exportaciones)
 

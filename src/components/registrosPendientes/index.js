@@ -7,3 +7,4 @@ export { default as SeccionDocumentos } from './SeccionDocumentos';
 export { default as SeccionEmails } from './SeccionEmails';
 export { default as SeccionDescargas } from './SeccionDescargas';
 export { default as SeccionDuplicados } from './SeccionDuplicados';
+export { default as ReinicioAlarmaRegistro } from './ReinicioAlarmaRegistro';

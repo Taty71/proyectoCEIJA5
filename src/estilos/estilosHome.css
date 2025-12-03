@@ -39,13 +39,23 @@ body {
 }
 
 .hamburger {
-  font-size: 30px; /* Tamaño más pequeño para un estilo más delicado */
-  background: none;
-  border: none;
+  font-size: 28px;
+  background: var(--color-acento);
+  border: 2px solid var(--color-acento-claro);
+  border-radius: 8px;
+  padding: 8px 12px;
   cursor: pointer;
-  color: #87ceeb;
-  text-shadow: 1px 1px 3px #ccc2c2;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(45, 65, 119, 0.2);
 }
+
+.hamburger:hover {
+  background: var(--color-header);
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(45, 65, 119, 0.3);
+}
+
 .menu {
   display: flex;
   flex-direction: column;
@@ -53,12 +63,17 @@ body {
   position: absolute;
   top: 50px;
   right: 10px;
-  background-color: #313030;
-  padding: 15px; /* Menor padding para que sea más compacto */
-  border-radius: 8px;
-  box-shadow: 0px 4px 10px #ccc2c2;
+  background: linear-gradient(
+    135deg,
+    var(--color-fondo-tarjeta) 0%,
+    #ffffff 100%
+  );
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(45, 65, 119, 0.25);
   z-index: 10;
-  width: 180px; /* Más estrecho */
+  width: 200px;
+  border: 2px solid var(--color-acento-claro);
 }
 
 .menu ul {
@@ -67,54 +82,122 @@ body {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  width: 100%;
 }
-.menu .opcMenu {
-  font-family: inherit; /* Hereda la fuente del elemento padre */
-  font-size: inherit; /* Hereda el tamaño de fuente del elemento padre */
-  background: none; /* Elimina el fondo predeterminado del botón */
-  border: none; /* Elimina el borde predeterminado del botón */
-  cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
-  text-decoration: none; /* Elimina la subrayado del texto */
-  padding: 0; /* Elim /* Tamaño más pequeño para delicadeza */
 
-  font-weight: bold;
-  text-align: left;
-}
 .menu ul li a {
   text-decoration: none;
-  color: #87ceeb;
+  color: var(--color-acento);
+  display: block;
+  padding: 10px 12px;
+  border-radius: 6px;
+  transition: color 0.2s ease;
+  font-weight: 600;
 }
 
-.menu button {
-  background: none;
+.menu ul li a:hover {
+  color: var(--color-header);
+  
+}
+
+.menu ul li {
+  width: 100%; /* Agrega esto */
+}
+
+.menu ul li a,
+li > button {
+  text-decoration: none;
+  color: var(--color-acento);
+  display: block;
+  padding: 10px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  cursor: pointer; /* Agrega esto */
+  background: none; /* Agrega esto */
+  border: none; /* Agrega esto */
+  width: 100%; /* Agrega esto */
+  text-align: left; /* Agrega esto */
+  font-size: 15px; /* Agrega esto */
+}
+
+.menu ul li a:hover,
+li > button:hover {
+  background: var(--color-acento);
+  color: white;
+  transform: translateX(5px);
+}
+
+.menu > button {
+  background: transparent;
   border: none;
-  color: #87ceeb;
-  font-size: 18px;
+  color: var(--color-texto-secundario);
+  font-size: 20px;
   align-self: flex-end;
   cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
+
+.menu > button:hover {
+  background: var(--color-acento);
+  color: white;
+  transform: rotate(90deg);
+}
+
 li > button {
   font-family: inherit;
   font-style: inherit;
-  font-weight: inherit;
-  color: #87ceeb;
-  font-size: inherit; /* Hereda el tamaño de fuente del elemento padre */
+  font-weight: 600;
+  color: var(--color-acento);
+  font-size: 15px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+li > button:hover {
+  background: var(--color-acento);
+  color: white;
+  transform: translateX(5px);
 }
 
 /* Botón de inicio de sesión */
 .barNav > .login-button {
-  width: 10%; /* Ancho más pequeño */
-  background-color: #313030;
-  color: #87ceeb;
-  border: none;
-  padding: 8px; /* Tamaño más pequeño */
+  background: var(--color-acento);
+  color: white;
+  border: 2px solid var(--color-acento-claro);
+  padding: 10px 20px;
   border-radius: 8px;
-  font-size: 14px; /* Tamaño más pequeño para un look más delicado */
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  text-shadow: 1px 1px 3px #d35400; /* Sombra amarilla */
-  margin-left: 20px; /* Espacio entre el botón y el menú */
+  margin-left: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(45, 65, 119, 0.2);
+  white-space: nowrap;
 }
+
+.barNav > .login-button:hover {
+  background: var(--color-header);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 65, 119, 0.3);
+}
+
+.barNav > .login-button:active {
+  transform: translateY(0);
+}
+
 /* Información de la escuela */
 .school-info {
   margin-top: 3%;

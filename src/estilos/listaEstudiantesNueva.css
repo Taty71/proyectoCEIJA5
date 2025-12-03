@@ -17,6 +17,7 @@
   cursor: default;
   transition: none;
 }
+
 .cerrar-button-flotante:hover {
   /* keep hover handled by the inner button */
   background: transparent;
@@ -29,14 +30,28 @@
   display: none !important;
 }
 
+/* Force close button color inside flotante wrapper */
+.cerrar-button-flotante .cerrar-button {
+  background: #2d4177 !important;
+  color: white !important;
+  border: 1px solid #1a2654 !important;
+}
+
+.cerrar-button-flotante .cerrar-button:hover {
+  background: #3d5187 !important;
+  color: white !important;
+}
+
 .lista-header-superior {
   position: relative;
   display: flex;
-  flex-direction: column; /* title row above controls */
+  flex-direction: column;
+  /* title row above controls */
   align-items: stretch;
   gap: 8px;
   margin-bottom: 18px;
 }
+
 .botones-navegacion {
   display: flex;
   flex-direction: row;
@@ -55,39 +70,51 @@
   align-items: center;
   gap: 12px;
 }
+
 .btn-ver-reportes,
 .btn-filtro-small,
 .btn-filtro,
 .btn-limpiar-busqueda,
 .btn-limpiar-busqueda-dni {
-  min-width: 110px;
-  height: 40px;
-  font-size: 0.95rem;
+  /* ESTILOS UNIFICADOS PROFESIONALES */
+  min-width: 100px;
+  height: 32px;
+  font-size: 0.85rem;
+  font-weight: 500;
   padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  background: white;
+  color: #495057;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.3px;
+  text-transform: none;
 }
+
 .btn-limpiar-busqueda {
   margin-left: 8px;
 }
-/* Uniform style for Ver Reportes button in header */
+
+/* Botón Ver Reportes - estilo distintivo pero coherente */
 .btn-ver-reportes {
-  background: #2c3e50;
+  background: #2d4177;
   color: white;
-  border-radius: 6px;
-  padding: 6px 12px;
+  border-color: #2d4177;
   font-weight: 600;
-  font-size: 0.95rem;
-  border: none;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.06s;
 }
+
 .btn-ver-reportes:hover {
-  background: #213242;
+  background: #1e2e5a;
+  border-color: #1e2e5a;
   transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(45, 65, 119, 0.25);
 }
+
 /* Estilos mejorados para Lista de Estudiantes */
 
 .lista-estudiantes-container {
@@ -102,6 +129,86 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
 }
 
+/* ===================== PAGINACIÓN ===================== */
+.seccion-paginacion {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.paginacion-controles {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  min-height: 0;
+}
+
+.btn-paginacion {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #2d4177;
+  border-radius: 6px;
+  background: white;
+  color: #2d4177;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.btn-paginacion:hover:not(:disabled) {
+  background: #2d4177;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(45, 65, 119, 0.2);
+}
+
+.btn-paginacion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 18px 0 8px 0;
+}
+
+.pagination-btn {
+  padding: 8px 16px;
+  border: 1px solid #007bff;
+  border-radius: 6px;
+  background: white;
+  color: #007bff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #007bff;
+  color: white;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font-size: 1rem;
+  color: #495057;
+  font-weight: 500;
+}
+
 /* Allow the main content wrapper to expand wider so inner containers can fill available space */
 .contenido-principal {
   max-width: 100%;
@@ -109,51 +216,6 @@
   padding-left: 12px;
   padding-right: 12px;
   box-sizing: border-box;
-}
-/* Head.btn-cerrar-modal {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  font-size: 0.7rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease;
-}
-.lista-header-superior {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid #e9ecef;
-}
-
-.titulo-seccion {
-  flex: 1;
-}
-
-.lista-titulo {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin: 0 0 8px 0;
-}
-
-.lista-subtitulo {
-  font-size: 1rem;
-  color: #6c757d;
-  margin: 0;
-}
-
-.botones-navegacion {
-  display: flex;
-  gap: 12px;
-  align-items: center;
 }
 
 /* Row that contains the title and the close button */
@@ -172,7 +234,8 @@
 
 .titulo-left-spacer,
 .titulo-right-spacer {
-  width: 44px; /* reserve space equal to close button to keep title visually centered */
+  width: 44px;
+  /* reserve space equal to close button to keep title visually centered */
   min-width: 44px;
 }
 
@@ -205,6 +268,7 @@
   .lista-titulo {
     font-size: 1.4rem;
   }
+
   .titulo-left-spacer,
   .titulo-right-spacer {
     width: 36px;
@@ -258,36 +322,39 @@
   gap: 12px;
   margin: 8px 0 12px 0;
 }
+
 .controls-left {
   display: flex;
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
 }
+
 .controls-right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
 
-/* Smaller, compact filter buttons as in sketch */
-.btn-filtro-small {
-  background: white;
-  border: 1px solid #dfe7f5;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  cursor: pointer;
+/* Smaller, compact filter buttons - estilos ya definidos arriba */
+
+.btn-filtro-small:hover {
+  background: #f8f9fa;
+  border-color: #2d4177;
+  color: #2d4177;
 }
+
 .btn-filtro-small.activo {
-  background: #e9f7ef;
-  border-color: #bfe6c7;
+  background: #2d4177;
+  color: white;
+  border-color: #2d4177;
 }
 
 /* Place buscador to the right aligned */
 .controls-right .buscador-dni-container {
   margin: 0;
 }
+
 .controls-right .buscador-dni-input-group {
   max-width: 520px;
   min-width: 320px;
@@ -309,43 +376,49 @@
   flex-wrap: wrap;
 }
 
-.btn-filtro {
-  padding: 8px 10px;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  color: #495057;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-weight: 600;
-  min-width: 110px;
-  height: 40px;
-  box-sizing: border-box;
-}
-
+/* Botones de filtro - hover y estados */
 .btn-filtro:hover {
-  background: #e9ecef;
-  border-color: #adb5bd;
+  background: #f8f9fa;
+  border-color: #2d4177;
+  color: #2d4177;
 }
 
 .btn-filtro.activo {
-  background: #007bff;
+  background: #2d4177;
   color: white;
-  border-color: #007bff;
+  border-color: #2d4177;
+  box-shadow: 0 1px 3px rgba(45, 65, 119, 0.3);
 }
 
 .btn-filtro:disabled {
-  opacity: 0.5;
+  background: #f8f9fa;
+  color: #adb5bd;
+  border-color: #e9ecef;
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .select-estado-inscripcion {
-  padding: 8px 12px;
+  height: 32px;
+  padding: 0 12px;
   border: 1px solid #dee2e6;
   border-radius: 6px;
   background: white;
   color: #495057;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.select-estado-inscripcion:hover {
+  border-color: #2d4177;
+}
+
+.select-estado-inscripcion:focus {
+  outline: none;
+  border-color: #2d4177;
+  box-shadow: 0 0 0 2px rgba(45, 65, 119, 0.1);
 }
 
 .btn-reporte {
@@ -451,6 +524,7 @@
     opacity: 0;
     transform: scale(0.9) translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -477,8 +551,8 @@
 }
 
 .btn-cerrar-modal {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: rgba(69, 68, 68, 0.418);
+  color: rgb(96, 94, 94);
   border: none;
   border-radius: 50%;
   width: 20px;
@@ -488,7 +562,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .btn-cerrar-modal:hover {
@@ -506,17 +580,20 @@
   flex-direction: column;
   max-height: 92vh;
 }
+
 .modal-reportes-body {
   flex: 1 1 auto;
   overflow: visible;
   display: flex;
   flex-direction: column;
 }
+
 .modal-reportes-body textarea {
   width: 100%;
   box-sizing: border-box;
   resize: vertical;
-  overflow: hidden; /* textarea is auto-resized by JS */
+  overflow: hidden;
+  /* textarea is auto-resized by JS */
   min-height: 120px;
 }
 
@@ -625,15 +702,6 @@
   }
 }
 
-/* Sección de gráfico */
-.seccion-grafico {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
 /* Mensajes de error */
 .error-message {
   background: #f8d7da;
@@ -643,7 +711,7 @@
   margin-bottom: 20px;
 }
 
-.error-content {
+/*.error-content {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -657,7 +725,7 @@
   flex: 1;
   margin: 0;
   color: #721c24;
-}
+}*/
 
 .btn-reintentar {
   padding: 6px 12px;
@@ -713,171 +781,17 @@
   overflow-x: auto;
 }
 
-.tabla-estudiantes {
-  width: 100%;
-  border-collapse: collapse;
-  /* Increased slightly for better readability (+ ~1.5-2px) */
-  font-size: 1.03rem;
-}
+/* ESTILOS DE TABLA MOVIDOS A tablaEstudiantes.css */
 
-.tabla-estudiantes th {
-  background: #f8f9fa;
-  padding: 12px 8px;
-  text-align: left;
-  font-weight: 600;
-  color: #495057;
-  border-bottom: 2px solid #dee2e6;
-  white-space: nowrap;
-  /* Keep header visible when scrolling */
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  /* ensure solid background when sticking */
-  -webkit-backdrop-filter: none; /* Safari/iOS prefix for compatibility */
-  backdrop-filter: none;
-}
+/* ESTILOS DE TABLA MOVIDOS A tablaEstudiantes.css */
 
-/* Make header font size match the name/row font for visual balance */
-.tabla-estudiantes th {
-  font-size: 16px;
-}
+/* ESTILOS DE FILAS MOVIDOS A tablaEstudiantes.css */
 
-/* Add subtle shadow when header sticks to content */
-.tabla-estudiantes thead th[style],
-.tabla-estudiantes thead th:stick {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-}
+/* ESTILOS DE COLUMNAS MOVIDOS A tablaEstudiantes.css */
 
-.tabla-estudiantes td {
-  padding: 12px 8px;
-  border-bottom: 1px solid #dee2e6;
-  vertical-align: middle;
-}
+/* ESTILOS DE TH COLUMNAS MOVIDOS A tablaEstudiantes.css */
 
-/* Reduce font-size for specific content columns (estado, curso/plan) to avoid visual noise */
-.tabla-estudiantes td.col-estado-activo,
-.tabla-estudiantes td.col-estado-inscripcion,
-.tabla-estudiantes td.col-plan {
-  font-size: 12px;
-}
-
-/* Ensure fecha header is readable and can wrap if needed */
-.tabla-estudiantes th.col-fecha {
-  white-space: normal;
-}
-.tabla-estudiantes td.col-fecha {
-  font-size: 12px;
-  color: #6c757d;
-  text-align: center;
-}
-
-.fila-estudiante.par {
-  background: #f8f9fa;
-}
-
-.fila-estudiante.impar {
-  background: white;
-}
-
-.fila-estudiante:hover {
-  background: #e3f2fd !important;
-}
-
-/* Columnas específicas */
-.col-id {
-  width: 60px;
-  text-align: center;
-}
-
-.col-dni {
-  width: 100px;
-}
-
-.col-nombre {
-  min-width: 95px;
-}
-
-.col-email {
-  min-width: 180px;
-  width: 30%;
-  font-size: 1.06rem;
-}
-
-.col-estado-activo,
-.col-estado-inscripcion {
-  width: 95px;
-  min-width: 90px;
-  text-align: center;
-}
-
-.col-plan {
-  width: 100px;
-  min-width: 90px;
-}
-
-.col-fecha {
-  width: 100px;
-  min-width: 120px;
-}
-
-/* Increase sizes for important table columns (email, estados, fecha) */
-
-.tabla-estudiantes th.col-email {
-  font-size: 0.88rem;
-}
-.link-email {
-  font-size: 0.88rem;
-}
-.badge-estado {
-  padding: 3px 5px;
-  font-size: 0.88rem;
-}
-
-.fecha-inscripcion {
-  color: #6c757d;
-  font-size: 0.88rem;
-}
-
-/* Increase sizes for estado, estado-inscripcion, curso/plan and fecha */
-
-.tabla-estudiantes th.col-estado-activo,
-.tabla-estudiantes th.col-estado-inscripcion,
-.tabla-estudiantes th.col-plan,
-.tabla-estudiantes th.col-modalidad,
-.tabla-estudiantes th.col-fecha {
-  font-size: 0.88rem;
-}
-
-.plan-info {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-/* Improve stacked layout readability on small screens */
-@media (max-width: 900px) {
-  .tabla-estudiantes td,
-  .tabla-estudiantes td * {
-    font-size: 1.05rem;
-  }
-  .tabla-estudiantes td:before {
-    font-size: 0.98rem;
-    font-weight: 700;
-    flex-basis: 40%;
-  }
-  .acciones-contenedor .accion-boton {
-    width: 25px !important;
-    height: 25px !important;
-  }
-}
-
-.col-acciones {
-  min-width: 80px;
-  width: 1%;
-  text-align: center;
-  white-space: nowrap;
-  padding-right: 0;
-  padding-left: 0;
-}
+/* MEDIA QUERIES DE TABLA MOVIDAS A tablaEstudiantes.css */
 
 /* Elementos de tabla */
 .id-badge {
@@ -977,31 +891,7 @@
   text-transform: capitalize;
 }
 
-/* Estilos para componentes pequeños */
-
-/* Botones de filtro más pequeños */
-.btn-filtro-small {
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  border-radius: 4px;
-  border: 1px solid #dee2e6;
-  background: white;
-  color: #495057;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
-}
-
-.btn-filtro-small:hover {
-  background: #f8f9fa;
-  border-color: #007bff;
-}
-
-.btn-filtro-small.activo {
-  background: #007bff;
-  color: white;
-  border-color: #007bff;
-}
+/* Estilos para componentes pequeños - botones ya unificados arriba */
 
 /* Paginación profesional compacta */
 .seccion-paginacion-profesional {
@@ -1064,13 +954,15 @@
 }
 
 /* Resumen final compacto (compacto y más discreto) */
-/*.resumen-final-compacto {
+.resumen-final-compacto {
   margin: 5px 0 6px 0;
   padding: 5px 8px;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   border-radius: 8px;
   border: 1px solid #dee2e6;
-}*/
+}
+
+/* Fin de resumen-final-compacto */
 
 .estadisticas-grid {
   display: grid;
@@ -1130,42 +1022,7 @@
   margin: 0;
 }
 
-.select-estado-inscripcion {
-  padding: 6px 10px;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  background: white;
-  color: #212529 !important;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-  min-width: 150px;
-  font-weight: 500;
-  height: 40px;
-  box-sizing: border-box;
-}
-
-.select-estado-inscripcion:hover {
-  border-color: #007bff;
-}
-
-.select-estado-inscripcion:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.select-estado-inscripcion option {
-  padding: 8px;
-  background: white;
-  color: #212529 !important;
-  font-weight: 500;
-}
-
-.select-estado-inscripcion option:checked {
-  background: #007bff;
-  color: white !important;
-}
+/* Select estado - estilos ya unificados arriba */
 
 .plan-info {
   color: #495057;
@@ -1234,7 +1091,8 @@
 }
 
 .btn-accion-ver {
-  background: #17a2b8; /* match comprobante by default but can be differentiated */
+  background: #17a2b8;
+  /* match comprobante by default but can be differentiated */
   color: white;
   border: none;
 }
@@ -1275,78 +1133,7 @@
   display: none;
 }
 
-/* Responsive table: stacked rows on small screens */
-@media (max-width: 900px) {
-  .tabla-estudiantes thead {
-    display: none;
-  }
-  .tabla-estudiantes th {
-    background: #f8f9fa;
-    padding: 12px 8px;
-    text-align: left;
-    font-weight: 600;
-    color: #495057;
-    border-bottom: 2px solid #dee2e6;
-    white-space: nowrap;
-    /* Keep header visible when scrolling. Adjust `top` if your page has a fixed navbar. */
-    position: sticky;
-    top: 112px; /* tweak this value if a fixed navbar or header overlaps the table header */
-    z-index: 120; /* ensure it sits above other controls */
-    /* ensure solid background when sticking */
-    -webkit-backdrop-filter: none; /* Safari/iOS prefix for compatibility */
-    backdrop-filter: none;
-  }
-  .tabla-estudiantes td {
-    padding: 8px 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: none;
-  }
-  .tabla-estudiantes td:before {
-    content: attr(data-label);
-    color: #6c757d;
-    font-weight: 600;
-    margin-right: 12px;
-    flex: 0 0 45%;
-  }
-  .tabla-estudiantes td .id-badge,
-  .tabla-estudiantes td .modalidad-tag,
-  .tabla-estudiantes td .plan-info {
-    text-align: right;
-  }
-  .col-acciones {
-    display: flex;
-    justify-content: flex-end;
-  }
-  .acciones-contenedor {
-    gap: 2px;
-  }
-}
-
-@media (max-width: 600px) {
-  /* tighten stacked layout for small phones */
-  .tabla-estudiantes tr {
-    padding: 8px;
-  }
-  .tabla-estudiantes td:before {
-    flex-basis: 50%;
-    font-size: 0.85rem;
-  }
-
-  /* Make comprobante icon larger and label smaller on medium screens */
-  .btn-accion-comprobante .accion-ico {
-    font-size: 1.6rem;
-  }
-  .btn-accion-comprobante .accion-label {
-    font-size: 0.68rem;
-  }
-
-  /* Mobile: slightly larger icons for touch friendliness */
-  .accion-boton .accion-ico {
-    font-size: 0.8rem;
-  }
-}
+/* RESPONSIVE TABLA MOVIDO A tablaEstudiantes.css */
 
 /* Increase icon size on desktop/tablet for better visibility */
 .accion-boton .accion-ico {
@@ -1381,6 +1168,7 @@
   padding: 0;
   margin: 0;
 }
+
 .acciones-contenedor .accion-boton,
 .acciones-contenedor .btn-accion-comprobante,
 .acciones-contenedor .btn-accion-ver,
@@ -1388,11 +1176,16 @@
   margin: 0 1px;
   display: inline-flex;
   flex-shrink: 0;
+  /* Commented fixed small-button sizing so component-specific rules
+     (eg. tablaEstudiantesLimpio.css) can control icon/button dimensions
+     without being overridden by this generic stylesheet. If you need
+     a global icon-only style, re-enable and remove !important flags.
+  
   min-width: 28px !important;
   width: 28px !important;
   height: 28px !important;
   padding: 0 !important;
-  border-radius: 50% !important;
+  border-radius: 50% !important; */
 }
 
 .acciones-contenedor button {
@@ -1405,6 +1198,7 @@
 .accion-boton .accion-ico {
   font-size: 1.1rem !important;
 }
+
 .accion-boton .accion-label {
   display: none !important;
 }
@@ -1512,46 +1306,7 @@
   background: #218838;
 }
 
-/* Paginación */
-.seccion-paginacion {
-  background: white;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.paginacion-controles {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  min-height: 0;
-}
-
-.btn-paginacion {
-  padding: 6px 12px;
-  border: 1px solid #007bff;
-  border-radius: 5px;
-  background: white;
-  color: #007bff;
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  min-width: 80px;
-}
-
-.btn-paginacion:hover:not(:disabled) {
-  background: #007bff;
-  color: white;
-}
-
-.btn-paginacion:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+/* Paginación - estilos ya definidos arriba */
 
 .info-paginacion {
   display: flex;
@@ -1747,6 +1502,7 @@
   .lista-titulo {
     font-size: 1.45rem;
   }
+
   .controls-right .buscador-dni-input-group {
     max-width: 420px;
     min-width: 220px;
@@ -1757,15 +1513,205 @@
   .lista-titulo {
     font-size: 1.3rem;
   }
+
   .controls-row {
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
   }
+
   .controls-left {
     justify-content: flex-start;
   }
+
   .controls-right {
     justify-content: flex-start;
+  }
+}
+
+/* ========================================
+   RESPONSIVE STYLES FOR LISTAESTUDIANTES
+   ======================================== */
+
+/* Controls row layout */
+.controls-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.controls-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.controls-right {
+  display: flex;
+  align-items: center;
+  min-width: 280px;
+}
+
+/* Panel controles layout */
+.panel-controles {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.grupo-filtros-estado {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.grupo-select-estado {
+  display: flex;
+  align-items: center;
+}
+
+/* Select estado - estilos ya unificados arriba */
+
+/* Container responsive adjustments */
+.lista-estudiantes-container {
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Tablet breakpoint (768px - 900px) */
+@media (max-width: 900px) {
+  .lista-estudiantes-container {
+    padding: 16px;
+    margin: 16px auto;
+    width: calc(100% - 32px);
+  }
+
+  .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .controls-left {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .controls-right {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .panel-controles {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .grupo-filtros-estado {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .grupo-filtros-estado .btn-filtro-small {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .grupo-select-estado {
+    width: 100%;
+  }
+
+  .select-estado-inscripcion {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .btn-ver-reportes {
+    width: 100%;
+  }
+
+  .fila-titulo-cerrar {
+    padding: 14px 18px 8px 18px;
+  }
+
+  .lista-titulo {
+    font-size: 1.3rem;
+  }
+}
+
+/* Mobile breakpoint (max 600px) */
+@media (max-width: 600px) {
+  .lista-estudiantes-container {
+    padding: 12px;
+    margin: 12px auto;
+    width: calc(100% - 24px);
+  }
+
+  .fila-titulo-cerrar {
+    padding: 12px 14px 6px 14px;
+  }
+
+  .lista-titulo {
+    font-size: 1.1rem;
+  }
+
+  .controls-row {
+    gap: 10px;
+  }
+
+  .controls-left {
+    gap: 8px;
+  }
+
+  .btn-ver-reportes,
+  .btn-filtro-small {
+    font-size: 0.85rem;
+    height: 36px;
+    padding: 0 10px;
+  }
+
+  .select-estado-inscripcion {
+    font-size: 0.85rem;
+    height: 36px;
+  }
+
+  .grupo-filtros-estado {
+    gap: 4px;
+  }
+}
+
+/* Extra small mobile (max 400px) */
+@media (max-width: 400px) {
+  .lista-estudiantes-container {
+    padding: 10px;
+    margin: 10px auto;
+    width: calc(100% - 20px);
+  }
+
+  .lista-titulo {
+    font-size: 1rem;
+  }
+
+  .btn-ver-reportes,
+  .btn-filtro-small {
+    font-size: 0.8rem;
+    height: 34px;
+    padding: 0 8px;
+  }
+
+  .select-estado-inscripcion {
+    font-size: 0.8rem;
+    height: 34px;
   }
 }

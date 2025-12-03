@@ -6,6 +6,7 @@ import { useUserContext } from "../context/useUserContext";
 import { useAlerts } from '../hooks/useAlerts';
 import BotonCargando from '../components/BotonCargando';
 import AlertaMens from '../components/AlertaMens';
+import Captcha from '../components/Captcha';
 import { useForm } from "react-hook-form";
 import Input from '../components/Input';
 import serviceUsuario from '../services/serviceUsuario';
@@ -15,6 +16,7 @@ import { loginValidationSchema } from '../validaciones/ValidacionSchemaYup';
 const LoginButton = ({ onClose, onRegisterClick }) => {
     const { register, handleSubmit, formState: { errors } } = useForm({ resolver: yupResolver(loginValidationSchema) });
     const [loading, setLoading] = useState(false);
+    const [captchaValid, setCaptchaValid] = useState(false);
     const { 
         alerts, 
         modal, 
@@ -26,7 +28,6 @@ const LoginButton = ({ onClose, onRegisterClick }) => {
     const { setUser } = useUserContext();
     const navigate = useNavigate();
 
-    // Funciones de alerta now provided by useAlerts hook
     const mostrarAlerta = (text, variant) => {
         switch (variant) {
             case 'success':
@@ -41,35 +42,38 @@ const LoginButton = ({ onClose, onRegisterClick }) => {
     };
 
     const onSubmit = async (data) => {
+        // Validar captcha antes de enviar
+        if (!captchaValid) {
+            mostrarAlerta('Por favor, completa la verificación de seguridad', 'error');
+            return;
+        }
+
         setLoading(true);
         console.log("Form", data);
         try {
-            const response = await serviceUsuario.getUser(data);  // Pasa 'data' directamente
-            /*console.log("Respuesta completa del servidor:", response);*/
+            const response = await serviceUsuario.getUser(data);
             setTimeout(() => {
-            setLoading(false);
-            if (response?.token) { // Verifica si el token está presente en la respuesta
-                const { nombre, rol, email } = response.user; // Extraemos los datos relevantes
-                console.log(`Nombre: ${nombre}, Rol: ${rol}, Email: ${email}`);
-            
-                // Guarda el token en localStorage
-                localStorage.setItem('token', response.token);
-                console.log('Token guardado:', response.token);
+                setLoading(false);
+                if (response?.token) {
+                    const { nombre, rol, email } = response.user;
+                    console.log(`Nombre: ${nombre}, Rol: ${rol}, Email: ${email}`);
                 
-                // Actualizar el estado del usuario en el contexto
-                setUser({ nombre, rol, email });
+                    localStorage.setItem('token', response.token);
+                    console.log('Token guardado:', response.token);
+                    
+                    setUser({ nombre, rol, email });
 
-                mostrarAlerta(`Bienvenido, ${nombre}. Rol: ${rol}`, 'success');
-                console.log("Estado del usuario en el contexto:", { nombre, rol, email }); // Verificar el estado del usuario en el contexto
-                console.log('Redirigiendo al dashboard'); // Lo // Guardamos el usuario en el contexto
-                
-                setTimeout(() => {
-                    navigate('/dashboard'); // Redirige al dashboard después de 3 segundos
-                }, 3000);
-            } else {
-                mostrarAlerta(response?.message || 'Error en las credenciales', 'error');
-            }
-        }, 2000); // Retraso de 1 segundo
+                    mostrarAlerta(`Bienvenido, ${nombre}. Rol: ${rol}`, 'success');
+                    console.log("Estado del usuario en el contexto:", { nombre, rol, email });
+                    console.log('Redirigiendo al dashboard');
+                    
+                    setTimeout(() => {
+                        navigate('/dashboard');
+                    }, 3000);
+                } else {
+                    mostrarAlerta(response?.message || 'Error en las credenciales', 'error');
+                }
+            }, 2000);
         } catch (error) {
             mostrarAlerta(error.response?.data?.message || 'Error del servidor. Intenta nuevamente.', 'error');
             console.error('Error en login:', error);
@@ -81,7 +85,6 @@ const LoginButton = ({ onClose, onRegisterClick }) => {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="login-box">
-                    {/* Sistema de alertas unificado */}
                     <AlertaMens
                         mode="floating"
                         alerts={alerts}
@@ -93,14 +96,15 @@ const LoginButton = ({ onClose, onRegisterClick }) => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Input label="Email" placeholder="Email" registro={{ ...register("email") }} error={errors.email?.message} />
                         <Input label="Contraseña" placeholder="Password" type="password" registro={{ ...register("password") }} error={errors.password?.message} />
-                        <div className="button-container" style={{ justifyContent: 'flex-end' }}> {/* Alinea el botón a la derecha */}
-
+                        
+                        <Captcha onValidate={setCaptchaValid} />
+                        
+                        <div className="button-container" style={{ justifyContent: 'flex-end' }}>
                             <BotonCargando loading={loading} type="submit">
                                 Iniciar Sesión
                             </BotonCargando>
                         </div>
                         <p className="register-text">¿No tienes cuenta? 
-                            {/* Enlace para mostrar el modal de registro */}
                             <a href="#" onClick={(e) => { e.preventDefault(); onRegisterClick(); }} className="register-link">Regístrate</a>
                         </p>
                     </form>

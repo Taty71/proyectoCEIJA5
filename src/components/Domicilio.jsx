@@ -4,13 +4,13 @@ import PropTypes from 'prop-types';
 import AlertaMens from './AlertaMens';
 import FormatError from '../utils/MensajeError';
 import SpinnerCeiJa from './SpinnerCeiJa';
+import ubicacionesService from '../services/ubicacionesService';
 import '../estilos/ModalAgregarBarrio.css';
 
 export const Domicilio = ({ esAdmin = false }) => {
     const { values, setFieldValue } = useFormikContext();
     
-    // Estados para selects dinámicos (TODOS los usuarios los ven)
-    
+    // Estados para selects dinámicos
     const [provincias, setProvincias] = useState([]);
     const [localidades, setLocalidades] = useState([]);
     const [barrios, setBarrios] = useState([]);
@@ -21,29 +21,22 @@ export const Domicilio = ({ esAdmin = false }) => {
     const [guardandoBarrio, setGuardandoBarrio] = useState(false);
     const [alerta, setAlerta] = useState({ text: '', variant: '' });
 
-    const API_BASE = 'http://localhost:5000/api/ubicaciones';
-
     // Cargar provincias al montar el componente
     useEffect(() => {
         const cargarProvincias = async () => {
             try {
                 setLoading(true);
                 setError('');
-                const response = await fetch(`${API_BASE}/provincias`);
-                const data = await response.json();
-                
-                if (data.success && data.data) {
-                    setProvincias(data.data);
-                    
-                    // Si tenemos provincia pre-seleccionada desde registro pendiente, cargar localidades
-                    if (values.provincia && values.provincia !== '') {
-                        // Las localidades se cargarán automáticamente por el useEffect de provincia
-                    }
-                } else {
-                    setError('Error cargando provincias');
+                const data = await ubicacionesService.getProvincias();
+                setProvincias(data);
+
+                // Si hay una provincia preseleccionada, cargar localidades
+                if (values.provincia) {
+                    setFieldValue('localidad', '');
+                    setFieldValue('barrio', '');
                 }
             } catch (error) {
-                setError('Error de conexión con provincias');
+                setError('Error cargando provincias');
                 console.error('🚨 Error al cargar provincias:', error);
             } finally {
                 setLoading(false);
@@ -51,14 +44,7 @@ export const Domicilio = ({ esAdmin = false }) => {
         };
 
         cargarProvincias();
-    }, [values.provincia]);    
-    
-    // Efecto especial para manejar valores pre-cargados desde registros pendientes
-    useEffect(() => {
-        // Los barrios se cargarán automáticamente cuando sea necesario
-    }, [localidades, values.localidad]);
-    
-    // Los barrios se manejan automáticamente cuando se cargan
+    }, [values.provincia, setFieldValue]);
 
     // Cargar localidades cuando cambia la provincia
     useEffect(() => {
@@ -70,17 +56,10 @@ export const Domicilio = ({ esAdmin = false }) => {
 
             try {
                 setLoading(true);
-                
-                const response = await fetch(`${API_BASE}/localidades/${values.provincia}`);
-                const data = await response.json();
-                
-                if (data.success && data.data) {
-                    setLocalidades(data.data);
-                } else {
-                    setError('Error cargando localidades');
-                }
+                const data = await ubicacionesService.getLocalidadesByProvincia(values.provincia);
+                setLocalidades(data);
             } catch (error) {
-                setError('Error de conexión con localidades');
+                setError('Error cargando localidades');
                 console.error('🚨 Error al cargar localidades:', error);
             } finally {
                 setLoading(false);
@@ -88,14 +67,9 @@ export const Domicilio = ({ esAdmin = false }) => {
         };
 
         cargarLocalidades();
-        // Reset campos dependientes solo si no vienen de registro pendiente
-        if (!values.localidad || values.localidad === '') {
-            setFieldValue('localidad', '');
-        }
-        if (!values.barrio || values.barrio === '') {
-            setFieldValue('barrio', '');
-        }
-    }, [values.provincia, values.localidad, values.barrio, setFieldValue]);
+        setFieldValue('localidad', '');
+        setFieldValue('barrio', '');
+    }, [values.provincia, setFieldValue]);
 
     // Cargar barrios cuando cambia la localidad
     useEffect(() => {
@@ -107,18 +81,10 @@ export const Domicilio = ({ esAdmin = false }) => {
 
             try {
                 setLoading(true);
-                
-                const response = await fetch(`${API_BASE}/barrios/${values.localidad}`);
-                const data = await response.json();
-                
-                if (data.success && data.data) {
-                    setBarrios(data.data);
-                } else {
-                    setError('Error cargando barrios');
-                    console.error('❌ Error en barrios:', data);
-                }
+                const data = await ubicacionesService.getBarriosByLocalidad(values.localidad);
+                setBarrios(data);
             } catch (error) {
-                setError('Error de conexión con barrios');
+                setError('Error cargando barrios');
                 console.error('🚨 Error al cargar barrios:', error);
             } finally {
                 setLoading(false);
@@ -126,11 +92,8 @@ export const Domicilio = ({ esAdmin = false }) => {
         };
 
         cargarBarrios();
-        // Reset barrio solo si no viene de registro pendiente
-        if (!values.barrio || values.barrio === '') {
-            setFieldValue('barrio', '');
-        }
-    }, [values.localidad, values.barrio, setFieldValue]);
+        setFieldValue('barrio', '');
+    }, [values.localidad, setFieldValue]);
 
     const handleSelectChange = (e) => {
         const { name, value } = e.target;
@@ -171,42 +134,20 @@ export const Domicilio = ({ esAdmin = false }) => {
                 idLocalidad: values.localidad
             });
 
-            const response = await fetch(`${API_BASE}/barrios`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    nombre: nuevoBarrio.trim(),
-                    idLocalidad: values.localidad
-                })
-            });
+            const nuevo = await ubicacionesService.crearBarrio(nuevoBarrio.trim(), values.localidad);
 
-            const data = await response.json();
+            // Recargar la lista de barrios
+            const dataBarrios = await ubicacionesService.getBarriosByLocalidad(values.localidad);
+            setBarrios(dataBarrios);
+
+            // Seleccionar automáticamente el barrio recién creado
+            setFieldValue('barrio', nuevo.id);
+
+            console.log('✅ Barrio creado exitosamente:', nuevo);
+            setAlerta({ text: `Barrio "${nuevoBarrio}" creado exitosamente`, variant: 'success' });
             
-            if (data.success) {
-                // Recargar la lista de barrios
-                const responseBarrios = await fetch(`${API_BASE}/barrios/${values.localidad}`);
-                const dataBarrios = await responseBarrios.json();
-                
-                if (dataBarrios.success && dataBarrios.data) {
-                    setBarrios(dataBarrios.data);
-                    
-                    // Seleccionar automáticamente el barrio recién creado
-                    setFieldValue('barrio', data.data.id);
-                    
-                    console.log('✅ Barrio creado exitosamente:', data.data);
-                    setAlerta({ text: `Barrio "${nuevoBarrio}" creado exitosamente`, variant: 'success' });
-                    
-                    setShowModalBarrio(false);
-                    setNuevoBarrio('');
-                } else {
-                    throw new Error('Error al recargar lista de barrios');
-                }
-            } else {
-                throw new Error(data.message || 'Error al crear barrio');
-            }
-            
+            setShowModalBarrio(false);
+            setNuevoBarrio('');
         } catch (error) {
             console.error('❌ Error al crear barrio:', error);
             setAlerta({ text: `Error al crear barrio: ${FormatError(error)}`, variant: 'error' });
@@ -219,7 +160,7 @@ export const Domicilio = ({ esAdmin = false }) => {
         <div className="form-domicilio">
             <h3>
                 Domicilio {esAdmin ? '(Administrador)' : '(Usuario Web)'}
-                {loading && <span style={{color: 'blue', marginLeft: '10px'}}>⏳</span>}
+                {loading && <span style={{ color: 'blue', marginLeft: '10px' }}>⏳</span>}
             </h3>
             
             {error && (
@@ -277,7 +218,7 @@ export const Domicilio = ({ esAdmin = false }) => {
                         )}
                     </div>
                     <ErrorMessage name="provincia" component="div" className="error" />
-                    <small style={{color: 'gray'}}>
+                    <small style={{ color: 'gray' }}>
                         {provincias.length} provincias disponibles
                     </small>
                 </div>
@@ -313,7 +254,7 @@ export const Domicilio = ({ esAdmin = false }) => {
                         )}
                     </div>
                     <ErrorMessage name="localidad" component="div" className="error" />
-                    <small style={{color: 'gray'}}>
+                    <small style={{ color: 'gray' }}>
                         {localidades.length} localidades disponibles
                     </small>
                 </div>
@@ -350,7 +291,7 @@ export const Domicilio = ({ esAdmin = false }) => {
                     )}
                 </div>
                 <ErrorMessage name="barrio" component="div" className="error" />
-                <small style={{color: 'gray'}}>
+                <small style={{ color: 'gray' }}>
                     {barrios.length} barrios disponibles
                 </small>
             </div>

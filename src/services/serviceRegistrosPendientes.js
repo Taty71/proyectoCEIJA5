@@ -135,10 +135,12 @@ const registrosPendientesService = {
     },
 
     // Enviar notificación por email
-    enviarNotificacion: async (dni) => {
+    // acepta (dni, options) donde options puede incluir { nota, extensionExcepcion }
+    enviarNotificacion: async (dni, options = {}) => {
         try {
-            console.log(`📧 Enviando notificación por email para DNI: ${dni}`);
-            const { data: resultado } = await axiosInstance.post('/notificaciones/enviar-individual', { dni });
+            console.log(`📧 Enviando notificación por email para DNI: ${dni}`, options);
+            const body = Object.assign({ dni }, options || {});
+            const { data: resultado } = await axiosInstance.post('/notificaciones/enviar-individual', body);
             console.log('✅ Notificación enviada exitosamente');
             return resultado;
         } catch (error) {

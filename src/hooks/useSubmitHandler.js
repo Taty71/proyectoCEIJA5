@@ -172,7 +172,7 @@ export const useSubmitHandler = (files, previews, resetArchivos, buildDetalleDoc
                 console.log('📋 [DEBUG] FormData pendiente construido');
                 // Log del contenido del FormData
                 console.log('📋 [DEBUG] Contenido FormData:');
-                for (let [key, value] of formDataPendiente.entries()) {
+                for (const [key, value] of formDataPendiente.entries()) {
                     console.log(`   ${key}: ${value}`);
                 }
                 // Enviar al backend para guardar en Registros_Pendientes.json
@@ -366,6 +366,17 @@ export const useSubmitHandler = (files, previews, resetArchivos, buildDetalleDoc
             // Manejar respuesta (incluye lógica para casos de error de BD)
             await handleResponse(response, values, files, previews, accion, isWebUser, completarWebParam, resetForm, resetArchivos, modalidad, isAdmin, errorBD);
 
+            // ✅ AGREGAR SOLO ESTO: Retornar éxito para mostrar encuesta a usuarios web
+            if (isWebUser && !isAdmin && accion === 'Registrar' && !errorBD) {
+                console.log('🎉 [DEBUG] Registro web exitoso - Retornando success para encuesta');
+                return { 
+                    success: true, 
+                    message: '✅ ¡Registro realizado con éxito!' 
+                };
+            }
+
+            return { success: true };
+
         } catch (error) {
             console.error('❌ [DEBUG] Error completo en handleSubmit:', error);
             console.error('❌ [DEBUG] error.response:', error.response);
@@ -380,6 +391,7 @@ export const useSubmitHandler = (files, previews, resetArchivos, buildDetalleDoc
             }
             console.error('❌ [DEBUG] Mensaje final de error:', mensajeError);
             showError(`❌ Error: ${mensajeError}`);
+            return { success: false, error: mensajeError };
         } finally {
             setSubmitting(false);
         }

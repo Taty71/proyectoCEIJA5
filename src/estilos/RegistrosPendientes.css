@@ -1,4 +1,13 @@
 /* Estilos para el Gestor de Registros Web */
+.root-placeholder {
+}
+:root {
+  --color-bg-main: #ffffff;
+  --color-btn-main: #2d4177; /* Paleta institucional */
+  --color-dark: #313030;
+  --color-mid: #666666;
+  --color-accent: #3a3a5a;
+}
 .gestor-registros-web {
   position: fixed;
   top: 0;
@@ -27,7 +36,7 @@
 }
 
 .gestor-header {
-  background: linear-gradient(135deg, #2d4177 0%, #3d5aa7 100%);
+  background: linear-gradient(135deg, var(--color-btn-main) 0%, #1f2b50 100%);
   color: white;
   padding: 20px 25px;
   display: flex;
@@ -42,19 +51,54 @@
   font-weight: 600;
 }
 
+/* Close button used in Gestor: keep it compact like ListarEstudiantes */
+.cerrar-button,
+.gestor-header .cerrar-button {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: white;
+  font-size: 1.05rem;
+  cursor: pointer;
+  padding: 6px 8px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 140ms ease, transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.cerrar-button:hover:not(:disabled),
+.gestor-header .cerrar-button:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+/* Fallback selector for components that use english class name */
 .close-button {
   background: none;
   border: none;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.05rem;
   cursor: pointer;
-  padding: 5px;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
+  padding: 6px 8px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 140ms ease, transform 140ms ease,
+    box-shadow 140ms ease;
 }
 
-.close-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+.close-button:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
 }
 
 .gestor-content {
@@ -121,7 +165,7 @@
 }
 
 .refresh-button {
-  background: #28a745;
+  background: var(--color-btn-main);
   color: white;
   border: none;
   padding: 8px 15px;
@@ -135,7 +179,7 @@
 }
 
 .refresh-button:hover {
-  background: #218838;
+  background: #1f2b50;
 }
 
 /* Lista de registros */
@@ -209,49 +253,47 @@
 
 .estado-badge {
   padding: 4px 8px;
-  border-radius: 20px;
+  border-radius: 14px;
   font-size: 0.8rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.3px;
+  background: #ffffff;
+  color: var(--color-btn-main);
+  border: 1px solid rgba(45, 65, 119, 0.12);
+  box-shadow: 0 2px 6px rgba(45, 65, 119, 0.04);
 }
 
-.estado-pendiente {
-  background: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeaa7;
-}
-
-.estado-procesado {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
+/* Unified appearance for different states (keeps textual label but unified color) */
+.estado-pendiente,
+.estado-procesado,
 .estado-anulado {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background: #ffffff;
+  color: var(--color-btn-main);
+  border: 1px solid rgba(45, 65, 119, 0.08);
 }
 
 /* Botones de acción */
 .btn-procesar {
-  background: #007bff;
+  background: var(--color-btn-main);
   color: white;
   border: none;
   padding: 6px 12px;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.8rem;
-  transition: background-color 0.2s ease;
+  font-size: 0.85rem;
+  transition: transform 0.14s ease, box-shadow 0.14s ease,
+    background-color 0.14s ease;
+  box-shadow: 0 6px 18px rgba(45, 65, 119, 0.06);
 }
 
-.btn-procesar:hover {
-  background: #0056b3;
+.btn-procesar:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #1f2b50;
 }
 
 .btn-procesar:disabled {
-  background: #6c757d;
+  background: #adb5bd;
   cursor: not-allowed;
 }
 
@@ -283,6 +325,54 @@
 
 .btn-eliminar:hover {
   background: #5a6268;
+}
+
+/* Stronger unified hover/active/keyboard styles for action buttons */
+.gestor-modal-container .registro-acciones .btn-procesar,
+.gestor-modal-container .registro-acciones .btn-eliminar,
+.gestor-modal-container .registro-acciones .refresh-button {
+  transition: transform 160ms ease, box-shadow 160ms ease,
+    background-color 140ms ease, opacity 120ms ease;
+  will-change: transform, box-shadow;
+}
+
+.gestor-modal-container .registro-acciones .btn-procesar:hover:not(:disabled),
+.gestor-modal-container .registro-acciones .btn-eliminar:hover:not(:disabled),
+.gestor-modal-container
+  .registro-acciones
+  .refresh-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(31, 43, 80, 0.18);
+}
+
+.gestor-modal-container .registro-acciones .btn-procesar:active,
+.gestor-modal-container .registro-acciones .btn-eliminar:active,
+.gestor-modal-container .registro-acciones .refresh-button:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(31, 43, 80, 0.12);
+}
+
+/* Visible focus for keyboard users */
+.gestor-modal-container .registro-acciones .btn-procesar:focus-visible,
+.gestor-modal-container .registro-acciones .btn-eliminar:focus-visible,
+.gestor-modal-container .registro-acciones .refresh-button:focus-visible,
+.cerrar-button:focus-visible,
+.close-button:focus-visible {
+  outline: 3px solid rgba(45, 65, 119, 0.18);
+  outline-offset: 3px;
+}
+
+/* Ensure btn-eliminar uses unified grey/neutral look inside Gestor modal (higher specificity to override other rules) */
+.gestor-modal-container .registro-acciones .btn-eliminar {
+  background: #6c757d !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  box-shadow: 0 6px 18px rgba(31, 43, 80, 0.06) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.gestor-modal-container .registro-acciones .btn-eliminar:hover:not(:disabled) {
+  background: #5a6268 !important;
 }
 
 /* Estado sin registros */
@@ -536,4 +626,42 @@
   background: #adb5bd;
   cursor: not-allowed;
   transform: none;
+}
+
+/* Documentos - estilos usados por GestorRegistrosWeb para coincidir con Registros Pendientes */
+.registro-documentos {
+  margin-top: 8px;
+}
+.documentos-subidos,
+.documentos-faltantes {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-left: 4px solid var(--color-btn-main);
+  padding: 10px;
+  border-radius: 8px;
+}
+.registro-documentos ul {
+  margin: 5px 0 0 15px;
+  padding: 0;
+  font-size: 0.85rem;
+  color: var(--color-dark);
+}
+.doc-presentado {
+  color: var(--color-btn-main);
+  font-weight: 600;
+}
+.doc-nombre-archivo {
+  color: var(--color-mid);
+  margin-left: 6px;
+  font-size: 0.85rem;
+}
+.info-al-completar {
+  font-size: 0.8rem;
+  color: var(--color-btn-main);
+  margin-top: 5px;
+  font-style: italic;
+}
+.sin-documentos {
+  color: var(--color-mid);
+  font-size: 0.85rem;
 }

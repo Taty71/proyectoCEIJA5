@@ -3,176 +3,233 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro translúcido */
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
 }
 
-/* Estilos para el contenido del modal */
 .modal-content {
-  background-color: #313030;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 16px #ccc2c2;
-  max-width: 400px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
   width: 90%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  animation: slideDown 0.3s ease; /* Animación de aparición */
-}
-
-/* Nueva clase para el contenedor del modal */
-.modal-container {
-  background-color: #ffffff; /* Fondo blanco */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 90%;
-  max-width: 900px;
-  padding: 20px;
-}
-
-/* Estilos para la cabecera del modal */
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #666; /* Línea gris */
-  padding-bottom: 10px;
-  margin-bottom: 15px;
-}
-
-/* Estilos para el botón de cerrar del modal */
-.modal-close-btn {
-  background-color: #ffffff; /* Fondo blanco */
-  color: #2d4177; /* Azul oscuro */
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.modal-close-btn:hover {
-  background-color: #2d4177; /* Azul oscuro */
-  color: #ffffff; /* Texto blanco */
-}
-
-/* Estilos para la caja de registro */
-.login-box,
-.register-box {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Estilos específicos para los elementos del modal */
-.login-box label,
-.register-box label {
-  margin-top: 10px;
-  margin-bottom: 5px;
-  display: flex;
-  color: #ffff;
-  font-size: 1.1rem;
-}
-
-.button .clip-loader {
-  position: absolute;
-}
-.button {
-  color: #000;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-  width: auto;
-  margin-top: 10px;
-  margin-left: 260px;
-  padding: 10px;
-  transition: background-color 0.3s ease;
-  background-color: #ccc2c2;
-}
-
-.button:hover {
-  color: #2d4177;
-  background-color: #87ceeb;
-}
-.login-box input > span {
-  position: "relative";
-  top: "10px";
-  left: "350px";
-}
-
-.back-button {
+  max-height: 90vh;
+  overflow-y: auto;
   position: relative;
-  top: 10px;
-  right: -180px;
-  background: none;
-  border: none;
-  color: #ccc2c2;
-  font-size: 24px; /* Tamaño pequeño */
-  font-weight: bold;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-.back-button:hover {
-  color: #2d4177;
-  background: none;
-  border: none;
+  animation: modalFadeIn 0.3s ease;
 }
 
-/* Estilo para el enlace de registro */
+.modal-content-large {
+  max-width: 900px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-box {
+  padding: 2.5rem;
+  background: linear-gradient(135deg, #f8f8fc 0%, #ffffff 100%);
+  border-radius: 16px;
+  position: relative;
+}
+
+/* Unificación de tipografía y colores en modales */
+.login-box,
+.login-box * {
+  font-family: "Roboto Slab", serif;
+}
+
+/* Labels unificadas con color azul acento */
+.login-box label {
+  color: var(--color-acento);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+/* Inputs con placeholders grises */
+.login-box input,
+.login-box select {
+  font-size: 0.95rem;
+  font-family: "Roboto Slab", serif;
+}
+
+.login-box input::placeholder {
+  color: var(--color-texto-secundario);
+  font-size: 0.95rem;
+  font-family: "Roboto Slab", serif;
+}
+
+/* Botón de envío */
+.login-box button[type="submit"] {
+  font-family: "Roboto Slab", serif;
+  font-size: 0.95rem;
+}
+
+/* Texto de registro/login inferior */
 .register-text {
-  margin: 25px 5px;
-  font-size: 1rem;
-  color: #ccc2c2;
-  font-style: oblique;
+  text-align: center;
+  margin-top: 1.5rem;
+  color: var(--color-texto-secundario);
+  font-size: 0.95rem;
+  font-family: "Roboto Slab", serif;
 }
 
 .register-link {
-  color: #7db6cc;
+  color: var(--color-texto-secundario);
   text-decoration: none;
-  padding-left: 20px;
-  font-size: 1.3rem;
-  font-style: initial;
+  font-weight: 600;
+  margin-left: 0.3rem;
+  transition: color 0.2s;
+  font-family: "Roboto Slab", serif;
+  font-size: 0.95rem;
 }
 
 .register-link:hover {
-  color: #ffffff;
-  text-shadow: 1px 1px 10px #ccc2c2;
+  color: var(--color-acento);
+  text-decoration: underline;
 }
 
-@keyframes slideDown {
-  from {
-    transform: translateY(-20px);
-    opacity: 0;
+/* Grid de 2 columnas para registro */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Wrapper para select */
+.form-select-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  grid-column: 1 / -1;
+}
+
+.form-select-wrapper label {
+  color: var(--color-acento);
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: "Roboto Slab", serif;
+}
+
+.form-select {
+  font-family: "Roboto Slab", serif;
+  font-size: 0.95rem;
+  color: var(--color-texto-principal);
+}
+
+/* Sección del captcha */
+.captcha-section {
+  margin: 1.25rem 0;
+  padding: 1.25rem;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid var(--color-acento-claro);
+  box-shadow: 0 2px 8px rgba(45, 65, 119, 0.08);
+}
+
+/* Contenedor de botones */
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+}
+
+/* Mensajes de error */
+.error-message {
+  font-family: "Roboto Slab", serif;
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+  display: block;
+}
+
+/* Botón de retroceso */
+.back-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--color-acento) !important;
+  color: white !important;
+  border: 2px solid var(--color-acento-claro) !important;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(45, 65, 119, 0.2);
+}
+
+.back-button:hover {
+  background: var(--color-header) !important;
+  color: white !important;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(45, 65, 119, 0.3);
+}
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
-  to {
-    transform: translateY(0);
-    opacity: 1;
+
+  .modal-content-large {
+    max-width: 95%;
+  }
+
+  .login-box {
+    padding: 1.5rem;
   }
 }
 
-/* Ajustes responsivos */
-@media (max-width: 480px) {
-  .modal-content {
-    padding: 15px;
-  }
+/* Scrollbar personalizado */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
 
-  .login-box input {
-    font-size: 0.9rem;
-  }
-  .login-button,
-  .register-button,
-  .back-button {
-    font-size: 0.9rem;
-    padding: 8px;
-  }
-  .register-text {
-    font-size: 0.8rem;
-  }
+.modal-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--color-acento);
+  border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-header);
 }

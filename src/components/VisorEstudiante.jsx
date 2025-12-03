@@ -168,13 +168,25 @@ useEffect(() => {
             return;
         }
         // Validar planAnioId antes de enviar
-        let datos = {
+        // Construir datos SOLO con los campos que espera el backend de modificación
+        const datos = {
             ...formData,
-            planAnioId: formData.planAnioId && !isNaN(formData.planAnioId) ? Number(formData.planAnioId) : (estudiante.planAnioId ? Number(estudiante.planAnioId) : 1),
             modalidadId: formData.modalidadId && !isNaN(formData.modalidadId) ? Number(formData.modalidadId) : (estudiante.modalidadId ? Number(estudiante.modalidadId) : 1),
+            planAnioId: formData.planAnioId && !isNaN(formData.planAnioId) ? Number(formData.planAnioId) : (estudiante.planAnioId ? Number(estudiante.planAnioId) : 1),
             modulosId: formData.modulosId && !isNaN(formData.modulosId) ? Number(formData.modulosId) : (estudiante.modulosId ? Number(estudiante.modulosId) : ''),
             estadoInscripcionId: formData.estadoInscripcionId && !isNaN(formData.estadoInscripcionId) ? Number(formData.estadoInscripcionId) : (estudiante.estadoInscripcionId ? Number(estudiante.estadoInscripcionId) : 1),
         };
+        // Eliminar campos que NO espera el backend de modificación
+        delete datos.planAnio;
+        delete datos.idModulo;
+        delete datos.idEstadoInscripcion;
+        // Asegurar que detalleDocumentacion y archivos coincidan en nombre
+        if (datos.documentacion && Array.isArray(datos.documentacion)) {
+            datos.detalleDocumentacion = datos.documentacion.map(doc => ({
+                ...doc,
+                nombreArchivo: doc.nombreArchivo || doc.descripcionDocumentacion?.replace(/\s+/g, '')
+            }));
+        }
         
         console.log('📤 [ENVIANDO DATOS] Estudiante:', estudiante.nombre, estudiante.apellido, 'DNI:', estudiante.dni);
         console.log('📤 [ENVIANDO DATOS] Estado inscripción:', {

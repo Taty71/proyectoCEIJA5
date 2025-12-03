@@ -34,7 +34,7 @@ const GestionEstudiante = ({ modalidad, accion, isAdmin, completarRegistro, isWe
     // Wrapper para el handleSubmit que incluye los parámetros específicos del componente
     const handleSubmit = async (values, formikBag) => {
         // El useSubmitHandler ya maneja todos los mensajes a través del sistema unificado de alertas
-        await handleSubmitForm(
+        const result = await handleSubmitForm(
             values, 
             formikBag, 
             accion, 
@@ -43,6 +43,8 @@ const GestionEstudiante = ({ modalidad, accion, isAdmin, completarRegistro, isWe
             completarWebParam, 
             modalidad
         );
+
+        return result; // Devolver el resultado para que RegistroEstd.jsx lo detecte
     };
 
     // Función simplificada para manejo de archivos - usar solo useGestionDocumentacion

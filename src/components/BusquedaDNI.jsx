@@ -140,7 +140,7 @@ const BusquedaDNI = ({
                             />
                         </div>
                         <div className="button-group-uniforme">
-                            <BotonCargando loading={loading} className="btn-uniforme btn-primary-uniforme">
+                            <BotonCargando loading={loading} className="btn-uniforme btn-primary-uniforme" type="submit">
                                 {modoEliminacion ? "Buscar para Eliminar" : 
                                  modoModificacion ? "Buscar para Modificar" : 
                                  "Buscar"}

@@ -5,13 +5,13 @@ import registrosPendientesService from '../services/serviceRegistrosPendientes';
 import { enriquecerRegistroProcesado } from '../services/serviceVerificarEstudiante';
 import { useAlerts } from '../hooks/useAlerts';
 import jsPDF from 'jspdf';
+import { exportarExcel } from './ListaEstudiantes/reportes/utils';
 import AlertaMens from './AlertaMens';
 import HeaderModal from './registrosPendientes/HeaderModal';
 import ListaRegistrosPendientes from './registrosPendientes/ListaRegistrosPendientes';
-import SeccionEmails from './registrosPendientes/SeccionEmails';
-import SeccionDescargas from './registrosPendientes/SeccionDescargas';
-import SeccionDuplicados from './registrosPendientes/SeccionDuplicados';
+// Secciones removidas: no se usan en este componente directo
 import ModalEditarRegistro from './registrosPendientes/ModalEditarRegistro';
+import ModalFooter from './registrosPendientes/ModalFooter';
 
 import '../estilos/modalM.css';
 import '../estilos/botones.css';
@@ -21,12 +21,12 @@ const ModalRegistrosPendientes = ({ onClose }) => {
     const { showSuccess, showError, showWarning, showInfo, alerts, removeAlert, modal, closeModal, clearAlerts } = useAlerts();
     // Eliminar estado local de alerta, usar solo sistema global
     const [registros, setRegistros] = useState([]);
-    const [mensajeEmail, setMensajeEmail] = useState('');
+    const [_mensajeEmail, setMensajeEmail] = useState('');
     const [enviandoEmail, setEnviandoEmail] = useState(false);
-    const [descargando, setDescargando] = useState(false);
+    const [_descargando, setDescargando] = useState(false);
     const [estadoDuplicados, setEstadoDuplicados] = useState(null);
     const [cargandoRegistros, setCargandoRegistros] = useState(false);
-    const [limpiandoDuplicados, setLimpiandoDuplicados] = useState(false);
+    const [_limpiandoDuplicados, setLimpiandoDuplicados] = useState(false);
     const [registroEditando, setRegistroEditando] = useState(null);
     const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);
     // Estado eliminado: estudiantesRegistrados (no es necesario, usamos estudianteEnBD del registro enriquecido)
@@ -220,15 +220,13 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         if (registro.vencimiento) {
             const info = registro.vencimiento;
             return {
-                vencido: info.tipoNotificacion === 'vencido',
-                diasRestantes: info.diasRestantes || 0,
-                mensaje: info.mensaje || 'Sin información',
-                color: info.tipoNotificacion === 'vencido' ? '#dc3545' : 
-                       info.diasRestantes <= 1 ? '#dc3545' : 
-                       info.diasRestantes <= 3 ? '#ffc107' : '#28a745',
-                fechaVencimiento: info.fechaVencimiento || 'No disponible',
-                puedeReiniciarAlarma: info.puedeReiniciarAlarma || false
-            };
+                    vencido: info.tipoNotificacion === 'vencido',
+                    diasRestantes: info.diasRestantes || 0,
+                    mensaje: info.mensaje || 'Sin información',
+                    color: 'var(--color-btn-main)',
+                    fechaVencimiento: info.fechaVencimiento || 'No disponible',
+                    puedeReiniciarAlarma: info.puedeReiniciarAlarma || false
+                };
         }
 
         // Fallback: lógica original para registros sin información de vencimiento del backend
@@ -242,7 +240,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                 vencido: true, 
                 diasRestantes: 0, 
                 mensaje: 'VENCIDO', 
-                color: '#dc3545',
+                color: 'var(--color-btn-main)',
                 fechaVencimiento: vencimiento.toLocaleString(),
                 puedeReiniciarAlarma: true
             };
@@ -254,16 +252,16 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         let mensaje, color;
         if (diasRestantes > 3) {
             mensaje = `${diasRestantes} días restantes`;
-            color = '#28a745';
+            color = 'var(--color-btn-main)';
         } else if (diasRestantes > 1) {
             mensaje = `${diasRestantes} días restantes`;
-            color = '#ffc107';
+            color = 'var(--color-btn-main)';
         } else if (diasRestantes === 1) {
             mensaje = `1 día restante`;
-            color = '#fd7e14';
+            color = 'var(--color-btn-main)';
         } else {
             mensaje = `${horasRestantes}h restantes`;
-            color = '#dc3545';
+            color = 'var(--color-btn-main)';
         }
 
         return {
@@ -339,7 +337,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
 
                 // Mostrar información adicional sobre el resultado si está disponible
                 if (resultado && (resultado.insertId || resultado.insertId === 0)) {
-                    let infoAdicional = [];
+                    const infoAdicional = [];
                     infoAdicional.push(`ID: ${resultado.insertId}`);
                     
                     if (resultado.archivos) {
@@ -430,7 +428,39 @@ const ModalRegistrosPendientes = ({ onClose }) => {
             
             // El backend devuelve un objeto con 'mensaje' si es exitoso
             if (resultado && resultado.mensaje === 'Alarma reiniciada exitosamente') {
-                // Recargar registros para mostrar la nueva fecha de vencimiento
+                // Marcar localmente y persistir autorización de extensión y estado de alarma
+                const fechaReinicioISO = new Date().toISOString();
+                try {
+                    await registrosPendientesService.actualizarRegistroPendiente(registro.dni, {
+                        alarmaReiniciada: true,
+                        autorizacionExtension: true,
+                        fechaReinicio: fechaReinicioISO,
+                        motivoExtension: motivo,
+                        diasExtension: diasExtension,
+                        // añadir historial de extensiones si backend lo soporta
+                    });
+                } catch (errUpdate) {
+                    console.warn('⚠️ No se pudo persistir campos de extensión, se mantendrán localmente:', errUpdate.message);
+                }
+
+                // Actualizar estado local inmediato para reflejar cambios en UI
+                setRegistros(prev => prev.map(r => {
+                    const dniR = r.datos?.dni || r.dni;
+                    if (dniR === (registro.datos?.dni || registro.dni)) {
+                        const nuevo = Object.assign({}, r, {
+                            alarmaReiniciada: true,
+                            autorizacionExtension: true,
+                            fechaReinicio: fechaReinicioISO,
+                            motivoExtension: motivo,
+                            diasExtension: diasExtension,
+                            historialExtensiones: Array.isArray(r.historialExtensiones) ? [...r.historialExtensiones, { fecha: fechaReinicioISO, dias: diasExtension, motivo, usuario: 'admin' }] : [{ fecha: fechaReinicioISO, dias: diasExtension, motivo, usuario: 'admin' }]
+                        });
+                        return nuevo;
+                    }
+                    return r;
+                }));
+
+                // Recargar registros para sincronizar con backend
                 await recargarRegistros(false);
                 showSuccess(`✅ Alarma reiniciada: ${nombreCompleto} tiene ${diasExtension} días adicionales`);
             } else {
@@ -463,13 +493,20 @@ const ModalRegistrosPendientes = ({ onClose }) => {
             setEnviandoEmail(true);
             setMensajeEmail(`📧 Enviando notificación a ${nombreCompleto}...`);
 
-            const resultado = await registrosPendientesService.enviarNotificacion(registro.dni);
+            // Si el registro tiene alarma reiniciada/autorización, agregar nota para el email
+            const opcionesEnvio = {};
+            if (registro.alarmaReiniciada || registro.autorizacionExtension) {
+                opcionesEnvio.extensionExcepcion = true;
+                opcionesEnvio.nota = 'Extensión por excepción de gestión directiva';
+            }
 
-            if (resultado.success) {
+            const resultado = await registrosPendientesService.enviarNotificacion(registro.dni, opcionesEnvio);
+
+            if (resultado && resultado.success) {
                 setMensajeEmail(`✅ Email enviado exitosamente a ${nombreCompleto} (${email})`);
                 setTimeout(() => setMensajeEmail(''), 3000);
             } else {
-                setMensajeEmail(`❌ Error: ${resultado.message}`);
+                setMensajeEmail(`❌ Error: ${resultado?.message || 'Error desconocido'}`);
                 setTimeout(() => setMensajeEmail(''), 5000);
             }
 
@@ -755,11 +792,14 @@ const ModalRegistrosPendientes = ({ onClose }) => {
     };
 
     // Funciones para descargas
+    // Reportes: TXT, PDF, CSV
     const generarReporteAdministrativo = () => {
         try {
             setDescargando(true);
-            
-            let contenido = `REPORTE ADMINISTRATIVO - REGISTROS PENDIENTES DE DOCUMENTACIÓN\n`;
+            // Encabezado institucional
+            let contenido = `CEIJA5 LA CALERA CBA\n`;
+            contenido += `Educacion Integral para Jovenes y Adultos\n`;
+            contenido += `REPORTE ADMINISTRATIVO - REGISTROS PENDIENTES DE DOCUMENTACIÓN\n`;
             contenido += `Fecha de generación: ${new Date().toLocaleString('es-AR')}\n`;
             contenido += `Total de registros: ${registros.length}\n`;
             contenido += `${'='.repeat(80)}\n\n`;
@@ -825,37 +865,77 @@ const ModalRegistrosPendientes = ({ onClose }) => {
             const doc = new jsPDF();
             const pageWidth = doc.internal.pageSize.width;
             const margin = 20;
-            let yPosition = 30;
-            
-            // Encabezado
+            let yPosition = 20;
+            // Encabezado institucional azul oscuro y negrita
+            doc.setTextColor(45, 65, 119);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('CEIJA5 LA CALERA CBA', pageWidth / 2, yPosition, { align: 'center' });
+            yPosition += 8;
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Educacion Integral para Jovenes y Adultos', pageWidth / 2, yPosition, { align: 'center' });
+            yPosition += 8;
+            // Encabezado de reporte
             doc.setFontSize(16);
             doc.setFont('helvetica', 'bold');
+            doc.setTextColor(45, 65, 119);
             doc.text('REPORTE DE REGISTROS PENDIENTES', pageWidth / 2, yPosition, { align: 'center' });
-            
             yPosition += 10;
             doc.setFontSize(10);
             doc.setFont('helvetica', 'normal');
+            doc.setTextColor(0, 0, 0);
             doc.text(`Fecha: ${new Date().toLocaleString('es-AR')}`, pageWidth / 2, yPosition, { align: 'center' });
             doc.text(`Total: ${registros.length} registros`, pageWidth / 2, yPosition + 5, { align: 'center' });
-            
             yPosition += 20;
-            
-            // Tabla de registros
+
+            // Pie de página y paginación
+            let pageNum = 1;
+            const addFooter = (pageNum) => {
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                const footerText = `Reporte CEIJA5 Educativa`;
+                const pageText = `Página ${pageNum}`;
+                const yFooter = doc.internal.pageSize.height - 10;
+                doc.text(footerText, margin, yFooter, { align: 'left' });
+                doc.text(pageText, pageWidth - margin, yFooter, { align: 'right' });
+            };
+
             registros.forEach((registro, index) => {
                 if (yPosition > 200) {
+                    addFooter(pageNum);
                     doc.addPage();
-                    yPosition = 30;
+                    pageNum++;
+                    yPosition = 20;
+                    // Repetir encabezado en cada página (azul y negrita)
+                    doc.setTextColor(45, 65, 119);
+                    doc.setFontSize(14);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('CEIJA5 LA CALERA CBA', pageWidth / 2, yPosition, { align: 'center' });
+                    yPosition += 8;
+                    doc.setFontSize(11);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Educacion Integral para Jovenes y Adultos', pageWidth / 2, yPosition, { align: 'center' });
+                    yPosition += 8;
+                    doc.setFontSize(16);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(45, 65, 119);
+                    doc.text('REPORTE DE REGISTROS PENDIENTES', pageWidth / 2, yPosition, { align: 'center' });
+                    yPosition += 10;
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(`Fecha: ${new Date().toLocaleString('es-AR')}`, pageWidth / 2, yPosition, { align: 'center' });
+                    doc.text(`Total: ${registros.length} registros`, pageWidth / 2, yPosition + 5, { align: 'center' });
+                    yPosition += 20;
                 }
-                
                 const info = obtenerInfoVencimiento(registro);
                 const estadoDoc = obtenerEstadoDocumentacion(registro);
                 const nombre = `${registro.datos?.nombre || registro.nombre} ${registro.datos?.apellido || registro.apellido}`;
-                
                 // Número y nombre
                 doc.setFont('helvetica', 'bold');
                 doc.text(`${index + 1}. ${nombre}`, margin, yPosition);
                 yPosition += 7;
-                
                 // Información básica
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(8);
@@ -864,36 +944,30 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                 doc.text(`Modalidad: ${registro.datos?.modalidad || registro.modalidad}`, margin + 5, yPosition + 6);
                 doc.text(`Estado: ${info.vencido ? 'VENCIDO' : info.mensaje}`, margin + 5, yPosition + 9);
                 doc.text(`Fecha: ${new Date(registro.timestamp).toLocaleDateString('es-AR')}`, margin + 5, yPosition + 12);
-                
                 yPosition += 18;
-                
                 // Información de documentación
                 doc.setFont('helvetica', 'bold');
                 doc.text(`Documentación: ${estadoDoc.totalSubidos}/${estadoDoc.totalRequeridos} (${estadoDoc.porcentajeCompletado}%)`, margin + 5, yPosition);
                 yPosition += 4;
-                
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(7);
-                
                 if (estadoDoc.subidos.length > 0) {
                     doc.text('Presentados: ' + estadoDoc.subidos.join(', '), margin + 5, yPosition, { maxWidth: pageWidth - 2 * margin });
                     yPosition += 3;
                 }
-                
                 if (estadoDoc.faltantes.length > 0) {
                     doc.text('Faltantes: ' + estadoDoc.faltantes.join(', '), margin + 5, yPosition, { maxWidth: pageWidth - 2 * margin });
                     yPosition += 3;
                 }
-                
                 if (estadoDoc.documentoUsado) {
                     doc.text(`Especial: ${estadoDoc.documentoUsado}`, margin + 5, yPosition);
                     yPosition += 3;
                 }
-                
                 yPosition += 8;
                 doc.setFontSize(10);
             });
-            
+            // Pie de página en la última página
+            addFooter(pageNum);
             // Descargar PDF
             doc.save(`reporte-registros-pendientes-${new Date().toISOString().split('T')[0]}.pdf`);
             
@@ -905,69 +979,109 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         }
     };
 
-    const generarReporteCSV = () => {
+    // Reporte Excel real y legible
+    const generarReporteExcel = () => {
         try {
             setDescargando(true);
-            
+            // Encabezado y datos
             const headers = [
-                'Nombre', 'Apellido', 'DNI', 'Email', 'Modalidad', 'Estado', 'Días Restantes', 
-                'Fecha Registro', 'Docs Presentados', 'Docs Requeridos', '% Completado', 
+                'Nombre', 'Apellido', 'DNI', 'Email', 'Modalidad', 'Estado', 'Días Restantes',
+                'Fecha Registro', 'Docs Presentados', 'Docs Requeridos', '% Completado',
                 'Documentos Subidos', 'Documentos Faltantes', 'Documento Especial'
             ];
-            let csv = headers.join(',') + '\n';
-
-            registros.forEach(registro => {
+            const datos = registros.map(registro => {
                 const info = obtenerInfoVencimiento(registro);
                 const estadoDoc = obtenerEstadoDocumentacion(registro);
-                const fila = [
-                    `"${registro.datos?.nombre || registro.nombre}"`,
-                    `"${registro.datos?.apellido || registro.apellido}"`,
-                    `"${registro.datos?.dni || registro.dni}"`,
-                    `"${registro.datos?.email || registro.email || 'Sin email'}"`,
-                    `"${registro.datos?.modalidad || registro.modalidad}"`,
-                    `"${info.vencido ? 'VENCIDO' : 'VIGENTE'}"`,
-                    `"${info.diasRestantes}"`,
-                    `"${new Date(registro.timestamp).toLocaleString('es-AR')}"`,
-                    `"${estadoDoc.totalSubidos}"`,
-                    `"${estadoDoc.totalRequeridos}"`,
-                    `"${estadoDoc.porcentajeCompletado}%"`,
-                    `"${estadoDoc.subidos.join('; ')}"`,
-                    `"${estadoDoc.faltantes.join('; ')}"`,
-                    `"${estadoDoc.documentoUsado || ''}"`
+                return [
+                    registro.datos?.nombre || registro.nombre,
+                    registro.datos?.apellido || registro.apellido,
+                    registro.datos?.dni || registro.dni,
+                    registro.datos?.email || registro.email || 'Sin email',
+                    registro.datos?.modalidad || registro.modalidad,
+                    info.vencido ? 'VENCIDO' : 'VIGENTE',
+                    info.diasRestantes,
+                    new Date(registro.timestamp).toLocaleString('es-AR'),
+                    estadoDoc.totalSubidos,
+                    estadoDoc.totalRequeridos,
+                    `${estadoDoc.porcentajeCompletado}%`,
+                    estadoDoc.subidos.join('; '),
+                    estadoDoc.faltantes.join('; '),
+                    estadoDoc.documentoUsado || ''
                 ];
-                csv += fila.join(',') + '\n';
             });
-
-            const BOM = '\uFEFF';
-            const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `registros-pendientes-${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-            URL.revokeObjectURL(url);
-            
-            showSuccess('📄 Archivo CSV descargado');
+            // Dos renglones libres antes del encabezado
+            const datosFinal = [[], [], headers, ...datos];
+            exportarExcel(
+                datosFinal,
+                'registros-pendientes',
+                'REPORTE DE REGISTROS PENDIENTES'
+            );
+            showSuccess('📊 Archivo Excel generado');
         } catch (error) {
-            showError(`Error al generar CSV: ${error.message}`);
+            showError(`Error al generar Excel: ${error.message}`);
         } finally {
             setDescargando(false);
         }
     };
 
-    const descargarJSON = () => {
+    // Generar PDF de "Extensión Inscripción" — estudiantes con permiso de reinicio de alarma
+    const handleExtensionInscripcion = () => {
         try {
-            const dataStr = JSON.stringify(registros, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `registros-pendientes-${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-            URL.revokeObjectURL(url);
-            showSuccess('📄 Archivo JSON descargado');
+            // Seleccionar únicamente los registros que tengan la alarma reiniciada o autorización explícita
+            const seleccion = registros.filter(r => r && (r.alarmaReiniciada === true || r.autorizacionExtension === true));
+
+            if (!seleccion || seleccion.length === 0) {
+                showInfo('ℹ️ No hay estudiantes con alarma reiniciada/autorización para generar la extensión.');
+                return;
+            }
+
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.width;
+            const margin = 20;
+            let y = 20;
+
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(45,65,119);
+            doc.text('EXTENSIÓN DE INSCRIPCIÓN - Alumnos con reinicio de alarma', pageWidth / 2, y, { align: 'center' });
+            y += 10;
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Generado: ${new Date().toLocaleString('es-AR')}`, margin, y);
+            y += 8;
+
+            seleccion.forEach((reg, idx) => {
+                if (y > 250) {
+                    doc.addPage();
+                    y = 20;
+                }
+                const nombre = `${reg.datos?.nombre || reg.nombre || ''} ${reg.datos?.apellido || reg.apellido || ''}`.trim();
+                const dni = reg.datos?.dni || reg.dni || '';
+                const email = reg.datos?.email || reg.email || 'Sin email';
+                const fechaReinicio = reg.fechaReinicio || reg.fechaReinicioISO || '';
+                const motivo = reg.motivoExtension || reg.motivo || '';
+
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(11);
+                doc.text(`${idx + 1}. ${nombre}`, margin, y);
+                y += 6;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                doc.text(`DNI: ${dni}   Email: ${email}`, margin + 4, y);
+                y += 5;
+                if (fechaReinicio) {
+                    const fechaFmt = new Date(fechaReinicio).toLocaleString('es-AR');
+                    doc.text(`Fecha reinicio: ${fechaFmt}   Motivo: ${motivo}`, margin + 4, y);
+                    y += 6;
+                }
+                y += 4;
+            });
+
+            doc.save(`extension-inscripcion-${new Date().toISOString().split('T')[0]}.pdf`);
+            showSuccess('📄 Extensión Inscripción generada');
         } catch (error) {
-            showError(`Error al descargar JSON: ${error.message}`);
+            console.error('Error generando extensión inscripción:', error);
+            showError('❌ Error al generar Extensión Inscripción');
         }
     };
 
@@ -975,6 +1089,9 @@ const ModalRegistrosPendientes = ({ onClose }) => {
     const fechaActualizacion = registros.length > 0 
         ? new Date(Math.max(...registros.map(r => new Date(r.timestamp)))).toLocaleString('es-AR')
         : null;
+
+    // Handler para cerrar/ocultar el estado de duplicados (prefijado para evitar linter cuando no se usa)
+    const _limpiarEstadoDuplicados = () => setEstadoDuplicados(null);
 
     return (
         <div className="modal-registros-pendientes">
@@ -997,7 +1114,6 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                     />
                     {/* Contenido principal */}
                     <div className="modal-content">
-                        
                         {/* Lista de registros */}
                         <ListaRegistrosPendientes
                             registros={registros}
@@ -1023,41 +1139,18 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                         />
                     </div>
 
-                    {/* Footer */}
-                    <div className="modal-footer">
-                        
-                        {/* Mensaje de estado de emails */}
-                        {mensajeEmail && (
-                            <div className={`mensaje-email ${mensajeEmail.includes('❌') ? 'error' : 'success'}`}>
-                                {mensajeEmail}
-                            </div>
-                        )}
-
-                        {/* Sección de emails */}
-                        <SeccionEmails
-                            onEnviarUrgentes={enviarEmailsUrgentes}
-                            onEnviarTodos={enviarEmailsMasivos}
-                            enviandoEmail={enviandoEmail}
-                        />
-
-                        {/* Sección de descargas */}
-                        <SeccionDescargas
-                            onGenerarReporteTXT={generarReporteAdministrativo}
-                            onGenerarReporteCSV={generarReporteCSV}
-                            onGenerarReportePDF={generarReportePDF}
-                            onDescargarJSON={descargarJSON}
-                            descargando={descargando}
-                        />
-
-                        {/* Sección de duplicados */}
-                        <SeccionDuplicados
-                            estadoDuplicados={estadoDuplicados}
-                            limpiandoDuplicados={limpiandoDuplicados}
-                            onVerificarDuplicados={verificarEstadoDuplicadosManual}
-                            onLimpiarDuplicados={limpiarDuplicadosManual}
-                            onTestSistema7Dias={probarSistema7Dias}
-                        />
-                    </div>
+                    {/* Footer (componente unificado y responsive) */}
+                    <ModalFooter
+                        onUrgentes={enviarEmailsUrgentes}
+                        onTodos={enviarEmailsMasivos}
+                        onReporteTxt={generarReporteAdministrativo}
+                        onReporteExcel={generarReporteExcel}
+                        onReportePdf={generarReportePDF}
+                        onExtensionInscripcion={handleExtensionInscripcion}
+                        onTest7Dias={probarSistema7Dias}
+                        onVerificarDuplicados={verificarEstadoDuplicadosManual}
+                        onLimpiarDuplicados={limpiarDuplicadosManual}
+                    />
                 </div>
             </div>
 

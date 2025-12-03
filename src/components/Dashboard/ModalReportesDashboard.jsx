@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useUserContext } from '../../context/useUserContext';
 import CloseButton from '../CloseButton';
 import BotonCargando from '../BotonCargando';
-import service from '../../services/serviceInscripcion';
+import serviceListaEstudiantes from '../../services/serviceListaEstudiantes';
 import GraficoTendenciasPlan from '../ListaEstudiantes/reportes/GraficoTendenciasPlan';
 import GraficoEstadosInscripcion from '../ListaEstudiantes/reportes/GraficoEstadosInscripcion';
 import GraficoPeriodosAcademicos from '../ListaEstudiantes/reportes/GraficoPeriodosAcademicos';
@@ -111,7 +111,7 @@ const ModalReportesDashboard = ({
       
       // Solicitar registros según los permisos del usuario
       // IMPORTANTE: Cargar TODOS los estudiantes (activos e inactivos) para análisis de retención
-      const response = await service.getPaginatedEstudiantes(
+      const response = await serviceListaEstudiantes.getPaginatedAllEstudiantes(
         1, 
         9999, 
         'todos', // Cargar todos los estudiantes (activos e inactivos) para análisis completo
@@ -119,16 +119,25 @@ const ModalReportesDashboard = ({
       );
       
       if (response.success && response.estudiantes) {
-        console.log('📋 Estudiantes cargados:', response.estudiantes.length, 'de', response.total);
+        // Log para ver el tipo de dato de 'activo' que manda el backend
+        if (response.estudiantes.length > 0) {
+          console.log('🧪 Ejemplo de estudiante recibido del backend:', response.estudiantes[0], 'Tipo de activo:', typeof response.estudiantes[0].activo);
+        }
+        // Normalizar campo activo a número (0/1) para todos los estudiantes
+        const estudiantesNormalizados = response.estudiantes.map(e => ({
+          ...e,
+          activo: Number(e.activo)
+        }));
+        console.log('📋 Estudiantes cargados:', estudiantesNormalizados.length, 'de', response.total);
         console.log('🎯 Modalidad cargada:', modalidadParaCargar);
         console.log('📊 Estudiantes ACTIVOS e INACTIVOS cargados para análisis de retención');
-        
         // Verificar distribución activos/inactivos
-        const estudiantesActivos = response.estudiantes.filter(e => e.activo === 1 || e.activo === true);
-        const estudiantesInactivos = response.estudiantes.filter(e => e.activo === 0 || e.activo === false);
-        console.log('✅ Activos:', estudiantesActivos.length, '❌ Inactivos:', estudiantesInactivos.length);
-        
-        setEstudiantes(response.estudiantes);
+        const estudiantesActivos = estudiantesNormalizados.filter(e => e.activo === 1);
+        const estudiantesInactivos = estudiantesNormalizados.filter(e => e.activo === 0);
+        console.log('✅ Activos (normalizados):', estudiantesActivos.length, '❌ Inactivos (normalizados):', estudiantesInactivos.length);
+        // Debug: mostrar primeros 5 estudiantes
+        console.log('📋 Primeros 5 estudiantes normalizados:', estudiantesNormalizados.slice(0, 5));
+        setEstudiantes(estudiantesNormalizados);
         setEstudiantesCargados(true);
       } else {
         console.error('❌ Error en respuesta:', response.error || 'Respuesta inválida');
@@ -367,14 +376,14 @@ const ModalReportesDashboard = ({
     {
       id: 'rendimiento',
       icon: '🎓',
-      titulo: 'Inscripciones Activas-Inactivas',
+      titulo: 'Distribución Cuantitativa de Estudiantes por Estado Institucional',
       descripcion: 'Estudiantes con inscripción activa en el año en curso - Estudiantes con inscripción inactiva',
       color: '#1abc9c'
     },
     {
       id: 'kpis',
       icon: '💼',
-      titulo: 'KPIs Ejecutivos',
+      titulo: 'Resumen Ejecutivo de Métricas Institucionales',
       descripcion: 'Dashboard con métricas institucionales clave para toma de decisiones',
       color: '#e67e22'
     }
@@ -1203,7 +1212,7 @@ const DetalleKPIs = ({ datos }) => (
 const DetalleRendimiento = ({ datos }) => (
   <div className="detalle-rendimiento">
     <div className="seccion-resumen">
-      <h5> 🎓 Inscripciones Activas - Inactivas en el sistema</h5>
+      <h5> 🎓 Distribución Cuantitativa de Estudiantes por Estado Institucional</h5>
       <div className="mensaje-explicativo">
         <p><strong>Activos:  </strong> Estudiantes inscriptos</p>
         <p><strong>Inactivos:  </strong> Estudiantes sin renovación de inscripción/incompleta</p>

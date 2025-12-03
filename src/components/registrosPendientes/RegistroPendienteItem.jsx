@@ -161,7 +161,7 @@ const RegistroPendienteItem = ({
         <div 
             key={registro.id || index} 
             className={`registro-item ${esProcesado ? 'registro-procesado' : (info.vencido ? 'registro-vencido' : 'registro-vigente')}`} 
-            style={{ borderLeftColor: esProcesado ? '#28a745' : info.color }}
+            style={{ borderLeftColor: 'var(--color-btn-main)' }}
         >
             <div className="registro-grid">
                 {/* Información principal del registro */}
@@ -170,42 +170,12 @@ const RegistroPendienteItem = ({
                         <h4>
                             {registro.datos?.nombre || registro.nombre} {registro.datos?.apellido || registro.apellido}
                             {esProcesado && (
-                                <span 
-                                    className="badge-estudiante-registrado" 
-                                    style={{
-                                        display: 'inline-block',
-                                        visibility: 'visible',
-                                        opacity: 1,
-                                        backgroundColor: '#28a745',
-                                        color: 'white',
-                                        padding: '6px 12px',
-                                        borderRadius: '12px',
-                                        marginLeft: '10px',
-                                        fontSize: '0.9rem',
-                                        fontWeight: 'bold',
-                                        zIndex: 9999
-                                    }}
-                                >
+                                <span className="badge-unificado" style={{ marginLeft: '10px' }}>
                                     ✅ Registro Procesado y Completa
                                 </span>
                             )}
                             {!esProcesado && mostrarBadgeCompleta && (
-                                <span 
-                                    className="badge-estudiante-registrado" 
-                                    style={{
-                                        display: 'inline-block',
-                                        visibility: 'visible',
-                                        opacity: 1,
-                                        backgroundColor: '#28a745',
-                                        color: 'white',
-                                        padding: '6px 12px',
-                                        borderRadius: '12px',
-                                        marginLeft: '10px',
-                                        fontSize: '0.8rem',
-                                        fontWeight: 'bold',
-                                        zIndex: 9999
-                                    }}
-                                >
+                                <span className="badge-unificado" style={{ marginLeft: '10px' }}>
                                     ✅ Registro Procesado y Completa
                                 </span>
                             )}
@@ -214,7 +184,7 @@ const RegistroPendienteItem = ({
                         <p>
                             <strong>📧 Email:</strong> {
                                 (registro.datos?.email || registro.email) || 
-                                <span style={{color: '#dc3545', fontStyle: 'italic'}}>Sin email</span>
+                                    <span style={{color: 'var(--color-mid)', fontStyle: 'italic'}}>Sin email</span>
                             }
                         </p>
                         <p>
@@ -229,7 +199,7 @@ const RegistroPendienteItem = ({
                         {/* Mostrar alarma/vencimiento solo si NO está registrado NI procesado */}
                         {!mostrarBadgeCompleta && !esProcesado && (
                             <>
-                                <div className="registro-vencimiento" style={{ color: info.color }}>
+                                <div className="registro-vencimiento">
                                     {info.vencido ? `🔴 ${info.mensaje}` : `🕒 ${info.mensaje}`}
                                 </div>
                                 {!info.vencido && (

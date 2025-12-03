@@ -82,11 +82,11 @@ export const exportarExcel = (datos, nombreBase, tituloReporte) => {
     ];
     
     const ws = XLSX.utils.aoa_to_sheet(wsData);
-    
+
     // Configurar estilos con rayado alternado
     const numCols = datos[0]?.length || 4;
     const maxCol = Math.max(numCols - 1, 3);
-    
+
     // Establecer anchos de columna optimizados
     const colWidths = [];
     for (let i = 0; i <= maxCol; i++) {
@@ -94,7 +94,7 @@ export const exportarExcel = (datos, nombreBase, tituloReporte) => {
       else colWidths.push({ wch: 18 }); // Otras columnas
     }
     ws['!cols'] = colWidths;
-    
+
     // Combinar celdas para el encabezado institucional
     ws['!merges'] = [
       { s: { r: 0, c: 0 }, e: { r: 0, c: maxCol } }, // CEIJA 5
@@ -102,6 +102,20 @@ export const exportarExcel = (datos, nombreBase, tituloReporte) => {
       { s: { r: 3, c: 0 }, e: { r: 3, c: maxCol } }, // Título del reporte
       { s: { r: 4, c: 0 }, e: { r: 4, c: maxCol } }  // Fecha
     ];
+
+    // Estilos: azul oscuro y negrita para encabezado y títulos
+    const azulOscuro = { rgb: '2D4177' };
+    // Encabezado institucional
+    ws['A1'].s = { font: { bold: true, color: azulOscuro, sz: 11 } };
+    ws['A2'].s = { font: { bold: true, color: azulOscuro, sz: 11 } };
+    // Título del reporte
+    ws[`A4`].s = { font: { bold: true, color: azulOscuro, sz: 14 } };
+    // Títulos de columnas (fila 7, índice 6)
+    for (let c = 0; c <= maxCol; c++) {
+      const col = String.fromCharCode(65 + c); // A, B, C...
+      const cell = `${col}7`;
+      if (ws[cell]) ws[cell].s = { font: { bold: true, color: azulOscuro, sz: 11 } };
+    }
     
     // Agregar hoja al workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Reporte');

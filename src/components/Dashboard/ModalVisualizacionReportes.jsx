@@ -139,7 +139,7 @@ const ModalVisualizacionReportes = ({
     {
       id: 'kpis',
       icon: '💼',
-      titulo: 'KPIs Ejecutivos',
+      titulo: 'Resumen Ejecutivo de Métricas Institucionales',
       descripcion: 'Dashboard con métricas institucionales avanzadas',
       color: '#e67e22'
     }

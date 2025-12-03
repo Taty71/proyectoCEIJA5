@@ -11,7 +11,7 @@ const SeccionEmails = ({
             <div className="botones-emails">
                 <button 
                     onClick={onEnviarUrgentes}
-                    className="btn-urgente"
+                    className="boton-pendiente"
                     disabled={enviandoEmail}
                     title="Enviar emails solo a registros urgentes (próximos a vencer)"
                 >
@@ -19,7 +19,7 @@ const SeccionEmails = ({
                 </button>
                 <button 
                     onClick={onEnviarTodos}
-                    className="btn-todos-emails"
+                    className="boton-pendiente"
                     disabled={enviandoEmail}
                     title="Enviar email a todos los estudiantes con registros pendientes"
                 >

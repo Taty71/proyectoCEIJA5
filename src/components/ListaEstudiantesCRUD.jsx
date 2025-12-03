@@ -8,8 +8,11 @@ import '../estilos/listaEstudiantes.css';
 import '../estilos/estilosInscripcion.css';
 import '../estilos/modalUniforme.css';
 import { AlertContext } from '../context/AlertContext'; // Sistema unificado de alertas
+import iconEliminar from '../assets/logos/eliminar.svg';
+import iconVer from '../assets/logos/ver.svg';
+import iconModificar from '../assets/logos/lapíz.png';
 
-const ListaEstudiantes = ({ onAccion, onClose, onVolver, soloParaEliminacion = false, refreshKey = 0, modalidadId }) => {
+const ListaEstudiantesCRUD = ({ onAccion, onClose, onVolver, soloParaEliminacion = false, refreshKey = 0, modalidadId }) => {
     const [estudiantes, setEstudiantes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -18,7 +21,7 @@ const ListaEstudiantes = ({ onAccion, onClose, onVolver, soloParaEliminacion = f
     const [estudianteAEliminar, setEstudianteAEliminar] = useState(null);
     const [showConfirmDelete, setShowConfirmDelete] = useState(false);
     const [showConfirmDeleteDefinitivo, setShowConfirmDeleteDefinitivo] = useState(false);
-    
+
     // Sistema unificado de alertas
     const { showError, showSuccess } = useContext(AlertContext);
     // Filtrar por modalidadId (número) si está definido
@@ -144,13 +147,13 @@ const ListaEstudiantes = ({ onAccion, onClose, onVolver, soloParaEliminacion = f
                     {onVolver && <VolverButton onClick={onVolver} className="boton-principal boton-small" />}
                     {onClose && <CloseButton onClose={onClose} className="boton-principal boton-small" />}
                 </div>
-                
+
                 {/* Título delicado más arriba */}
                 <div className="lista-header">
                     <h2 className="lista-titulo">{getTituloLista()}</h2>
-                    
+
                 </div>
-                
+
                 <div className="loading-container">
                     <BotonCargando loading={true}>Cargando estudiantes...</BotonCargando>
                 </div>
@@ -177,24 +180,43 @@ const ListaEstudiantes = ({ onAccion, onClose, onVolver, soloParaEliminacion = f
                         <table className="tabla-estudiantes">
                             <thead>
                                 <tr>
-                                    <th>ID</th><th>DNI</th><th>Nombre Apellido</th><th>Email</th><th>Modalidad</th><th>Curso/Plan</th><th>Estado de Inscripción</th><th>Fecha Inscripción</th><th>Fecha Nacimiento</th><th>Acciones</th>
+                                    <th>ID</th><th>DNI</th><th>Nombre Apellido</th><th>Email</th><th>Curso/Plan</th><th>Estado de<br />Inscripción</th><th>Fecha<br />Inscripción</th><th>Fecha<br />Nacimiento</th><th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {estudiantes.map((estudiante, index) => (
                                     <tr key={`${estudiante.dni}-${estudiante.id}-${index}`}>
-                                        <td>{estudiante.id}</td><td>{estudiante.dni}</td><td>{`${estudiante.nombre} ${estudiante.apellido}`}</td><td>{estudiante.email || 'No registrado'}</td><td>{estudiante.modalidad}</td><td>{estudiante.cursoPlan || 'Sin asignar'}</td><td><span className={`estado estado-${estudiante.estadoInscripcion?.toLowerCase().replace(/\s+/g, '-')}`}>{estudiante.estadoInscripcion || 'Sin estado'}</span></td><td>{formatearFecha(estudiante.fechaInscripcion)}</td><td>{formatearFecha(estudiante.fechaNacimiento)}</td><td><div className="acciones-grupo">{soloParaEliminacion ? (
+                                        <td><span className="id-badge">{estudiante.id}</span></td>
+                                        <td>{estudiante.dni}</td>
+                                        <td>
+                                            <div className="nombre-completo">
+                                                <span className="nombre">{estudiante.nombre}</span>
+                                                <span className="apellido">{estudiante.apellido}</span>
+                                            </div>
+                                        </td>
+                                        <td>{estudiante.email || 'No registrado'}</td>
+                                        <td>{estudiante.cursoPlan || 'Sin asignar'}</td>
+                                        <td><span className={`estado estado-${estudiante.estadoInscripcion?.toLowerCase().replace(/\s+/g, '-')}`}>{estudiante.estadoInscripcion || 'Sin estado'}</span></td>
+                                        <td>{formatearFecha(estudiante.fechaInscripcion)}</td>
+                                        <td>{formatearFecha(estudiante.fechaNacimiento)}</td>
+                                        <td><div className="acciones-grupo">{soloParaEliminacion ? (
                                             <>
                                                 <button className="btn-accion btn-eliminar" onClick={() => { setShowConfirmDeleteDefinitivo(true); setEstudianteAEliminar(estudiante); }} title="Seleccionar para eliminar de la base de datos">⚠️ Eliminar</button>
                                             </>
                                         ) : (
                                             <>
-                                                <button className="btn-accion btn-modificar" onClick={() => handleAccion('Modificar', estudiante)} title="Modificar estudiante">✏️</button>
-                                                <button className="btn-accion btn-eliminar" onClick={() => handleEliminarClick(estudiante)} title="Desactivar estudiante (eliminación lógica)">❌</button>
-                                                <button className="btn-accion btn-ver" onClick={() => handleAccion('Ver', estudiante)} title="Ver detalles">👁️</button>
+                                                <button className="btn-accion btn-modificar" onClick={() => handleAccion('Modificar', estudiante)} data-tooltip="Modificar">
+                                                    <img src={iconModificar} alt="Modificar" />
+                                                </button>
+                                                <button className="btn-accion btn-eliminar" onClick={() => handleEliminarClick(estudiante)} data-tooltip="Eliminar">
+                                                    <img src={iconEliminar} alt="Eliminar" />
+                                                </button>
+                                                <button className="btn-accion btn-ver" onClick={() => handleAccion('Ver', estudiante)} data-tooltip="Ver Detalles">
+                                                    <img src={iconVer} alt="Ver" />
+                                                </button>
                                             </>
                                         )}
-                                            </div></td>
+                                        </div></td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -270,7 +292,7 @@ const ListaEstudiantes = ({ onAccion, onClose, onVolver, soloParaEliminacion = f
 };
 
 
-ListaEstudiantes.propTypes = {
+ListaEstudiantesCRUD.propTypes = {
     onAccion: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onVolver: PropTypes.func, // Callback para el botón "Volver"
@@ -278,4 +300,4 @@ ListaEstudiantes.propTypes = {
     refreshKey: PropTypes.number, // Clave para forzar recarga de datos
     modalidadId: PropTypes.number, // modalidadId numérico
 };
-export default ListaEstudiantes;
+export default ListaEstudiantesCRUD;

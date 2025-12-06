@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import '../estilos/VisorEncuestas.css';
+import { jsPDF } from 'jspdf';
+import pdfIcon from '../assets/logos/pdf.png';
+import { crearEncabezadoInstitucional, crearControlPaginas, normalizarTexto } from './ListaEstudiantes/reportes/utils';
 
 const VisorEncuestas = ({ onClose, userRole }) => {
     const [encuestas, setEncuestas] = useState([]);
@@ -26,17 +29,17 @@ const VisorEncuestas = ({ onClose, userRole }) => {
         try {
             const modalidad = modalidadPermitida();
             const params = modalidad ? { modalidad } : {};
-            
+
             // Cargar encuestas usando axios
             const respEncuestas = await axios.get('/api/encuestas-satisfaccion', { params });
-            
+
             // Cargar estadísticas usando axios
             const respEstadisticas = await axios.get('/api/encuestas-satisfaccion/estadisticas', { params });
-            
+
             if (respEncuestas.data.success) {
                 setEncuestas(respEncuestas.data.encuestas);
             }
-            
+
             if (respEstadisticas.data.success) {
                 setEstadisticas(respEstadisticas.data.estadisticas);
             }
@@ -48,36 +51,153 @@ const VisorEncuestas = ({ onClose, userRole }) => {
     };
 
     // SOLO MANTENER LA FUNCIÓN PDF
-    const descargarPDF = async () => {
+    const generarReportePDF = async () => {
         try {
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const margin = 20;
+
+            // Usar encabezado estandarizado
+            let y = crearEncabezadoInstitucional(doc, '');
+
+            // Agregar título del reporte
+            y += 10;
+            doc.setFontSize(12);
+            doc.setFont('Helvetica', 'bold');
+            doc.setTextColor(45, 65, 119);
+            doc.text('Encuestas De Satisfacción', pageWidth / 2, y, { align: 'center' });
+            y += 15;
+
+            // Crear control de páginas
+            const { agregarPiePagina } = crearControlPaginas(doc);
+
+            // Información general
+            doc.setFontSize(11);
+            doc.setFont('Helvetica', 'normal');
+            doc.setTextColor(0, 0, 0);
             const modalidad = modalidadPermitida();
-            const params = modalidad ? { modalidad } : {};
-            
-            const response = await axios.get('/api/encuestas-satisfaccion/exportar-pdf', {
-                params,
-                responseType: 'blob'
+            const tituloModalidad = modalidad ? modalidad.charAt(0).toUpperCase() + modalidad.slice(1) : 'Todas';
+            doc.text(`Modalidad: ${tituloModalidad}`, margin, y);
+            y += 6;
+            doc.text(`Total de encuestas: ${encuestas.length}`, margin, y);
+            y += 6;
+            doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-AR')}`, margin, y);
+            y += 10;
+            // Estadísticas tabla
+            const stats = estadisticas || { promedio_facilidad: 0, promedio_claridad: 0, ultima_actualizacion: null };
+            const tableTop = y;
+            const col1X = margin;
+            const col2X = pageWidth - margin - 60;
+            const rowHeight = 10;
+            // Header row
+            doc.setFillColor(45, 65, 119);
+            doc.rect(col1X, tableTop, pageWidth - 2 * margin, rowHeight, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.text('Métrica', col1X + 2, tableTop + 7);
+            doc.text('Valor', col2X + 2, tableTop + 7);
+            let curY = tableTop + rowHeight;
+            const rows = [
+                ['Facilidad de Uso Promedio', `${stats.promedio_facilidad} ⭐`],
+                ['Claridad de Información Promedio', `${stats.promedio_claridad} ⭐`],
+                ['Última Actualización', stats.ultima_actualizacion ? new Date(stats.ultima_actualizacion).toLocaleString('es-AR') : 'N/A']
+            ];
+            rows.forEach((r, i) => {
+                doc.setFillColor(i % 2 === 0 ? 248 : 255);
+                doc.rect(col1X, curY, pageWidth - 2 * margin, rowHeight, 'F');
+                doc.setTextColor(0, 0, 0);
+                doc.text(r[0], col1X + 2, curY + 7);
+                doc.text(r[1], col2X + 2, curY + 7);
+                curY += rowHeight;
             });
-            
-            const blob = new Blob([response.data], { type: 'application/pdf' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Encuestas_Satisfaccion_${modalidad || 'Todas'}_${new Date().toISOString().split('T')[0]}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+            y = curY + 10;
+
+            // SECCIÓN: Estado y Recomendaciones
+            const estado = getEstadoEncuestas();
+            if (estado) {
+                // Configurar fuente para cálculos
+                doc.setFontSize(10);
+                doc.setFont('Helvetica', 'normal');
+                const msgLines = doc.splitTextToSize(estado.mensaje, pageWidth - (2 * margin) - 10);
+
+                // Calcular altura de la caja
+                let boxHeight = 10 + 7 + (msgLines.length * 5) + 5 + 6 + (estado.recomendaciones.length * 5) + 5;
+
+                // Dibujar caja
+                doc.setDrawColor(200, 200, 200);
+                doc.setFillColor(250, 252, 255);
+                doc.roundedRect(margin, y, pageWidth - (2 * margin), boxHeight, 3, 3, 'FD');
+
+                let contentY = y + 10;
+
+                // Título
+                doc.setFontSize(12);
+                doc.setFont('Helvetica', 'bold');
+                doc.setTextColor(0, 0, 0);
+                doc.text(estado.titulo, margin + 5, contentY);
+                contentY += 7;
+
+                // Mensaje
+                doc.setFontSize(10);
+                doc.setFont('Helvetica', 'normal');
+                doc.text(msgLines, margin + 5, contentY);
+                contentY += (msgLines.length * 5) + 5;
+
+                // Header Recomendaciones
+                doc.setFont('Helvetica', 'bold');
+                doc.setTextColor(45, 65, 119);
+                doc.text('Acciones Recomendadas:', margin + 5, contentY);
+                contentY += 6;
+
+                // Lista Recomendaciones
+                doc.setFont('Helvetica', 'normal');
+                doc.setTextColor(0, 0, 0);
+                estado.recomendaciones.forEach(rec => {
+                    doc.text(`• ${rec}`, margin + 8, contentY);
+                    contentY += 5;
+                });
+
+                y += boxHeight + 10;
+            }
+
+            // Detalle de encuestas (first 20)
+            doc.setFontSize(12);
+            doc.setFont('Helvetica', 'bold');
+            doc.text('DETALLE DE ENCUESTAS (primeras 20)', margin, y);
+            y += 8;
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(9);
+            encuestas.slice(0, 20).forEach((enc, idx) => {
+                if (y > doc.internal.pageSize.getHeight() - 30) {
+                    doc.addPage();
+                    y = 20;
+                }
+                doc.text(`#${idx + 1} | Modalidad: ${enc.modalidad || 'N/A'} | Fecha: ${new Date(enc.fecha).toLocaleDateString('es-AR')}`, margin, y);
+                y += 5;
+                doc.text(`Facilidad: ${enc.respuestas?.facilidad_uso || 'N/A'} ⭐  Claridad: ${enc.respuestas?.claridad_informacion || 'N/A'} ⭐`, margin, y);
+                y += 5;
+                if (enc.respuestas?.sugerencias) {
+                    const sug = enc.respuestas.sugerencias.length > 100 ? enc.respuestas.sugerencias.substring(0, 100) + '...' : enc.respuestas.sugerencias;
+                    doc.text(`Sugerencias: ${sug}`, margin, y);
+                    y += 5;
+                }
+                y += 4;
+            });
+
+            // Footer usando función estandarizada
+            agregarPiePagina();
+
+            doc.save(`Encuestas_Satisfaccion_${tituloModalidad.replace(/\\s/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
         } catch (error) {
-            console.error('Error descargando PDF:', error);
+            console.error('Error al generar PDF:', error);
         }
     };
-
     // Función para determinar el estado según los promedios
     const getEstadoEncuestas = () => {
         if (!estadisticas) return null;
-        
+
         const promedioGeneral = (parseFloat(estadisticas.promedio_facilidad) + parseFloat(estadisticas.promedio_claridad)) / 2;
-        
+
         if (promedioGeneral >= 4.5) {
             return {
                 tipo: 'excelente',
@@ -149,7 +269,7 @@ const VisorEncuestas = ({ onClose, userRole }) => {
         );
     }
 
-    const modalidadTexto = modalidadPermitida() 
+    const modalidadTexto = modalidadPermitida()
         ? modalidadPermitida().charAt(0).toUpperCase() + modalidadPermitida().slice(1)
         : 'Todas las modalidades';
 
@@ -164,13 +284,8 @@ const VisorEncuestas = ({ onClose, userRole }) => {
                     </div>
                     <div className="header-actions">
                         {/* BOTÓN PDF MÁS PEQUEÑO Y DELICADO */}
-                        <button className="btn-export-pdf" onClick={descargarPDF} title="Exportar a PDF">
-                            <svg className="pdf-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                                <path fill="#DC3545" d="M9.064,3.162h11.6A31.459,31.459,0,0,1,28.188,10.7V28.542H9.064Z"/>
-                                <path fill="#FFF" d="M15.819,19.855c.466-.914,1-1.943,1.42-2.977h0l.168-.408c-.554-2.108-.886-3.8-.589-4.894h0a.755.755,0,0,1,.763-.458h0l.215,0h.039c.484-.007.711.608.737.847h0a3.847,3.847,0,0,1-.141,1.072h0a2.639,2.639,0,0,0-.161-1.091h0c-.2-.439-.391-.7-.562-.743h0a.54.54,0,0,0-.2.407h0a5.874,5.874,0,0,0-.077.939h0a10.511,10.511,0,0,0,.433,2.729h0c.054-.156.1-.306.14-.447h0c.059-.222.433-1.691.433-1.691h0s-.094,1.956-.226,2.547h0c-.028.125-.059.249-.092.375h0a8.586,8.586,0,0,0,2.145,3.351h0a6.7,6.7,0,0,0,1.24.852h0a16.9,16.9,0,0,1,2.517-.189h0a3.153,3.153,0,0,1,1.938.433h0a.738.738,0,0,1,.213.484h0a1.446,1.446,0,0,1-.041.282h0c.01-.051.01-.3-.755-.546h0a8.91,8.91,0,0,0-3.086-.043h0c1.566.766,3.093,1.147,3.576.919h0a1.015,1.015,0,0,0,.262-.254h0a2.727,2.727,0,0,1-.146.484h0a.764.764,0,0,1-.377.258h0c-.764.2-2.752-.268-4.485-1.258h0a36.619,36.619,0,0,0-5.768,1.371h0c-1.675,2.936-2.935,4.284-3.959,3.771h0l-.377-.189a.436.436,0,0,1-.141-.474h0c.119-.584.852-1.465,2.324-2.344h0c.158-.1.864-.469.864-.469h0s-.523.506-.645.605h0c-1.175.963-2.042,2.174-2.021,2.644h0l0,.041c1-.142,2.495-2.174,4.419-5.939m.61.312c-.321.605-.636,1.166-.926,1.682h0a24.582,24.582,0,0,1,4.975-1.408h0c-.221-.153-.435-.314-.637-.485h0a8.531,8.531,0,0,1-2.1-2.729h0a23.388,23.388,0,0,1-1.317,2.94"/>
-                                <text x="8" y="9" fill="#FFF" fontSize="3" fontFamily="Arial" fontWeight="bold">PDF</text>
-                            </svg>
-                            <span>PDF</span>
+                        <button className="btn-export-pdf" onClick={generarReportePDF} title="Exportar a PDF">
+                            <img src={pdfIcon} alt="PDF" className="pdf-icon" />
                         </button>
                         <button className="btn-close-visor" onClick={onClose}>✖</button>
                     </div>
@@ -198,26 +313,26 @@ const VisorEncuestas = ({ onClose, userRole }) => {
 
                     {/* Filtros - sticky */}
                     <div className="filtros-encuestas">
-                        <button 
-                            className={filtro === 'todas' ? 'active' : ''} 
+                        <button
+                            className={filtro === 'todas' ? 'active' : ''}
                             onClick={() => setFiltro('todas')}
                         >
                             Todas ({encuestas.length})
                         </button>
-                        <button 
-                            className={filtro === 'ultimas' ? 'active' : ''} 
+                        <button
+                            className={filtro === 'ultimas' ? 'active' : ''}
                             onClick={() => setFiltro('ultimas')}
                         >
                             Últimas 10
                         </button>
-                        <button 
-                            className={filtro === 'mejores' ? 'active' : ''} 
+                        <button
+                            className={filtro === 'mejores' ? 'active' : ''}
                             onClick={() => setFiltro('mejores')}
                         >
                             Mejores (4-5★)
                         </button>
-                        <button 
-                            className={filtro === 'peores' ? 'active' : ''} 
+                        <button
+                            className={filtro === 'peores' ? 'active' : ''}
                             onClick={() => setFiltro('peores')}
                         >
                             A mejorar (1-2★)
@@ -233,18 +348,16 @@ const VisorEncuestas = ({ onClose, userRole }) => {
                                 <div key={encuesta.id} className="encuesta-card">
                                     <div className="encuesta-header-card">
                                         <div className="encuesta-info">
-                                            <span className="dni-badge">DNI: {encuesta.dni_estudiante}</span>
-                                            {encuesta.modalidad && (
-                                                <span className={`modalidad-tag ${encuesta.modalidad}`}>
-                                                    {encuesta.modalidad}
-                                                </span>
-                                            )}
+                                            <span className={`modalidad-tag ${encuesta.modalidad}`}>
+                                                {encuesta.modalidad}
+                                            </span>
+
                                         </div>
                                         <span className="fecha-encuesta">
                                             {new Date(encuesta.fecha).toLocaleString('es-AR')}
                                         </span>
                                     </div>
-                                    
+
                                     <div className="encuesta-respuestas">
                                         <div className="respuesta-item">
                                             <span className="respuesta-label">Facilidad:</span>
@@ -262,15 +375,15 @@ const VisorEncuestas = ({ onClose, userRole }) => {
                                             <span className="respuesta-label">Tiempo:</span>
                                             <span>{encuesta.respuestas.tiempo_completado}</span>
                                         </div>
-                                        {encuesta.respuestas.problemas_encontrados && 
-                                         encuesta.respuestas.problemas_encontrados !== 'Ninguno' && (
-                                            <div className="respuesta-item">
-                                                <span className="respuesta-label">Problemas:</span>
-                                                <span className="problema-badge">
-                                                    {encuesta.respuestas.problemas_encontrados}
-                                                </span>
-                                            </div>
-                                        )}
+                                        {encuesta.respuestas.problemas_encontrados &&
+                                            encuesta.respuestas.problemas_encontrados !== 'Ninguno' && (
+                                                <div className="respuesta-item">
+                                                    <span className="respuesta-label">Problemas:</span>
+                                                    <span className="problema-badge">
+                                                        {encuesta.respuestas.problemas_encontrados}
+                                                    </span>
+                                                </div>
+                                            )}
                                         {encuesta.respuestas.sugerencias && (
                                             <div className="respuesta-item sugerencias">
                                                 <span className="respuesta-label">💡 Sugerencias:</span>

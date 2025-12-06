@@ -6,11 +6,11 @@ import { crearEncabezadoInstitucional, normalizarTexto, exportarExcel, calcularP
 export const generarAnalisisRendimiento = async (estudiantes, showAlerta, modalidadSeleccionada = 'todas') => {
   try {
     const analisis = analizarEstadoInscripciones(estudiantes, modalidadSeleccionada);
-    
+
     const doc = new jsPDF();
     const { verificarEspacio, agregarPiePagina } = crearControlPaginas(doc);
     let yPos = crearEncabezadoInstitucional(doc, 'ESTADO PORCENTUAL INSCRIPCIONES ACTIVAS-INACTIVAS');
-    
+
     // ===== INFORMACIÓN GENERAL =====
     yPos = verificarEspacio(doc, yPos, 40); // Espacio para la sección de información general
     doc.setFontSize(14);
@@ -18,7 +18,7 @@ export const generarAnalisisRendimiento = async (estudiantes, showAlerta, modali
     doc.setTextColor(45, 65, 119);
     doc.text(normalizarTexto('INFORMACION GENERAL'), 14, yPos);
     yPos += 10;
-    
+
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(11);
     doc.setTextColor(0, 0, 0);
@@ -28,7 +28,7 @@ export const generarAnalisisRendimiento = async (estudiantes, showAlerta, modali
     yPos += 6;
     doc.text(`Ano lectivo: ${analisis.anioLectivo}`, 20, yPos);
     yPos += 15;
-    
+
     // ===== RESUMEN DE ESTADOS =====
     yPos = verificarEspacio(doc, yPos, 60); // Espacio para la tabla de resumen
     doc.setFontSize(14);
@@ -36,12 +36,12 @@ export const generarAnalisisRendimiento = async (estudiantes, showAlerta, modali
     doc.setTextColor(45, 65, 119);
     doc.text(normalizarTexto('RESUMEN DE ESTADOS'), 14, yPos);
     yPos += 15;
-    
+
     const resumenData = [
       ['Estudiantes activos', analisis.activos.toString(), `${analisis.porcentajeActivos}%`],
       ['Estudiantes inactivos', analisis.inactivos.toString(), `${analisis.porcentajeInactivos}%`]
     ];
-    
+
     autoTable(doc, {
       head: [['Estado', 'Cantidad', 'Porcentaje']],
       body: resumenData,
@@ -65,9 +65,9 @@ export const generarAnalisisRendimiento = async (estudiantes, showAlerta, modali
       },
       margin: { left: 14, right: 14 }
     });
-    
+
     yPos = doc.lastAutoTable.finalY + 15;
-    
+
     // ===== DESGLOSE POR MODALIDAD =====
     yPos = verificarEspacio(doc, yPos, 80); // Espacio para la sección de desglose
     if (analisis.desglosePorModalidad && Object.keys(analisis.desglosePorModalidad).length > 0) {
@@ -75,13 +75,13 @@ export const generarAnalisisRendimiento = async (estudiantes, showAlerta, modali
         doc.addPage();
         yPos = 20;
       }
-      
+
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(45, 65, 119);
       doc.text(normalizarTexto('DESGLOSE POR MODALIDAD'), 14, yPos);
       yPos += 15;
-      
+
       const modalidadData = Object.entries(analisis.desglosePorModalidad).map(([modalidad, datos]) => [
         modalidad || 'Sin modalidad',
         datos.total.toString(),
@@ -90,7 +90,7 @@ export const generarAnalisisRendimiento = async (estudiantes, showAlerta, modali
         datos.inactivos.toString(),
         `${datos.porcentajeInactivos}%`
       ]);
-      
+
       autoTable(doc, {
         head: [['Modalidad', 'Total', 'Activos', '%', 'Inactivos', '%']],
         body: modalidadData,
@@ -117,46 +117,46 @@ export const generarAnalisisRendimiento = async (estudiantes, showAlerta, modali
         },
         margin: { left: 14, right: 14 }
       });
-      
+
       yPos = doc.lastAutoTable.finalY + 15;
     }
-    
+
     // ===== NOTAS ACLARATORIAS =====
     yPos = verificarEspacio(doc, yPos, 50); // Espacio para las notas
     if (yPos > 230) {
       doc.addPage();
       yPos = 20;
     }
-    
+
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(45, 65, 119);
     doc.text(normalizarTexto('DEFINICIONES'), 14, yPos);
     yPos += 10;
-    
+
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(0, 0, 0);
-    
+
     const notas = [
       `Estudiante ACTIVO: Estudiante con inscripcion vigente en el ano lectivo ${analisis.anioLectivo}`,
       'Estudiante INACTIVO: Estudiante sin inscripcion en el ano lectivo actual'
     ];
-    
+
     notas.forEach(nota => {
       const textoNota = normalizarTexto(`• ${nota}`);
       const lineasTexto = doc.splitTextToSize(textoNota, 160);
       doc.text(lineasTexto, 20, yPos);
       yPos += lineasTexto.length * 5 + 3;
     });
-    
+
     // Agregar pie de página antes de guardar
     agregarPiePagina();
-    
+
     // Guardar el PDF
     doc.save(`Estado_Inscripciones_Estudiantiles_${new Date().toISOString().split('T')[0]}.pdf`);
     showAlerta('Estado de inscripciones estudiantiles PDF generado exitosamente', 'success');
-    
+
   } catch (error) {
     console.error('Error al generar estado de inscripciones estudiantiles:', error);
     showAlerta('Error al generar estado de inscripciones estudiantiles: ' + error.message, 'error');
@@ -164,65 +164,115 @@ export const generarAnalisisRendimiento = async (estudiantes, showAlerta, modali
 };
 
 // ===== ESTADO PORCENTUAL INSCRIPCIONES ACTIVAS-INACTIVAS EXCEL =====
+// ===== ESTADO PORCENTUAL INSCRIPCIONES ACTIVAS-INACTIVAS EXCEL =====
 export const generarAnalisisRendimientoExcel = async (estudiantes, showAlerta, modalidadSeleccionada = 'todas') => {
   try {
     const analisis = analizarEstadoInscripciones(estudiantes, modalidadSeleccionada);
-    
-    const datos = [
-      // Información general
-      ['=== INFORMACION GENERAL ==='],
-      ['Métrica', 'Valor'],
-      ['Modalidad analizada', modalidadSeleccionada.toUpperCase()],
-      ['Total de estudiantes', analisis.total],
-      ['Año lectivo', analisis.anioLectivo],
-      ['Fecha del reporte', new Date().toLocaleDateString('es-ES')],
-      [''],
-      
-      // Resumen de estados
-      ['=== RESUMEN DE ESTADOS ==='],
-      ['Estado', 'Cantidad', 'Porcentaje'],
-      ['Activos', analisis.activos, `${analisis.porcentajeActivos}%`],
-      ['Inactivos', analisis.inactivos, `${analisis.porcentajeInactivos}%`],
-      ['']
+
+    // MATRIZ DE DOBLE ENTRADA
+    // Filas: Modalidades + Total
+    // Columnas: Total Alumnos, Activos (Cant, %), Inactivos (Cant, %)
+
+    const headers = [
+      'Modalidad',
+      'Total Alumnos',
+      'Activos (Cant)', 'Activos (%)',
+      'Inactivos (Cant)', 'Inactivos (%)'
     ];
-    
-    // Desglose por modalidad (si existe)
-    if (analisis.desglosePorModalidad && Object.keys(analisis.desglosePorModalidad).length > 0) {
-      datos.push(['=== DESGLOSE POR MODALIDAD ===']);
-      datos.push(['Modalidad', 'Total', 'Activos', '% Activos', 'Inactivos', '% Inactivos']);
-      
-      Object.entries(analisis.desglosePorModalidad).forEach(([modalidad, info]) => {
-        datos.push([
-          modalidad || 'Sin modalidad',
-          info.total,
-          info.activos,
-          `${info.porcentajeActivos}%`,
-          info.inactivos,
-          `${info.porcentajeInactivos}%`
+
+    const matrixData = [];
+    const modalidades = ['PRESENCIAL', 'SEMIPRESENCIAL'];
+
+    // Llenar por Modalidad (si existen datos)
+    // El objeto analisis.desglosePorModalidad tiene claves como 'PRESENCIAL', 'SEMIPRESENCIAL'
+    // aunque a veces pueden venir en minúsculas o variar, iteraremos sobre lo que hay.
+
+    if (analisis.desglosePorModalidad) {
+      Object.entries(analisis.desglosePorModalidad).forEach(([modName, datos]) => {
+        matrixData.push([
+          modName.toUpperCase(),
+          datos.total,
+          datos.activos, `${datos.porcentajeActivos}%`,
+          datos.inactivos, `${datos.porcentajeInactivos}%`
         ]);
       });
-      
-      datos.push(['']);
     }
-    
+
+    // Agregar Fila TOTAL
+    matrixData.push([
+      'TOTAL GENERAL',
+      analisis.total,
+      analisis.activos, `${analisis.porcentajeActivos}%`,
+      analisis.inactivos, `${analisis.porcentajeInactivos}%`
+    ]);
+
+    const datosFinales = [
+      headers,
+      ...matrixData
+    ];
+
+    const extraHeaderRows = [];
+    const customMerges = [];
+
+    datosFinales.push(['']);
+
+    const analysisTitleIndex = datosFinales.length;
+    extraHeaderRows.push(analysisTitleIndex);
+    datosFinales.push(['═══ ANÁLISIS DE DATOS ═══']);
+
+    // Merge Título Sección A-D (0-3)
+    const titleRowExcelIndex = analysisTitleIndex + 6;
+    customMerges.push({
+      s: { r: titleRowExcelIndex, c: 0 },
+      e: { r: titleRowExcelIndex, c: 3 }
+    });
+
+    const obsHeaderIndex = datosFinales.length;
+    extraHeaderRows.push(obsHeaderIndex);
+    datosFinales.push(['#', 'Detalle', '', '']);
+
+    // Merge Header Row ("Detalle") B-D (1-3)
+    const headerRowExcelIndex = obsHeaderIndex + 6;
+    customMerges.push({
+      s: { r: headerRowExcelIndex, c: 1 },
+      e: { r: headerRowExcelIndex, c: 3 }
+    });
+
     // Definiciones
-    datos.push(['=== DEFINICIONES ===']);
-    datos.push(['Concepto', 'Definición']);
-    datos.push(['Estudiante ACTIVO', `Inscripción vigente en el año ${analisis.anioLectivo}`]);
-    datos.push(['Estudiante INACTIVO', 'Sin inscripción en el año lectivo actual']);
-    
+    const notas = [
+      `Estudiante ACTIVO: Estudiante con inscripcion vigente en el ano lectivo ${analisis.anioLectivo}`,
+      'Estudiante INACTIVO: Estudiante sin inscripcion en el ano lectivo actual'
+    ];
+
+    if (parseFloat(analisis.porcentajeInactivos) > 50) {
+      notas.push(`ALERTA: El porcentaje de inactivos (${analisis.porcentajeInactivos}%) es alto. Verificar situación.`);
+    }
+
+    notas.forEach((nota, index) => {
+      const currentRowIndex = datosFinales.length;
+      const excelRowIndex = currentRowIndex + 6;
+      datosFinales.push([index + 1, nota, '', '']);
+
+      customMerges.push({
+        s: { r: excelRowIndex, c: 1 },
+        e: { r: excelRowIndex, c: 3 } // Merge cols B-D (1-3)
+      });
+    });
+
     const exito = exportarExcel(
-      datos, 
-      'Estado_Inscripciones_Estudiantiles', 
-      'ESTADO PORCENTUAL INSCRIPCIONES ACTIVAS-INACTIVAS'
+      datosFinales,
+      'Estado_Inscripciones_Estudiantiles',
+      'ESTADO PORCENTUAL INSCRIPCIONES ACTIVAS-INACTIVAS',
+      extraHeaderRows,
+      customMerges
     );
-    
+
     if (exito) {
       showAlerta('Estado porcentual inscripciones Excel generado exitosamente', 'success');
     } else {
       showAlerta('Error al generar estado porcentual inscripciones Excel', 'error');
     }
-    
+
   } catch (error) {
     console.error('Error al generar estado porcentual inscripciones Excel:', error);
     showAlerta('Error al generar estado porcentual inscripciones Excel: ' + error.message, 'error');
@@ -235,22 +285,22 @@ const analizarEstadoInscripciones = (estudiantes, modalidadSeleccionada) => {
   // Filtrar estudiantes por modalidad si es necesario
   let estudiantesFiltrados = estudiantes;
   if (modalidadSeleccionada !== 'todas') {
-    estudiantesFiltrados = estudiantes.filter(est => 
+    estudiantesFiltrados = estudiantes.filter(est =>
       est.modalidad && est.modalidad.toLowerCase().includes(modalidadSeleccionada.toLowerCase())
     );
   }
-  
+
   const total = estudiantesFiltrados.length;
   const anioActual = new Date().getFullYear();
   const desglosePorModalidad = {};
-  
+
   let activos = 0;
   let inactivos = 0;
-  
+
   // Analizar cada estudiante
   estudiantesFiltrados.forEach(estudiante => {
     const modalidad = estudiante.modalidad || 'Sin modalidad';
-    
+
     // Inicializar desglose por modalidad si no existe
     if (!desglosePorModalidad[modalidad]) {
       desglosePorModalidad[modalidad] = {
@@ -259,13 +309,13 @@ const analizarEstadoInscripciones = (estudiantes, modalidadSeleccionada) => {
         inactivos: 0
       };
     }
-    
+
     desglosePorModalidad[modalidad].total++;
-    
+
     // Determinar si el estudiante está activo o inactivo
     // Usar el campo 'activo' de la base de datos
     const esActivo = estudiante.activo === true || estudiante.activo === 1;
-    
+
     if (esActivo) {
       activos++;
       desglosePorModalidad[modalidad].activos++;
@@ -274,18 +324,18 @@ const analizarEstadoInscripciones = (estudiantes, modalidadSeleccionada) => {
       desglosePorModalidad[modalidad].inactivos++;
     }
   });
-  
+
   // Calcular porcentajes por modalidad
   Object.keys(desglosePorModalidad).forEach(modalidad => {
     const datos = desglosePorModalidad[modalidad];
     datos.porcentajeActivos = ((datos.activos / datos.total) * 100).toFixed(1);
     datos.porcentajeInactivos = ((datos.inactivos / datos.total) * 100).toFixed(1);
   });
-  
+
   // Calcular porcentajes generales
   const porcentajeActivos = ((activos / total) * 100).toFixed(1);
   const porcentajeInactivos = ((inactivos / total) * 100).toFixed(1);
-  
+
   return {
     total,
     activos,

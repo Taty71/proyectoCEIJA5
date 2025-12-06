@@ -35,10 +35,10 @@ const ModalRegistrosPendientes = ({ onClose }) => {
     const verificarEstadoDuplicados = useCallback(async () => {
         try {
             setEstadoDuplicados(null);
-            
+
             // Usar los registros actuales en lugar del localStorage
             const registrosActuales = registros || [];
-            
+
             // Contar DNIs
             const dniMap = new Map();
             registrosActuales.forEach(registro => {
@@ -47,7 +47,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                     dniMap.set(dni, (dniMap.get(dni) || 0) + 1);
                 }
             });
-            
+
             // Encontrar duplicados
             const duplicados = Array.from(dniMap.entries())
                 .filter(([, cantidad]) => cantidad > 1)
@@ -61,25 +61,25 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                         tipo: r.tipo || 'REGISTRO_PENDIENTE'
                     }))
                 }));
-            
+
             const resultado = {
                 totalRegistros: registrosActuales.length,
                 dnisUnicos: dniMap.size,
                 cantidadDuplicados: duplicados.length,
                 duplicados
             };
-            
+
             console.log('📊 Estado de duplicados (registros actuales):', resultado);
-            
+
             setEstadoDuplicados(resultado);
-            
+
             // Solo mostrar alertas cuando se ejecuta manualmente, no automáticamente
             // if (resultado.cantidadDuplicados > 0) {
             //     showWarning(`⚠️ Encontrados ${resultado.cantidadDuplicados} DNI(s) duplicados`);
             // } else {
             //     showSuccess('✅ No se encontraron registros duplicados');
             // }
-            
+
         } catch (error) {
             console.error('Error al verificar duplicados:', error);
             showError('❌ Error al verificar duplicados');
@@ -89,7 +89,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
     // Función para verificación manual con alertas
     const verificarEstadoDuplicadosManual = async () => {
         await verificarEstadoDuplicados();
-        
+
         if (estadoDuplicados) {
             if (estadoDuplicados.cantidadDuplicados > 0) {
                 showWarning(`⚠️ Encontrados ${estadoDuplicados.cantidadDuplicados} DNI(s) duplicados`);
@@ -220,13 +220,13 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         if (registro.vencimiento) {
             const info = registro.vencimiento;
             return {
-                    vencido: info.tipoNotificacion === 'vencido',
-                    diasRestantes: info.diasRestantes || 0,
-                    mensaje: info.mensaje || 'Sin información',
-                    color: 'var(--color-btn-main)',
-                    fechaVencimiento: info.fechaVencimiento || 'No disponible',
-                    puedeReiniciarAlarma: info.puedeReiniciarAlarma || false
-                };
+                vencido: info.tipoNotificacion === 'vencido',
+                diasRestantes: info.diasRestantes || 0,
+                mensaje: info.mensaje || 'Sin información',
+                color: 'var(--color-btn-main)',
+                fechaVencimiento: info.fechaVencimiento || 'No disponible',
+                puedeReiniciarAlarma: info.puedeReiniciarAlarma || false
+            };
         }
 
         // Fallback: lógica original para registros sin información de vencimiento del backend
@@ -236,10 +236,10 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         const msRestantes = vencimiento.getTime() - ahora.getTime();
 
         if (msRestantes <= 0) {
-            return { 
-                vencido: true, 
-                diasRestantes: 0, 
-                mensaje: 'VENCIDO', 
+            return {
+                vencido: true,
+                diasRestantes: 0,
+                mensaje: 'VENCIDO',
                 color: 'var(--color-btn-main)',
                 fechaVencimiento: vencimiento.toLocaleString(),
                 puedeReiniciarAlarma: true
@@ -315,7 +315,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         try {
             if (tipoOperacion === 'completado') {
                 const nombreCompleto = `${registro.datos?.nombre || registro.nombre} ${registro.datos?.apellido || registro.apellido}`.trim();
-                
+
                 // Si fue actualización de un registro existente
                 if (resultado?.yaExistia) {
                     // Mostrar más detalles del resultado de la actualización
@@ -339,41 +339,41 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                 if (resultado && (resultado.insertId || resultado.insertId === 0)) {
                     const infoAdicional = [];
                     infoAdicional.push(`ID: ${resultado.insertId}`);
-                    
+
                     if (resultado.archivos) {
                         infoAdicional.push(`Archivos migrados: ${Object.keys(resultado.archivos).length}`);
                     }
-                    
+
                     if (resultado.modulosAsignados) {
                         infoAdicional.push(`Módulos: ${resultado.modulosAsignados.join(', ')}`);
                     }
-                    
+
                     showInfo(`ℹ️ Detalles: ${infoAdicional.join(' | ')}`);
                 }
 
             } else if (tipoOperacion === 'ya_procesado') {
                 const nombreCompleto = `${registro.datos?.nombre || registro.nombre} ${registro.datos?.apellido || registro.apellido}`.trim();
-                
+
                 // Mostrar mensaje detallado sobre el registro existente
                 if (resultado?.mensaje) {
                     showWarning(resultado.mensaje);
                 } else {
                     showWarning(`⚠️ ${nombreCompleto} ya está registrado en el sistema.`);
                 }
-                
+
                 // Información adicional sobre el registro existente
                 if (resultado?.detalles) {
                     showInfo(resultado.detalles);
                 }
-                
+
                 // Eliminar de la lista local y sincronizar
                 setRegistros(prevRegistros => prevRegistros.filter(r => r.dni !== registro.dni));
                 await recargarRegistros(false);
-                
+
             } else if (tipoOperacion === 'actualizado') {
                 // Recargar lista después de una actualización
                 await recargarRegistros(false);
-                
+
                 if (resultado?.mensaje) {
                     showSuccess(resultado.mensaje);
                 } else {
@@ -395,7 +395,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
     const handleRegistroEliminado = (registro) => {
         console.log(`🗑️ Registro eliminado:`, registro.dni);
         // Eliminar de la lista local
-        setRegistros(prevRegistros => 
+        setRegistros(prevRegistros =>
             prevRegistros.filter(r => r.dni !== registro.dni)
         );
         cerrarModalEdicion();
@@ -425,7 +425,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         try {
             showInfo(`⏰ Reiniciando alarma para ${nombreCompleto || 'registro'}...`);
             const resultado = await registrosPendientesService.reiniciarAlarma(registro.dni, diasExtension, motivo);
-            
+
             // El backend devuelve un objeto con 'mensaje' si es exitoso
             if (resultado && resultado.mensaje === 'Alarma reiniciada exitosamente') {
                 // Marcar localmente y persistir autorización de extensión y estado de alarma
@@ -587,22 +587,22 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         try {
             setLimpiandoDuplicados(true);
             showWarning('🧹 Analizando duplicados en registros actuales...');
-            
+
             // Trabajar con registros actuales
             if (!estadoDuplicados || estadoDuplicados.cantidadDuplicados === 0) {
                 showInfo('ℹ️ No hay duplicados para limpiar');
                 return;
             }
-            
+
             // Para registros pendientes, no eliminamos automáticamente
             // Solo informamos al administrador
             const mensaje = `⚠️ Se encontraron ${estadoDuplicados.cantidadDuplicados} DNI(s) duplicados. `;
-            const detalles = estadoDuplicados.duplicados.map(dup => 
+            const detalles = estadoDuplicados.duplicados.map(dup =>
                 `DNI ${dup.dni}: ${dup.cantidad} registros`
             ).join(', ');
-            
+
             showWarning(`${mensaje} Detalles: ${detalles}. Revise manualmente.`);
-            
+
         } catch (error) {
             console.error('Error al analizar duplicados:', error);
             showError('❌ Error al analizar duplicados');
@@ -614,23 +614,23 @@ const ModalRegistrosPendientes = ({ onClose }) => {
     const probarSistema7Dias = async () => {
         try {
             showInfo('🧪 Analizando sistema de vencimiento en registros actuales...');
-            
+
             const registrosActuales = registros || [];
             const ahora = new Date();
-            
+
             console.log('🧪 === ANÁLISIS SISTEMA VENCIMIENTOS ===');
             console.log(`📅 Fecha actual: ${ahora.toLocaleString('es-AR')}`);
             console.log(`📋 Total registros: ${registrosActuales.length}`);
-            
+
             if (registrosActuales.length === 0) {
                 showInfo('ℹ️ No hay registros para analizar');
                 return;
             }
-            
+
             const detalles = registrosActuales.map((registro, index) => {
                 const fechaCreacion = new Date(registro.timestamp);
                 const info = obtenerInfoVencimiento(registro);
-                
+
                 const detalle = {
                     indice: index + 1,
                     dni: registro.datos?.dni || registro.dni,
@@ -641,26 +641,26 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                     diasRestantes: info.diasRestantes,
                     color: info.color
                 };
-                
+
                 console.log(`${detalle.indice}. ${detalle.nombre} (DNI: ${detalle.dni}):`);
                 console.log(`   📅 Creado: ${detalle.fechaCreacion}`);
                 console.log(`   📊 Estado: ${detalle.estado}`);
                 console.log(`   💬 Mensaje: ${detalle.mensaje}`);
                 console.log(`   ⏳ Días restantes: ${detalle.diasRestantes}`);
                 console.log('   ---');
-                
+
                 return detalle;
             });
-            
+
             const vigentes = detalles.filter(d => !d.estado.includes('VENCIDO')).length;
             const vencidos = detalles.filter(d => d.estado.includes('VENCIDO')).length;
-            
+
             console.log('📊 === RESUMEN ===');
             console.log(`✅ Registros vigentes: ${vigentes}`);
             console.log(`❌ Registros vencidos: ${vencidos}`);
-            
+
             showSuccess(`🧪 Análisis completado: ${vigentes} vigentes, ${vencidos} vencidos de ${registrosActuales.length} totales`);
-            
+
         } catch (error) {
             console.error('Error en análisis de vencimientos:', error);
             showError('❌ Error en análisis de vencimientos');
@@ -684,20 +684,20 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         // Si el registro tiene documentación de BD (fue procesado), usar esa
         if (registro.estudianteEnBD && registro.documentacionBD && registro.documentacionBD.length > 0) {
             console.log('📊 Usando documentación de BD para registro procesado:', registro.dni);
-            
+
             const documentosEntregados = registro.documentacionBD.filter(
                 doc => doc.estadoDocumentacion === 'Entregado'
             );
-            
+
             const documentosFaltantes = registro.documentacionBD.filter(
                 doc => doc.estadoDocumentacion === 'Faltante'
             );
 
             return {
-                subidos: documentosEntregados.map(doc => 
+                subidos: documentosEntregados.map(doc =>
                     mapeoDocumentos[doc.descripcionDocumentacion] || doc.descripcionDocumentacion
                 ),
-                faltantes: documentosFaltantes.map(doc => 
+                faltantes: documentosFaltantes.map(doc =>
                     mapeoDocumentos[doc.descripcionDocumentacion] || doc.descripcionDocumentacion
                 ),
                 totalSubidos: documentosEntregados.length,
@@ -710,10 +710,10 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         // Lógica original para registros pendientes normales
         const modalidad = registro.datos?.modalidad || registro.modalidad || '';
         const planAnio = registro.datos?.planAnio || registro.planAnio || '';
-        
+
         // Extraer modulos del campo directo o del array idModulo
         let modulos = registro.datos?.modulos || registro.modulos || '';
-        
+
         // Si modulos está vacío, intentar extraerlo del array idModulo
         if ((!modulos || modulos === '') && registro.datos?.idModulo && Array.isArray(registro.datos.idModulo)) {
             const moduloValido = registro.datos.idModulo.find(id => id && id !== '' && id !== null);
@@ -722,7 +722,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                 console.log('🔄 [MODAL] Módulo extraído del array idModulo:', moduloValido, 'de array:', registro.datos.idModulo);
             }
         }
-        
+
         console.log('[DEBUG] Llamando a obtenerDocumentosRequeridos desde ModalRegistrosPendientes.jsx con:', {
             modalidad, planAnio, modulos,
             idModulo: registro.datos?.idModulo,
@@ -731,44 +731,44 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         const requerimientos = obtenerDocumentosRequeridos(modalidad, planAnio, modulos);
         const documentosRequeridosDinamicos = requerimientos.documentos || [];
         const documentosAlternativos = requerimientos.alternativos;
-        
+
         let documentosSubidos = [];
-        
+
         if (Array.isArray(registro.documentosSubidos)) {
             documentosSubidos = registro.documentosSubidos;
         } else if (registro.archivos && typeof registro.archivos === 'object') {
-            documentosSubidos = Object.keys(registro.archivos).filter(key => 
+            documentosSubidos = Object.keys(registro.archivos).filter(key =>
                 registro.archivos[key] && registro.archivos[key] !== null && registro.archivos[key] !== ''
             );
         }
-        
+
         let documentosFaltantes = [];
         let documentosValidosSubidos = [];
         let documentoUsado = null;
-        
+
         if (documentosAlternativos) {
             const tienePreferido = documentosSubidos.includes(documentosAlternativos.preferido);
             const tieneAlternativa = documentosSubidos.includes(documentosAlternativos.alternativa);
-            
+
             if (tienePreferido) {
                 documentoUsado = `${mapeoDocumentos[documentosAlternativos.preferido]} (Preferido)`;
                 documentosValidosSubidos = documentosSubidos;
-                documentosFaltantes = documentosRequeridosDinamicos.filter(doc => 
-                    doc !== documentosAlternativos.preferido && 
-                    doc !== documentosAlternativos.alternativa && 
+                documentosFaltantes = documentosRequeridosDinamicos.filter(doc =>
+                    doc !== documentosAlternativos.preferido &&
+                    doc !== documentosAlternativos.alternativa &&
                     !documentosSubidos.includes(doc)
                 );
             } else if (tieneAlternativa) {
                 documentoUsado = `${mapeoDocumentos[documentosAlternativos.alternativa]} (Alternativo)`;
                 documentosValidosSubidos = documentosSubidos;
-                documentosFaltantes = documentosRequeridosDinamicos.filter(doc => 
-                    doc !== documentosAlternativos.preferido && 
-                    doc !== documentosAlternativos.alternativa && 
+                documentosFaltantes = documentosRequeridosDinamicos.filter(doc =>
+                    doc !== documentosAlternativos.preferido &&
+                    doc !== documentosAlternativos.alternativa &&
                     !documentosSubidos.includes(doc)
                 );
             } else {
-                documentosValidosSubidos = documentosSubidos.filter(doc => 
-                    doc !== documentosAlternativos.preferido && 
+                documentosValidosSubidos = documentosSubidos.filter(doc =>
+                    doc !== documentosAlternativos.preferido &&
                     doc !== documentosAlternativos.alternativa
                 );
                 documentosFaltantes = documentosRequeridosDinamicos.filter(doc => !documentosSubidos.includes(doc));
@@ -777,9 +777,9 @@ const ModalRegistrosPendientes = ({ onClose }) => {
             documentosValidosSubidos = documentosSubidos.filter(doc => documentosRequeridosDinamicos.includes(doc));
             documentosFaltantes = documentosRequeridosDinamicos.filter(doc => !documentosSubidos.includes(doc));
         }
-        
+
         const totalRequeridos = documentosRequeridosDinamicos.length - (documentosAlternativos ? 1 : 0);
-        
+
         return {
             subidos: documentosValidosSubidos.map(doc => mapeoDocumentos[doc] || doc),
             faltantes: documentosFaltantes.map(doc => mapeoDocumentos[doc] || doc),
@@ -798,7 +798,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
             setDescargando(true);
             // Encabezado institucional
             let contenido = `CEIJA5 LA CALERA CBA\n`;
-            contenido += `Educacion Integral para Jovenes y Adultos\n`;
+            contenido += `Educacion Integral de Jóvenes y Adultos\n`;
             contenido += `REPORTE ADMINISTRATIVO - REGISTROS PENDIENTES DE DOCUMENTACIÓN\n`;
             contenido += `Fecha de generación: ${new Date().toLocaleString('es-AR')}\n`;
             contenido += `Total de registros: ${registros.length}\n`;
@@ -807,25 +807,25 @@ const ModalRegistrosPendientes = ({ onClose }) => {
             registros.forEach((registro, index) => {
                 const info = obtenerInfoVencimiento(registro);
                 const estadoDoc = obtenerEstadoDocumentacion(registro);
-                
+
                 contenido += `${index + 1}. ${registro.datos?.nombre || registro.nombre} ${registro.datos?.apellido || registro.apellido}\n`;
                 contenido += `   DNI: ${registro.datos?.dni || registro.dni}\n`;
                 contenido += `   Email: ${registro.datos?.email || registro.email || 'Sin email'}\n`;
                 contenido += `   Modalidad: ${registro.datos?.modalidad || registro.modalidad}\n`;
                 contenido += `   Estado: ${info.vencido ? 'VENCIDO' : info.mensaje}\n`;
                 contenido += `   Registrado: ${new Date(registro.timestamp).toLocaleString('es-AR')}\n`;
-                
+
                 // Información de documentación
                 contenido += `   \n   📊 DOCUMENTACIÓN:\n`;
                 contenido += `   Completado: ${estadoDoc.totalSubidos}/${estadoDoc.totalRequeridos} (${estadoDoc.porcentajeCompletado}%)\n`;
-                
+
                 if (estadoDoc.subidos.length > 0) {
                     contenido += `   ✅ Documentos presentados:\n`;
                     estadoDoc.subidos.forEach(doc => {
                         contenido += `      • ${doc}\n`;
                     });
                 }
-                
+
                 if (estadoDoc.faltantes.length > 0) {
                     contenido += `   ❌ Documentos faltantes:\n`;
                     estadoDoc.faltantes.forEach(doc => {
@@ -834,11 +834,11 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                 } else {
                     contenido += `   ✅ Documentación completa\n`;
                 }
-                
+
                 if (estadoDoc.documentoUsado) {
                     contenido += `   📝 ${estadoDoc.documentoUsado}\n`;
                 }
-                
+
                 contenido += `\n${'─'.repeat(60)}\n\n`;
             });
 
@@ -849,7 +849,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
             link.download = `reporte-registros-pendientes-${new Date().toISOString().split('T')[0]}.txt`;
             link.click();
             URL.revokeObjectURL(url);
-            
+
             showSuccess('📊 Reporte administrativo descargado');
         } catch (error) {
             showError(`Error al generar reporte: ${error.message}`);
@@ -861,7 +861,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
     const generarReportePDF = () => {
         try {
             setDescargando(true);
-            
+
             const doc = new jsPDF();
             const pageWidth = doc.internal.pageSize.width;
             const margin = 20;
@@ -871,11 +871,18 @@ const ModalRegistrosPendientes = ({ onClose }) => {
             doc.setFontSize(14);
             doc.setFont('helvetica', 'bold');
             doc.text('CEIJA5 LA CALERA CBA', pageWidth / 2, yPosition, { align: 'center' });
-            yPosition += 8;
+            yPosition += 5;
             doc.setFontSize(11);
             doc.setFont('helvetica', 'bold');
-            doc.text('Educacion Integral para Jovenes y Adultos', pageWidth / 2, yPosition, { align: 'center' });
+            doc.text('Educacion Integral de Jóvenes y Adultos', pageWidth / 2, yPosition, { align: 'center' });
+            yPosition += 2;
+            // Blue separator line
+            doc.setDrawColor(0, 0, 255);
+            doc.setLineWidth(0.5);
+            doc.line(margin, yPosition + 2, pageWidth - margin, yPosition + 2);
+            yPosition += 4;
             yPosition += 8;
+            doc.setTextColor(45, 65, 119);
             // Encabezado de reporte
             doc.setFontSize(16);
             doc.setFont('helvetica', 'bold');
@@ -912,13 +919,19 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                     doc.setFontSize(14);
                     doc.setFont('helvetica', 'bold');
                     doc.text('CEIJA5 LA CALERA CBA', pageWidth / 2, yPosition, { align: 'center' });
-                    yPosition += 8;
+                    yPosition += 5;
                     doc.setFontSize(11);
                     doc.setFont('helvetica', 'bold');
-                    doc.text('Educacion Integral para Jovenes y Adultos', pageWidth / 2, yPosition, { align: 'center' });
-                    yPosition += 8;
-                    doc.setFontSize(16);
+                    doc.text('Educacion Integral de Jóvenes y Adultos', pageWidth / 2, yPosition, { align: 'center' });
+                    yPosition += 2;
+                    doc.setFontSize(12);
                     doc.setFont('helvetica', 'bold');
+                    // Blue separator line
+                    doc.setDrawColor(0, 0, 255);
+                    doc.setLineWidth(0.5);
+                    doc.line(margin, yPosition + 2, pageWidth - margin, yPosition + 2);
+                    yPosition += 4;
+                    yPosition += 8;
                     doc.setTextColor(45, 65, 119);
                     doc.text('REPORTE DE REGISTROS PENDIENTES', pageWidth / 2, yPosition, { align: 'center' });
                     yPosition += 10;
@@ -970,7 +983,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
             addFooter(pageNum);
             // Descargar PDF
             doc.save(`reporte-registros-pendientes-${new Date().toISOString().split('T')[0]}.pdf`);
-            
+
         } catch (error) {
             console.error('Error al generar reporte PDF:', error);
             showError('Error al generar el reporte PDF');
@@ -1009,12 +1022,69 @@ const ModalRegistrosPendientes = ({ onClose }) => {
                     estadoDoc.documentoUsado || ''
                 ];
             });
+
             // Dos renglones libres antes del encabezado
             const datosFinal = [[], [], headers, ...datos];
+
+            const extraHeaderRows = [];
+            const customMerges = [];
+
+            // --- SECCIÓN ANÁLISIS DE DATOS ---
+            datosFinal.push(['']);
+
+            const analysisTitleIndex = datosFinal.length;
+            extraHeaderRows.push(analysisTitleIndex);
+            // Relleno para cubrir A-D (col 0 + 3 vacías)
+            datosFinal.push(['═══ ANÁLISIS DE DATOS ═══', '', '', '']);
+
+            // Merge Título Sección A-D (0-3)
+            // +6 offset por los headers institucionales en utils.js
+            const titleRowExcelIndex = analysisTitleIndex + 6;
+            customMerges.push({
+                s: { r: titleRowExcelIndex, c: 0 },
+                e: { r: titleRowExcelIndex, c: 3 }
+            });
+
+            const obsHeaderIndex = datosFinal.length;
+            extraHeaderRows.push(obsHeaderIndex);
+            datosFinal.push(['#', 'Detalle', '', '']);
+
+            // Merge Header Row ("Detalle") B-D (1-3)
+            const headerRowExcelIndex = obsHeaderIndex + 6;
+            customMerges.push({
+                s: { r: headerRowExcelIndex, c: 1 },
+                e: { r: headerRowExcelIndex, c: 3 }
+            });
+
+            // Generar observaciones dinámicas
+            const totalRegistros = registros.length;
+            const vencidos = registros.filter(r => obtenerInfoVencimiento(r).vencido).length;
+            const porcentajeVencidos = totalRegistros > 0 ? ((vencidos / totalRegistros) * 100).toFixed(1) : 0;
+
+            const observaciones = [
+                `Total de inscripciones pendientes: ${totalRegistros}`,
+                `Inscripciones con plazo vencido: ${vencidos} (${porcentajeVencidos}%)`,
+                'Estos estudiantes no figuran en el padrón oficial hasta regularizar su documentación.'
+            ];
+
+            observaciones.forEach((obs, index) => {
+                const currentRowIndex = datosFinal.length;
+                const excelRowIndex = currentRowIndex + 6;
+                datosFinal.push([index + 1, obs, '', '']);
+
+                // Merge cols B-D (1-3)
+                customMerges.push({
+                    s: { r: excelRowIndex, c: 1 },
+                    e: { r: excelRowIndex, c: 3 }
+                });
+            });
+
             exportarExcel(
                 datosFinal,
                 'registros-pendientes',
-                'REPORTE DE REGISTROS PENDIENTES'
+                'ESTUDIANTES CON INSCRIPCION PENDIENTE POR DOCUMENTACION INCOMPLETA',
+                extraHeaderRows,
+                customMerges
             );
             showSuccess('📊 Archivo Excel generado');
         } catch (error) {
@@ -1042,7 +1112,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
 
             doc.setFontSize(14);
             doc.setFont('helvetica', 'bold');
-            doc.setTextColor(45,65,119);
+            doc.setTextColor(45, 65, 119);
             doc.text('EXTENSIÓN DE INSCRIPCIÓN - Alumnos con reinicio de alarma', pageWidth / 2, y, { align: 'center' });
             y += 10;
             doc.setFontSize(10);
@@ -1086,7 +1156,7 @@ const ModalRegistrosPendientes = ({ onClose }) => {
     };
 
     // Calcular fecha de última actualización
-    const fechaActualizacion = registros.length > 0 
+    const fechaActualizacion = registros.length > 0
         ? new Date(Math.max(...registros.map(r => new Date(r.timestamp)))).toLocaleString('es-AR')
         : null;
 
@@ -1097,15 +1167,15 @@ const ModalRegistrosPendientes = ({ onClose }) => {
         <div className="modal-registros-pendientes">
             <div className="modal-overlay">
                 <div className="modal-container registros-pendientes">
-                    
+
                     {/* Header del modal */}
-                    <HeaderModal 
+                    <HeaderModal
                         cantidadTotal={registros.length}
                         fechaActualizacion={fechaActualizacion}
                         onCerrar={onClose}
                     />
                     {/* ALERTAS FLOTANTES GLOBALES */}
-                    <AlertaMens 
+                    <AlertaMens
                         mode="floating"
                         alerts={alerts}
                         onCloseAlert={removeAlert}

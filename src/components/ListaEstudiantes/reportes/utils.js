@@ -1,4 +1,29 @@
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
+// ----------------------------------------------------
+// 🎯 AQUÍ VA LA DEFINICIÓN DEL ESTILO
+// ----------------------------------------------------
+const styleHeaderTable = {
+  font: {
+    bold: true,
+    sz: 11, // Aumentado a 11 (asumiendo 10 como base por defecto)
+    name: 'Calibri'
+  },
+  fill: {
+    fgColor: { rgb: "DDEBF7" } // Azul muy suave (similar al Excel light blue)
+  },
+  alignment: {
+    vertical: 'left',
+    horizontal: 'center',
+    wrapText: true
+  },
+  border: {
+    top: { style: 'thin', color: { auto: 1 } },
+    bottom: { style: 'thin', color: { auto: 1 } },
+    left: { style: 'thin', color: { auto: 1 } },
+    right: { style: 'thin', color: { auto: 1 } },
+  }
+};
+// ----------------------------------------------------
 
 // Función para normalizar texto a caracteres compatibles con jsPDF
 export const normalizarTexto = (texto) => {
@@ -16,7 +41,7 @@ export const normalizarTexto = (texto) => {
 // Funciones para control de páginas y pie de página
 export const crearControlPaginas = (doc) => {
   let numeroPagina = 1;
-  
+
   const agregarPiePagina = () => {
     doc.setFontSize(8);
     doc.setTextColor(100, 100, 100); // Gris
@@ -24,7 +49,7 @@ export const crearControlPaginas = (doc) => {
     doc.text(`Generado: ${new Date().toLocaleString('es-ES')}`, 20, 820);
     numeroPagina++;
   };
-  
+
   const verificarEspacio = (doc, yPos, espacioNecesario) => {
     if (yPos + espacioNecesario > 780) { // A4: 842 puntos total - 60 puntos para pie = 780
       agregarPiePagina();
@@ -33,7 +58,7 @@ export const crearControlPaginas = (doc) => {
     }
     return yPos;
   };
-  
+
   return { agregarPiePagina, verificarEspacio };
 };
 
@@ -48,13 +73,13 @@ export const crearEncabezadoInstitucional = (doc, tituloReporte) => {
   doc.setFont('helvetica', 'bold');
   doc.text('CEIJA 5 La Calera - Cba', pageWidth / 2, yPos, { align: 'center' });
 
-  yPos += 10; // separación clara
+  yPos += 5; // separación clara
   doc.setTextColor(108, 117, 125); // Gris elegante
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.text(normalizarTexto('Educacion Integral para Jovenes y Adultos'), pageWidth / 2, yPos, { align: 'center' });
+  doc.text(normalizarTexto('Educacion Integral de Jóvenes y Adultos'), pageWidth / 2, yPos, { align: 'center' });
 
-  yPos += 10; // separación clara
+  yPos += 2; // separación clara
   // Línea separadora
   doc.setDrawColor(45, 65, 119);
   doc.setLineWidth(0.5);
@@ -64,34 +89,109 @@ export const crearEncabezadoInstitucional = (doc, tituloReporte) => {
   return yPos + 10; // Retorna la posición Y para continuar
 };
 
-// Función para exportar a Excel multiplataforma
-export const exportarExcel = (datos, nombreBase, tituloReporte) => {
+// Función para exportar a Excel multiplataforma con ESTILOS
+// Función para exportar a Excel multiplataforma con ESTILOS
+export const exportarExcel = (datos, nombreBase, tituloReporte, extraHeaderRows = [], customMerges = []) => {
   try {
     // Crear workbook
     const wb = XLSX.utils.book_new();
-    
+
     // Crear hoja con encabezado institucional
     const wsData = [
       ['CEIJA 5 La Calera - Cba'],
-      ['Educación Integral para Jóvenes y Adultos'],
+      ['Educación Integral de Jóvenes y Adultos'],
       [''],
-      [tituloReporte],
+      [tituloReporte], // Fila 3 (índice 3) -> Título principal del reporte
       [`Generado: ${new Date().toLocaleDateString('es-AR')} ${new Date().toLocaleTimeString('es-AR')}`],
       [''],
-      ...datos
+      ...datos // Los datos empiezan típicamente en la fila 6 (índice 6)
     ];
-    
+
     const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-    // Configurar estilos con rayado alternado
-    const numCols = datos[0]?.length || 4;
-    const maxCol = Math.max(numCols - 1, 3);
+    // Obtener el rango de celdas
+    const range = XLSX.utils.decode_range(ws['!ref']);
 
-    // Establecer anchos de columna optimizados
+    // Definir estilos base
+    const borderStyle = {
+      top: { style: 'thin', color: { rgb: "2D4177" } },
+      bottom: { style: 'thin', color: { rgb: "2D4177" } },
+      left: { style: 'thin', color: { rgb: "2D4177" } },
+      right: { style: 'thin', color: { rgb: "2D4177" } }
+    };
+
+    // Estilo para el Título del Reporte (Fila 3) - Tamaño 12 solicitado
+    const titleStyle = {
+      font: { bold: true, color: { rgb: "2D4177" }, sz: 12, name: 'Calibri' },
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    // Estilo para el Encabezado Institucional (Filas 0 y 1)
+    const instStyle = {
+      font: { bold: true, color: { rgb: "2D4177" }, sz: 14, name: 'Calibri' }, // Un poco más grande para el nombre inst.
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    // Estilo para Encabezados de Tabla - Tamaño 11 solicitado
+    const headerTableStyle = {
+      font: { bold: true, color: { rgb: "2D4177" }, sz: 11, name: 'Calibri' }, // Tamaño 11
+      fill: { fgColor: { rgb: "DDEBF7" } }, // Azul muy suave
+      border: borderStyle,
+      alignment: { horizontal: "center", vertical: "center", wrapText: true }
+    };
+
+    // Estilo para Datos Generales
+    const dataStyle = {
+      font: { sz: 10, name: 'Calibri' },
+      border: borderStyle,
+      alignment: { vertical: "center", horizontal: "center" } // Centrado por defecto para números
+    };
+
+    // Estilo para primera columna (generalmente etiquetas de fila) - Alineación izquierda
+    const firstColStyle = {
+      font: { sz: 10, name: 'Calibri' },
+      border: borderStyle,
+      alignment: { vertical: "center", horizontal: "left" }
+    };
+
+    // Aplicar estilos a las celdas
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      // Identificar si la fila es un encabezado de tabla
+      // La primera fila de 'datos' (R=6) es siempre encabezado.
+      const isMainHeader = (R === 6);
+      const isExtraHeader = extraHeaderRows.includes(R - 6);
+      const isHeaderRow = isMainHeader || isExtraHeader;
+
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cellAddress = { c: C, r: R };
+        const cellRef = XLSX.utils.encode_cell(cellAddress);
+
+        if (!ws[cellRef]) continue;
+
+        // Aplicar estilos según la fila
+        if (R === 0 || R === 1) {
+          ws[cellRef].s = instStyle;
+        } else if (R === 3) {
+          ws[cellRef].s = titleStyle;
+        } else if (isHeaderRow) {
+          ws[cellRef].s = headerTableStyle;
+        } else if (R > 6) {
+          // Datos del cuerpo de la tabla
+          if (C === 0) {
+            ws[cellRef].s = firstColStyle; // Primera columna a la izquierda
+          } else {
+            ws[cellRef].s = dataStyle; // Resto centrado
+          }
+        }
+      }
+    }
+
+    // Establecer anchos de columna dinámicos o fijos mejorados
+    const maxCol = range.e.c;
     const colWidths = [];
     for (let i = 0; i <= maxCol; i++) {
-      if (i === 0) colWidths.push({ wch: 25 }); // Primera columna más ancha
-      else colWidths.push({ wch: 18 }); // Otras columnas
+      if (i === 0) colWidths.push({ wch: 35 }); // Primera columna ancha para etiquetas
+      else colWidths.push({ wch: 20 }); // Columnas de datos uniformes
     }
     ws['!cols'] = colWidths;
 
@@ -100,30 +200,17 @@ export const exportarExcel = (datos, nombreBase, tituloReporte) => {
       { s: { r: 0, c: 0 }, e: { r: 0, c: maxCol } }, // CEIJA 5
       { s: { r: 1, c: 0 }, e: { r: 1, c: maxCol } }, // Subtítulo
       { s: { r: 3, c: 0 }, e: { r: 3, c: maxCol } }, // Título del reporte
-      { s: { r: 4, c: 0 }, e: { r: 4, c: maxCol } }  // Fecha
+      { s: { r: 4, c: 0 }, e: { r: 4, c: maxCol } }, // Fecha
+      ...customMerges // 🔹 Agregar merges personalizados aquí
     ];
 
-    // Estilos: azul oscuro y negrita para encabezado y títulos
-    const azulOscuro = { rgb: '2D4177' };
-    // Encabezado institucional
-    ws['A1'].s = { font: { bold: true, color: azulOscuro, sz: 11 } };
-    ws['A2'].s = { font: { bold: true, color: azulOscuro, sz: 11 } };
-    // Título del reporte
-    ws[`A4`].s = { font: { bold: true, color: azulOscuro, sz: 14 } };
-    // Títulos de columnas (fila 7, índice 6)
-    for (let c = 0; c <= maxCol; c++) {
-      const col = String.fromCharCode(65 + c); // A, B, C...
-      const cell = `${col}7`;
-      if (ws[cell]) ws[cell].s = { font: { bold: true, color: azulOscuro, sz: 11 } };
-    }
-    
     // Agregar hoja al workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
-    
+
     // Generar el archivo
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    
+
     // Crear enlace de descarga
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -133,7 +220,7 @@ export const exportarExcel = (datos, nombreBase, tituloReporte) => {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
-    
+
     return true;
   } catch (error) {
     console.error('Error al generar Excel:', error);
